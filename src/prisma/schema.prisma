@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model devotees {
+  id                           String    @id @default("uuid()") @db.Char(36)
+  name                         String?   @db.VarChar(100)
+  phone                        String?   @unique(map: "phone") @db.VarChar(21)
+  phone_whatsapp               String?   @db.VarChar(21)
+  email                        String?   @unique(map: "email") @db.VarChar(255)
+  occupation                   String?   @db.VarChar(255)
+  gender                       String?   @db.VarChar(6)
+  dob_self                     DateTime? @db.Date
+  dob_spouse                   DateTime? @db.Date
+  dob_parents_father           DateTime? @db.Date
+  dob_parents_mother           DateTime? @db.Date
+  dob_children_1               DateTime? @db.Date
+  dob_children_2               DateTime? @db.Date
+  dob_children_3               DateTime? @db.Date
+  dob_children_4               DateTime? @db.Date
+  marriage_anniversary_self    DateTime? @db.Date
+  marriage_anniversary_parents DateTime? @db.Date
+  status                       String?   @db.VarChar(9)
+  created_at                   DateTime  @default(now()) @db.Timestamp(0)
+  updated_at                   DateTime  @default(now()) @db.Timestamp(0)
+}
+
+model system_roles {
+  id              Int      @id @default(autoincrement()) @db.UnsignedTinyInt
+  name            String   @db.VarChar(20)
+  hierarchy_level Int      @unique(map: "hierarchy_level") @db.UnsignedTinyInt
+  description     String?  @db.Text
+  created_at      DateTime @default(now()) @db.Timestamp(0)
+  updated_at      DateTime @default(now()) @db.Timestamp(0)
+}
