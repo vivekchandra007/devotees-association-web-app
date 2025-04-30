@@ -39,7 +39,9 @@ body {
 }
 
 .p-card.p-component.card-transparent {
-  background: rgba(255, 255, 255, 0.7);
+  background-color: rgba(255, 255, 255, 0.5);
+  backdrop-filter: saturate(210%) blur(9px);
+  border-radius: 11px;
 }
 
 .p-divider .p-divider-content {

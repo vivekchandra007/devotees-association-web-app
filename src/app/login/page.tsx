@@ -28,8 +28,8 @@ export default function LoginPage() {
 
     const title = (
         <span className="text-3xl font-light text-indigo-900">
-            <span className="text-orange-400">Dev</span>otees&apos;&nbsp; 
-            <span className="text-orange-400">Association</span>
+            <span className="text-orange-500">Dev</span>otees&apos;&nbsp; 
+            <span className="text-orange-500">Association</span>
             <Divider align="center">
                 <a className="hover:underline"href="https://vedabase.io/en/library/cc/adi/3/91/" target="_blank" rel="noopener noreferrer">
                     <span className="p-tag p-tag-warning">विष्णु-भक्तः स्मृतो दैव</span>
@@ -39,7 +39,7 @@ export default function LoginPage() {
     );
 
     const subTitle = (
-        <span className="text-sm text-gray-700">
+        <span className="text-sm text-gray-900">
             Hare Krishna 🙏🏼
             <br />
             As mentioned in&nbsp;
@@ -47,18 +47,18 @@ export default function LoginPage() {
             Śrī Caitanya-Caritāmṛta Ādi 3.91 &nbsp;<i className="pi pi-external-link"></i>
             </a>
             <br />
-            The devotees of Lord Viṣṇu are godly <span className="text-orange-400">(dev)</span>.
+            The devotees of Lord Viṣṇu are godly <span className="text-orange-600">(dev)</span>.
             <br />and we know Association of Devotees is one of the most important activity in Bhakti.
             <br />
-            So, let us connect with you, <span className="text-orange-400">dev</span>
+            So, let us connect with you, <span className="text-orange-600">dev</span>
         </span>
     );
     const footer = (
         <div>
             <small>
-                <Divider align="center" color="orange">
+                <Divider align="center">
                 </Divider>
-                <span className="flex justify-content-space-between">
+                <span className="flex justify-content-space-between text-orange-600">
                     <a href="https://iskconpunebcec.com/#/Home" target="_blank" rel="noopener noreferrer"className="hover:underline">
                         ISKCON BCEC
                     </a>
