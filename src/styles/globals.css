@@ -24,3 +24,24 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/** Text Gradient Example */ 
+.text-gradient {
+  color: #592E2F; 
+  background-image: radial-gradient(circle, #592E2F , #894939 , #C87A4B , #F0B268 , #FADAA0 ); 
+  background-clip: text; 
+  -webkit-background-clip: text; 
+  -webkit-text-fill-color: transparent; 
+ }
+
+.justify-content-space-between {
+  justify-content: space-between;
+}
+
+.p-card.p-component.card-transparent {
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.p-divider .p-divider-content {
+  background: transparent;
+}
