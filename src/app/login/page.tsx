@@ -6,6 +6,7 @@ import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import { Divider } from "primereact/divider";
 import axios from "axios";
+import { useRouter } from "next/navigation";
 
 declare global {
     interface Window {
@@ -14,6 +15,7 @@ declare global {
 }
 
 export default function LoginPage() {
+    const router = useRouter();
     const [authInProgress, setAuthInProgress] = useState<boolean>(false);
 
     const getVerifiedNumber = async (verifiedPhoneAccessToken: string) => {
@@ -28,7 +30,9 @@ export default function LoginPage() {
                 }
             );
             if (response.status === 200) {
-                alert('Login successful for: ' + response.data.message);
+                // Store access token after login in local storage
+                localStorage.setItem('access_token', response.data.accessToken);
+                router.push('/'); // Redirect to home page
             } else {
                 console.log('Error verifying phone number:', response);
             }
@@ -41,8 +45,8 @@ export default function LoginPage() {
         <Image
             src="/app-image.jpg"
             alt="Devotees' Association"
-            width={500}
-            height={500}
+            width={320}
+            height={320}
             priority
         />
     );
@@ -69,7 +73,7 @@ export default function LoginPage() {
             </a>
             <br />
             The devotees of Lord Viṣṇu are godly <span className="text-orange-600">(dev)</span>.
-            <br />and we know Association of Devotees is one of the most important activity in Bhakti.
+            <br />and we already know Association of Devotees is one of the most important activity in Bhakti.
             <br />
             So, let us connect with you, <span className="text-orange-600">dev</span>
         </span>
@@ -122,11 +126,15 @@ export default function LoginPage() {
         }
     }
     useEffect(() => {
-        const script = document.createElement('script');
-        script.src = process.env.NEXT_PUBLIC_MSG91_WIDGET_SCRIPT_URL!;
-        script.async = true;
-        document.body.appendChild(script);
-    }, []);
+        if (localStorage.getItem('access_token')) {
+            router.push('/'); // Redirect to home page if already logged in
+        } else {
+            const script = document.createElement('script');
+            script.src = process.env.NEXT_PUBLIC_MSG91_WIDGET_SCRIPT_URL!;
+            script.async = true;
+            document.body.appendChild(script);
+        }
+    }, [router]);
 
     return (
         <div className="grid items-center justify-items-center min-h-screen">

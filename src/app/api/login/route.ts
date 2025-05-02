@@ -1,4 +1,7 @@
 import axios from "axios";
+import prisma from '@/lib/prisma';
+import { signAccessToken, signRefreshToken } from "@/lib/auth";
+import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
     const authHeader = request.headers.get("Authorization");
@@ -20,14 +23,53 @@ export async function POST(request: Request) {
             },
         });
 
-        if (response.status === 200) {
-            return Response.json(response.data, { status: 200 });
+        if (response.status === 200 && response.data.type === "success" && response.data.message) {
+            // if the MSG verification is successful, phone number will be present in the response.data.message
+            // insert this verified phone number in DB if it doesn't exist already or fetch other details from "devotees" table corresponding to this phone number, if it already exists. 
+            return insertOrFetchDevotee(response.data.message);
+            //return Response.json(response.data, { status: 200 });
         } else {
-            console.log("Error verifying MSG91 access token", response.data);
-            return Response.json({ error: "Error verifying MSG91 access token" }, { status: 401 });
+            console.error("Error verifying MSG91 access token", response.data);
+            return Response.json({ error: "Error verifying MSG91 access token. Please refresh page and try again." }, { status: 401 });
         }
     } catch (error) {
-        console.log("Error verifying MSG91 access token", error)
+        console.error("Error verifying MSG91 access token", error)
         return Response.json({ error: "Error verifying MSG91 access token" }, { status: 401 });
+    }
+}
+
+async function insertOrFetchDevotee(phoneNumber: string) {
+    try {
+        let devotee = await prisma.devotees.findFirst({
+            where: { phone: phoneNumber },
+        });
+
+        if (!devotee) {
+            devotee = await prisma.devotees.create({
+                data: { 
+                    phone: phoneNumber,
+                    phone_verified: true,
+                    phone_whatsapp: phoneNumber,
+                    role_id: 1,
+                    source: "self",
+                    status: "active",
+                },
+            });
+        }
+
+        const accessToken = signAccessToken(devotee.id);
+        const refreshToken = signRefreshToken(devotee.id);
+        const res = NextResponse.json({ accessToken, devotee }, { status: 200 });
+        res.cookies.set('refresh_token', refreshToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict',
+            path: '/',
+            maxAge: 12 * 30 * 24 * 60 * 60, // 1 year i.e. 12 months i.e. 30 days i.e. 24 hours i.e. 60 minutes i.e. 60 seconds
+        });
+        return res;
+    } catch (error) {
+        console.error("Error inserting or fetching devotee:", error);
+        return Response.json({ error: "Failed to register and get details. Please refresh page and try again." }, { status: 500 });
     }
 }

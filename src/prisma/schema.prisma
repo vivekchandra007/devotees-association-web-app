@@ -8,24 +8,36 @@ datasource db {
 }
 
 model devotees {
-  id                           String    @id @default("uuid()") @db.Char(36)
+  id                           Int       @id @default(autoincrement()) @db.UnsignedInt
   name                         String?   @db.VarChar(100)
+  status                       String    @db.VarChar(11)
   phone                        String?   @unique(map: "phone") @db.VarChar(21)
+  phone_verified               Boolean   @default(false)
   phone_whatsapp               String?   @db.VarChar(21)
   email                        String?   @unique(map: "email") @db.VarChar(255)
-  occupation                   String?   @db.VarChar(255)
+  email_verified               Boolean   @default(false)
+  role_id                      Int       @db.UnsignedTinyInt
+  source                       String    @db.VarChar(40)
   gender                       String?   @db.VarChar(6)
-  dob_self                     DateTime? @db.Date
-  dob_spouse                   DateTime? @db.Date
-  dob_parents_father           DateTime? @db.Date
-  dob_parents_mother           DateTime? @db.Date
-  dob_children_1               DateTime? @db.Date
-  dob_children_2               DateTime? @db.Date
-  dob_children_3               DateTime? @db.Date
-  dob_children_4               DateTime? @db.Date
-  marriage_anniversary_self    DateTime? @db.Date
-  marriage_anniversary_parents DateTime? @db.Date
-  status                       String?   @db.VarChar(9)
+  dob                          DateTime? @db.Date
+  occupation                   String?   @db.VarChar(11)
+  occupation_position          String?   @db.VarChar(51)
+  spouse_name                  String?   @db.VarChar(100)
+  spouse_dob                   DateTime? @db.Date
+  spouse_marriage_anniversary  DateTime? @db.Date
+  parents_father_name          String?   @db.VarChar(100)
+  parents_father_dob           DateTime? @db.Date
+  parents_mother_name          String?   @db.VarChar(100)
+  parents_mother_dob           DateTime? @db.Date
+  parents_marriage_anniversary DateTime? @db.Date
+  children_1_name              String?   @db.VarChar(100)
+  children_1_dob               DateTime? @db.Date
+  children_2_name              String?   @db.VarChar(100)
+  children_2_dob               DateTime? @db.Date
+  children_3_name              String?   @db.VarChar(100)
+  children_3_dob               DateTime? @db.Date
+  children_4_name              String?   @db.VarChar(100)
+  children_4_dob               DateTime? @db.Date
   created_at                   DateTime  @default(now()) @db.Timestamp(0)
   updated_at                   DateTime  @default(now()) @db.Timestamp(0)
 }
