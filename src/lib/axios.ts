@@ -38,7 +38,7 @@ api.interceptors.response.use(
     const router = useRouter()
     const originalRequest = error.config as CustomAxiosRequestConfig;
 
-    if (error.response?.status === 401 && originalRequest && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest._retry) {
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({

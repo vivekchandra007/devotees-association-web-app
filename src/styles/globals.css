@@ -47,3 +47,57 @@ body {
 .p-divider .p-divider-content {
   background: transparent;
 }
+
+.footer-dark {
+  padding:50px 0;
+  color:#f0f9ff;
+  background-color:#282d32;
+  text-align: center;
+
+  .App-logo {
+      height: 14vmin;
+  }
+
+  .footer-dark-special-text {
+      color: #fd79a8;
+  }
+
+  .item.text {
+      margin-bottom:36px;
+      p {
+          opacity:0.6;
+          margin-bottom:0;
+      }
+  }
+
+  a {
+      color: #61dafb;
+  }
+
+  ul {
+      padding:0;
+      list-style:none;
+      line-height:1.6;
+      margin-bottom:0;
+      a {
+          color:inherit;
+          text-decoration:none;
+          opacity:0.6;
+          &:hover {
+              opacity:0.8;
+          }
+      }
+  }
+
+  .copyright {
+      text-align: center;
+      padding-top:24px;
+      opacity:0.3;
+      margin-bottom:0;
+  }
+
+  .mapouter {
+      margin: 12px 12px 0 12px;
+      filter: invert(90%);
+  }
+}

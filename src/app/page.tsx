@@ -32,28 +32,34 @@ export default function Home() {
     const getDevotee = async () => {
       try {
         setLoading(true);
-        setLoaderMessage('Hare Krishna! Please wait while we are fetching your details...');
+        setLoaderMessage('Hare Krishna! Fetching your details...');
         const authResponse = await api.get('/auth/me');
         setDevotee(authResponse.data.devotee);
         setLoading(false);
       } catch {
         setLoaderMessage('Hare Krishna. Redirecting you to login page');
-        setTimeout(() => {
-          // If the access token is expired or invalid, redirect to login page
-          cleanTokensAndRedirectToLogin();
+        // If the access token is expired or invalid, redirect to login page
+        // Clear local storage
+        localStorage.removeItem('access_token');
+        // Clear refresh token cookie
+        await axios.post('/api/auth/logout'); // NOTE: use raw axios, not the wrapped one
+        setTimeout(async () => {
+          // Redirect to /login page
+          router.push('/login');
+          setLoading(false);
         }, 4000);
       }
     };
     getDevotee();
-  }, [cleanTokensAndRedirectToLogin]);
+  }, [router]);
 
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 text-blue-950">
       {!loading ? (
         <Button className="justify-self-end" id="btn-log-out" label="Logout" severity="danger" raised
-        icon="pi pi-sign-out" loading={loading}
-        onClick={logout} />
-      ) : null 
+          icon="pi pi-sign-out" loading={loading}
+          onClick={logout} />
+      ) : null
       }
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
         <div>
