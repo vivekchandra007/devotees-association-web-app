@@ -81,10 +81,9 @@ export default function LoginPage() {
                 Śrī Caitanya-Caritāmṛta Ādi 3.91 &nbsp;<i className="pi pi-external-link"></i>
             </a>
             <br />
-            The devotees of Lord Viṣṇu are godly <span className="text-orange-600">(dev)</span>.
-            <br />and we already know Association of Devotees is one of the most important activity in Bhakti.
+            The devotees of Lord Viṣṇu are godly <span className="text-orange-600">(dev)</span>
             <br />
-            So, let us connect with you, <span className="text-orange-600">dev</span>
+            So, come and get associated with us, <span className="text-orange-600">dev</span>
         </span>
     );
     const footer = (
