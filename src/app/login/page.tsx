@@ -8,6 +8,7 @@ import { Divider } from "primereact/divider";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import FullPageSpinner from "@/components/FullPageSpinner";
+import { useAuth } from "@/hooks/useAuth";
 
 declare global {
     interface Window {
@@ -16,6 +17,7 @@ declare global {
 }
 
 export default function LoginPage() {
+    const { login } = useAuth();
     const router = useRouter();
     const [authInProgress, setAuthInProgress] = useState<boolean>(false);
 
@@ -33,9 +35,8 @@ export default function LoginPage() {
                 }
             ); 
             if (response.status === 200) {
-                // Store access token after login in local storage
-                localStorage.setItem('access_token', response.data.accessToken);
-                router.push('/'); // Redirect to home page
+                // call the login hook from useAuth()
+                login(response.data.accessToken, response.data.devotee);
             } else {
                 console.log('Error verifying phone number:', response);
             }
