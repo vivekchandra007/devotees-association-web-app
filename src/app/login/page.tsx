@@ -143,7 +143,7 @@ export default function LoginPage() {
             script.async = true;
             document.body.appendChild(script);
         }
-    }, []);
+    });
 
     return (
         <div className="grid items-center justify-items-center min-h-screen">

@@ -2,9 +2,7 @@
 import api from '@/lib/axios';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
-import Image from "next/image";
 import { useEffect, useState } from 'react';
-import { ProgressBar } from 'primereact/progressbar';
 import { Button } from 'primereact/button';
 import FullPageSpinner from '@/components/FullPageSpinner';
 

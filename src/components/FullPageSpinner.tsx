@@ -1,8 +1,6 @@
 'use client';
 
-import { ProgressSpinner } from 'primereact/progressspinner';
 import Image from 'next/image';
-import { ProgressBar } from 'primereact/progressbar';
 
 export default function FullPageSpinner({ message = 'Loading...' }: { message?: string }) {
   return (
