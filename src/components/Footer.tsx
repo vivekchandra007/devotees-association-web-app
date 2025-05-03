@@ -27,27 +27,27 @@ function Footer() {
                             <h3>Pune Temples&apos; Official Links</h3>
                             <ul>
                                 <li>
-                                    <a href="http://iskconvishalnagar.com" target="_blank" rel="noopener noreferrer">
+                                    <a className="underline" href="http://iskconvishalnagar.com" target="_blank" rel="noopener noreferrer">
                                         ISKCON (BCEC), formerly known as ISKCON Vishal Nagar
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="https://iskconpunebcec.com/#/newtemple" target="_blank" rel="noopener noreferrer">
+                                    <a className="underline" href="https://iskconpunebcec.com/#/newtemple" target="_blank" rel="noopener noreferrer">
                                     <p className="pi pi-star text-amber-300"/>&nbsp;&nbsp;ISKCON (Baner) New Temple&nbsp;&nbsp;<p className="pi pi-star text-amber-300"/>
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="https://iskconpunecamp.com" target="_blank" rel="noopener noreferrer">
+                                    <a className="underline" href="https://iskconpunecamp.com" target="_blank" rel="noopener noreferrer">
                                         ISKCON (Camp)
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="https://www.iskconpune.com" target="_blank" rel="noopener noreferrer">
+                                    <a className="underline" href="https://www.iskconpune.com" target="_blank" rel="noopener noreferrer">
                                         ISKCON (NVCC)
                                     </a>
                                 </li>
                                 <li>
-                                    <a href="https://iskconravet.com" target="_blank" rel="noopener noreferrer">
+                                    <a className="underline" href="https://iskconravet.com" target="_blank" rel="noopener noreferrer">
                                         ISKCON (Ravet)
                                     </a>
                                 </li>
