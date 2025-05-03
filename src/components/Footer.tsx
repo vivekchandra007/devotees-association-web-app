@@ -6,8 +6,8 @@ function Footer() {
             <footer>
                 <div>
                     <div className="row text-center">
-                        <div className="col-md-3 has-padding">
-                            <Image className="App-logo animate-spin duration-2000" src="/logo-dark.png" alt="logo" width={128} height={128} priority/>
+                        <div className="col-md-3 has-padding justify-center flex">
+                            <Image className="App-logo duration-30000" src="/logo-dark.png" alt="logo" width={128} height={128} priority/>
                         </div>
                         <div className="col-md-9">
                             <span className="footer-dark-special-text">
@@ -27,6 +27,11 @@ function Footer() {
                                 <li>
                                     <a href="http://iskconvishalnagar.com" target="_blank" rel="noopener noreferrer">
                                         ISKCON (BCEC), formerly known as ISKCON Vishal Nagar
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="https://iskconpunebcec.com/#/newtemple" target="_blank" rel="noopener noreferrer">
+                                    <p className="pi pi-star text-amber-300"/>&nbsp;&nbsp;ISKCON (Baner) New Temple&nbsp;&nbsp;<p className="pi pi-star text-amber-300"/>
                                     </a>
                                 </li>
                                 <li>

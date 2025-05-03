@@ -1,5 +1,7 @@
 // Axios wrapper in TypeScript that automatically refreshes the access token using your /api/auth/refresh endpoint when a 401 Unauthorized error occurs.
 
+"use client";
+
 import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
 import { useRouter } from 'next/navigation'
 
@@ -29,16 +31,19 @@ api.interceptors.request.use((config) => {
   if (token && config.headers) {
     config.headers['Authorization'] = `Bearer ${token}`;
   }
+  console.log('Request Config Axios interceptor:', config);
   return config;
 });
 
 api.interceptors.response.use(
   (response) => response,
   async (error: AxiosError) => {
-    const router = useRouter()
     const originalRequest = error.config as CustomAxiosRequestConfig;
 
+    // Only if the error is 401 and request config contains Authorization Header and and the request has not been retried yet, 
+    // we will try to refresh the token via cookie refresh_token
     if (error.response?.status === 401 && !originalRequest._retry) {
+      console.log('Error in Axios interceptor:', error);
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({
@@ -60,6 +65,8 @@ api.interceptors.response.use(
         localStorage.setItem('access_token', newToken);
         processQueue(null, newToken);
         originalRequest.headers['Authorization'] = `Bearer ${newToken}`;
+
+        // Finally, retry the original request with the refreshed tokens
         return api(originalRequest);
       } catch (err) {
         // If refresh token is expired or invalid, logout the user and redirect to login
@@ -68,6 +75,7 @@ api.interceptors.response.use(
         localStorage.removeItem('access_token');
         // Clear refresh token cookie
         await axios.post('/api/auth/logout'); // NOTE: use raw axios, not the wrapped one
+        const router = useRouter()
         // Redirect to /login page
         if (typeof window !== 'undefined') {
           router.push('/login');

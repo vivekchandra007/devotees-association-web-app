@@ -6,6 +6,7 @@ import Image from "next/image";
 import { useEffect, useState } from 'react';
 import { ProgressBar } from 'primereact/progressbar';
 import { Button } from 'primereact/button';
+import FullPageSpinner from '@/components/FullPageSpinner';
 
 export default function Home() {
   const router = useRouter();
@@ -14,18 +15,26 @@ export default function Home() {
   const [loaderMessage, setLoaderMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
-  async function cleanTokensAndRedirectToLogin() {
+  function cleanTokensAndRedirectToLogin() {
+    setLoading(true);
+    setLoaderMessage('Hare Krishna. Logging you out...');
+    // Clear the state
+    setDevotee({});
     // Clear local storage
     localStorage.removeItem('access_token');
     // Clear refresh token cookie
-    await axios.post('/api/auth/logout'); // NOTE: use raw axios, not the wrapped one
-    // Redirect to /login page
-    router.push('/login');
-    setLoading(false);
+    axios.post('/api/auth/logout'); // NOTE: use raw axios, not the wrapped one
+    setTimeout(() => {
+      setLoading(false);
+      // Redirect to /login page
+      if (typeof window !== 'undefined') {
+        router.push('/login');
+      }
+    }, 2000);
   }
 
   function logout() {
-    cleanTokensAndRedirectToLogin()
+    cleanTokensAndRedirectToLogin();
   }
 
   useEffect(() => {
@@ -34,24 +43,28 @@ export default function Home() {
         setLoading(true);
         setLoaderMessage('Hare Krishna! Fetching your details...');
         const authResponse = await api.get('/auth/me');
-        setDevotee(authResponse.data.devotee);
-        setLoading(false);
-      } catch {
-        setLoaderMessage('Hare Krishna. Redirecting you to login page');
-        // If the access token is expired or invalid, redirect to login page
-        // Clear local storage
-        localStorage.removeItem('access_token');
-        // Clear refresh token cookie
-        await axios.post('/api/auth/logout'); // NOTE: use raw axios, not the wrapped one
-        setTimeout(async () => {
-          // Redirect to /login page
-          router.push('/login');
+        if (authResponse?.status === 200 && authResponse?.data) {
+          setDevotee(authResponse.data.devotee);
           setLoading(false);
+        } else {
+          throw new Error();
+        }
+      } catch {
+        // means the access token is expired or invalid and also could not be refreshed, so ask the user to login again
+        setLoaderMessage('Hare Krishna. Redirecting you to login page');
+        setTimeout(() => {
+          setLoading(false);
+          // Redirect to /login page
+          if (typeof window !== 'undefined') {
+            router.push('/login');
+          }
         }, 4000);
       }
     };
-    getDevotee();
-  }, [router]);
+    if (!loading) {
+      getDevotee();
+    }
+  }, []);
 
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 text-blue-950">
@@ -79,25 +92,13 @@ export default function Home() {
         </div>
         <span className="text-center">
           {loading ? (
-            <span>
-              <Image
-                className="animate-pulse animation-duration-1000 rounded-full"
-                src="/app-image.jpg"
-                alt="Devotees' Association"
-                width={480}
-                height={480}
-                priority
-              />
-              <br />
-              {loaderMessage}
-              <ProgressBar mode="indeterminate" style={{ height: '2px' }} color="midnightblue"></ProgressBar>
-            </span>
+            <FullPageSpinner message={loaderMessage} />
           ) : null}
         </span>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
+      {/* <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
         --- footer ----
-      </footer>
+      </footer> */}
     </div>
   );
 }

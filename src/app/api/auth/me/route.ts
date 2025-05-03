@@ -7,7 +7,7 @@ import prisma from '@/lib/prisma';
 export async function GET(req: NextRequest) {
   const auth = req.headers.get('authorization');
   if (!auth || !auth.startsWith('Bearer ')) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    return Response.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {

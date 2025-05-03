@@ -7,6 +7,7 @@ import { Card } from "primereact/card";
 import { Divider } from "primereact/divider";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import FullPageSpinner from "@/components/FullPageSpinner";
 
 declare global {
     interface Window {
@@ -19,7 +20,9 @@ export default function LoginPage() {
     const [authInProgress, setAuthInProgress] = useState<boolean>(false);
 
     const getVerifiedNumber = async (verifiedPhoneAccessToken: string) => {
+        setAuthInProgress(true);
         try {
+            // use raw axios, not the wrapped one, coz we need to pass the MSG91_SERVER verified phone access-token in the header
             const response = await axios.post(
                 '/api/login',
                 {},
@@ -28,7 +31,7 @@ export default function LoginPage() {
                         Authorization: `Bearer ${verifiedPhoneAccessToken}`,
                     }
                 }
-            );
+            ); 
             if (response.status === 200) {
                 // Store access token after login in local storage
                 localStorage.setItem('access_token', response.data.accessToken);
@@ -38,17 +41,22 @@ export default function LoginPage() {
             }
         } catch (error: unknown) {
             console.log('Error verifying phone number:', error);
+        } finally {
+            setAuthInProgress(false);
         }
     };
 
     const header = (
-        <Image
-            src="/app-image.jpg"
-            alt="Devotees' Association"
-            width={320}
-            height={320}
-            priority
-        />
+        <div className="max-h-[240px] max-w-[240px] m-auto">
+            <Image
+                className="rounded-full border-2 border-yellow-500"
+                src="/app-image.jpg"
+                alt="Devotees' Association"
+                width={240}
+                height={240}
+                priority
+            />
+        </div>
     );
 
     const title = (
@@ -126,18 +134,20 @@ export default function LoginPage() {
         }
     }
     useEffect(() => {
+        // Redirect to home page if already has some access token, even if expired. Homepage will check if the token is valid or not and redirect to login page if not valid.
         if (localStorage.getItem('access_token')) {
-            router.push('/'); // Redirect to home page if already logged in
+            router.push('/');
         } else {
             const script = document.createElement('script');
             script.src = process.env.NEXT_PUBLIC_MSG91_WIDGET_SCRIPT_URL!;
             script.async = true;
             document.body.appendChild(script);
         }
-    }, [router]);
+    }, []);
 
     return (
         <div className="grid items-center justify-items-center min-h-screen">
+            {authInProgress && <FullPageSpinner message="Hare Krishna! OTP verifed. Redirecting you to Home Page" />}
             <div className="row-start-2">
                 <Card title={title}
                     subTitle={subTitle} footer={footer} header={header}
