@@ -31,7 +31,6 @@ api.interceptors.request.use((config) => {
   if (token && config.headers) {
     config.headers['Authorization'] = `Bearer ${token}`;
   }
-  console.log('Request Config Axios interceptor:', config);
   return config;
 });
 
@@ -43,7 +42,6 @@ api.interceptors.response.use(
     // Only if the error is 401 and request config contains Authorization Header and and the request has not been retried yet, 
     // we will try to refresh the token via cookie refresh_token
     if (error.response?.status === 401 && !originalRequest._retry) {
-      console.log('Error in Axios interceptor:', error);
       if (isRefreshing) {
         return new Promise((resolve, reject) => {
           failedQueue.push({
