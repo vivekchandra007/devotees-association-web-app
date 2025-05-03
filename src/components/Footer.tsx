@@ -5,7 +5,7 @@ function Footer() {
         <div id="App-footer" className="footer-dark has-padding">
             <footer>
                 <div>
-                    <div className="row text-center">
+                    <div className="row text-center m-2">
                         <div className="col-md-3 has-padding justify-center flex">
                             <Image className="App-logo duration-30000" src="/logo-dark.png" alt="logo" width={128} height={128} priority/>
                         </div>
@@ -19,7 +19,9 @@ function Footer() {
                             <p>{packageInfo.description}</p>
                         </div>
                     </div>
+                    <br />
                     <hr/>
+                    <br />
                     <div className="row">
                         <div className="col-sm-6 col-md-3 item">
                             <h3>Pune Temples&apos; Official Links</h3>
@@ -46,13 +48,14 @@ function Footer() {
                                 </li>
                                 <li>
                                     <a href="https://iskconravet.com" target="_blank" rel="noopener noreferrer">
-                                        ISKCON (Nigdi)
+                                        ISKCON (Ravet)
                                     </a>
                                 </li>
                             </ul>
                         </div>
+                        <br />
                         <hr/><br/>
-                        <div className="col-md-5 item text">
+                        <div className="col-md-5 item text m-2">
                             <h3>ISKCON Bhakti Center for Education and Culture (BCEC)</h3>
                             <p>
                                 Formerly known as ISKCON Vishal Nagar Pune is ISKCON Camp&apos;s Extension Center in
@@ -63,6 +66,7 @@ function Footer() {
                                 <br/>ISKCON Vishal Nagar is not an overnight establishment, but has taken
                                 shape due to the consistent endeavour by the leadership of ISKCON Camp, Pune.
                             </p>
+                            <br />
                             <div className="mapouter">
                                 <div className="gmap_canvas">
                                     <iframe className="gmap_iframe" width="100%" title="map-iskcon-bcec"
@@ -73,7 +77,7 @@ function Footer() {
                         </div>
                     </div>
                     <p className="copyright left">Developed with प्रेम❤️🙏भक्ति by {packageInfo.author}</p>
-                    <p className="copyright right">Copyright © 2023 Shri-Krishna - All Rights Reserved.</p>
+                    <p className="copyright right">Copyright © 2025 Shri-Krishna - All Rights Reserved.</p>
                 </div>
             </footer>
         </div>
