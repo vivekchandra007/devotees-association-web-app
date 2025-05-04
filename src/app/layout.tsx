@@ -36,11 +36,10 @@ export default function RootLayout({
         <AuthProvider>{children}</AuthProvider>
         <Footer />
         <Image
-          className="absolute -z-10 top-0 left-0 w-full h-full"
-          src="/mahaprabhu.jpg"
+          className="absolute -z-10 top-0 left-0 w-full h-full object-cover"
+          src="/mahaprabhu5.jpg"
           alt="Devotees' Association background image"
           sizes="100v"
-          objectFit="cover"
           fill
           priority
         />
