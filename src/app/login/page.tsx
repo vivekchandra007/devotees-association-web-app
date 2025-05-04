@@ -146,7 +146,7 @@ export default function LoginPage() {
     });
 
     return (
-        <div className="grid items-center justify-items-center min-h-screen">
+        <div className="grid md:items-center pt-4 justify-items-center min-h-screen">
             {authInProgress && <FullPageSpinner message="Hare Krishna! OTP verifed. Redirecting you to Home Page" />}
             <div className="">
                 <Card title={title}
