@@ -50,9 +50,10 @@ async function insertOrFetchDevotee(phoneNumber: string) {
                     phone: phoneNumber,
                     phone_verified: true,
                     phone_whatsapp: phoneNumber,
-                    role_id: 1,
-                    source: "self",
                     status: "active",
+                    role_id: 1,
+                    spiritual_level: 1,
+                    source: "self"
                 },
             });
         }

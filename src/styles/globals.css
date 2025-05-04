@@ -39,8 +39,8 @@ body {
 }
 
 .p-card.p-component.card-transparent {
-  background-color: rgba(255, 255, 255, 0.4);
-  backdrop-filter: saturate(180%) blur(9px);
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: saturate(210%) blur(9px);
   border-radius: 11px;
 }
 

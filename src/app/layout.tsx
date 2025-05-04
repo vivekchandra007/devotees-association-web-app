@@ -37,7 +37,7 @@ export default function RootLayout({
         <Footer />
         <Image
           className="absolute -z-10 top-0 left-0 w-full h-full"
-          src="/background.png"
+          src="/mahaprabhu.jpg"
           alt="Devotees' Association background image"
           sizes="100v"
           objectFit="cover"
