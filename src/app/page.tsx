@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from 'primereact/button';
 import { useAuth } from '@/hooks/useAuth';
 import FullPageSpinner from '@/components/FullPageSpinner';
 import TopNavBar from '@/components/TopNavBar';

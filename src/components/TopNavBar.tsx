@@ -20,9 +20,9 @@ type dialogueModalContentType = {
 
 export default function TopNavBar() {
     const { devotee, systemRole, logout } = useAuth();
-    const [inProgress, setInProgress] = useState<boolean>(false);
+    const [inProgress] = useState<boolean>(false);
     const [dialogueModalContent, setDialogueModalContent] = useState<dialogueModalContentType | null>(null);
-    const userProfileActionsPanel = useRef<any>(null);
+    const userProfileActionsPanel = useRef<Menu>(null);
 
     const topMenuItems: MenuItem[] = [
         {
