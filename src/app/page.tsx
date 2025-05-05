@@ -3,17 +3,17 @@
 import { Button } from 'primereact/button';
 import { useAuth } from '@/hooks/useAuth';
 import FullPageSpinner from '@/components/FullPageSpinner';
+import TopNavBar from '@/components/TopNavBar';
 
 export default function Home() {
-  const { devotee, isAuthenticated, logout } = useAuth();
+  const { devotee, isAuthenticated } = useAuth();
 
   if (!isAuthenticated) return <FullPageSpinner message="Hare Krishna! Fetching your details..." />;
 
   return (
+    <>
+    <TopNavBar />
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 text-blue-950">
-      <Button className="justify-self-end" id="btn-log-out" label="Logout" severity="danger" raised
-          icon="pi pi-sign-out"
-          onClick={logout} />
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
         <div>
           <span>
@@ -32,5 +32,6 @@ export default function Home() {
         --- footer ----
       </footer> */}
     </div>
+    </>
   );
 }

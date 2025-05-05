@@ -35,8 +35,8 @@ export default function LoginPage() {
                 }
             ); 
             if (response.status === 200) {
-                // call the login hook from useAuth()
-                login(response.data.accessToken, response.data.devotee);
+                // call the login hook from useAuth(), which will store access token in localStorae and again call fetchMe() hook with complete devotee details
+                login(response.data.accessToken);
             } else {
                 console.log('Error verifying phone number:', response);
             }

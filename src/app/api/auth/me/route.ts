@@ -14,7 +14,23 @@ export async function GET(req: NextRequest) {
     const token = auth.split(' ')[1];
     const devoteeId = verifyAccessToken(token);
 
-    const devotee = await prisma.devotees.findUnique({ where: { id: devoteeId } });
+    const devotee = await prisma.devotees.findUnique({ 
+      where: { id: devoteeId },
+      include: {
+        system_roles: {
+          select: {
+            name: true,
+          },
+        },
+        spiritual_levels: {
+          select: {
+            title_male: true,
+            title_female: true
+          }
+        }
+      }, 
+    });
+    console.log(devotee);
     if (!devotee) throw new Error();
 
     return NextResponse.json({ devotee });

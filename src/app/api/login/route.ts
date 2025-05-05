@@ -60,7 +60,7 @@ async function insertOrFetchDevotee(phoneNumber: string) {
 
         const accessToken = signAccessToken(devotee.id);
         const refreshToken = signRefreshToken(devotee.id);
-        const res = NextResponse.json({ accessToken, devotee }, { status: 200 });
+        const res = NextResponse.json({ accessToken }, { status: 200 });
         res.cookies.set('refresh_token', refreshToken, {
             httpOnly: true,
             secure: true,

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import packageInfo from '../../package.json';
-function Footer() {
+
+export default function Footer() {
     return (
         <div id="App-footer" className="footer-dark has-padding">
             <footer>
@@ -83,4 +84,3 @@ function Footer() {
         </div>
     );
 }
-export default Footer;

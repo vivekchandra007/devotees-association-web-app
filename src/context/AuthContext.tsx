@@ -4,18 +4,37 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/lib/axios';
 import axios from 'axios';
+import { Prisma } from '@prisma/client';
 
 type AuthContextType = {
-  devotee: object | null;
+  devotee: Devotee | null;
   isAuthenticated: boolean;
-  login: (accessTokenInLoginResponse: string, devoteeInLoginResponse: object) => void;
+  systemRole: string | null;
+  login: (accessTokenInLoginResponse: string) => void;
   logout: () => void;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
+type Devotee = Prisma.devoteesGetPayload<{
+  include: {
+    system_roles: {
+      select: {
+        name: true;
+      };
+    },
+    spiritual_levels: {
+      select: {
+        title_male: true,
+        title_female: true
+      };
+    }
+  };
+}>;
+
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
-  const [devotee, setDevotee] = useState<object | null>(null);
+  const [devotee, setDevotee] = useState<Devotee | null>(null);
+  const [systemRole, setSystemRole] = useState<string | null>(null);
   const [authInProgress, setAuthInProgress] = useState<boolean>(false);
   const router = useRouter();
 
@@ -25,6 +44,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       const res = await api.get('/auth/me');
       if (res && res.status === 200 && res.data?.devotee) {
         setDevotee(res.data.devotee);
+        setSystemRole(res.data.devotee.system_roles.name);
       } else {
         throw new Error();
       }
@@ -35,9 +55,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const login = (accessTokenInLoginResponse: string, devoteeInLoginResponse: object) => {
+  const login = async (accessTokenInLoginResponse: string) => {
     localStorage.setItem('access_token', accessTokenInLoginResponse);
-    setDevotee(devoteeInLoginResponse);
+    await fetchMe();
     router.push('/'); // Redirect to home page
   };
 
@@ -62,7 +82,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   });
 
   return (
-    <AuthContext.Provider value={{ devotee, isAuthenticated: !!devotee, login, logout }}>
+    <AuthContext.Provider value={{ devotee, isAuthenticated: !!devotee, systemRole, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
