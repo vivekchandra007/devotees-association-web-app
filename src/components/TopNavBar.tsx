@@ -137,7 +137,7 @@ export default function TopNavBar() {
     const end = (
         <div className="card flex justify-content-center">
             <Avatar image="/devotee-user-icon.gif" size="large" shape="circle"
-                    onClick={e => userProfileActionsPanel.current.toggle(e)}/>
+                    onClick={e => userProfileActionsPanel?.current?.toggle(e)}/>
             <Menu model={topRightMenuItems} popup ref={userProfileActionsPanel} style={{ width: '250px' }}/>
         </div>
     );
