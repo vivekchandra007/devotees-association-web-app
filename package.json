@@ -14,17 +14,21 @@
   "dependencies": {
     "@prisma/client": "^6.7.0",
     "axios": "^1.9.0",
+    "formik": "^2.4.6",
     "jsonwebtoken": "^9.0.2",
+    "lodash": "^4.17.21",
     "next": "15.3.1",
     "primeicons": "^7.0.0",
     "primereact": "^10.9.5",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "zod": "^3.24.4"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@tailwindcss/postcss": "^4",
     "@types/jsonwebtoken": "^9.0.9",
+    "@types/lodash": "^4.17.16",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

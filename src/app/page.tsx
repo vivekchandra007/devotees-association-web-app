@@ -16,14 +16,7 @@ export default function Home() {
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
         <div>
           <span>
-              <h1>Devotees Currently Logged In:</h1>
-              <ul>
-                {Object.entries(devotee!).map(([key, value]) => (
-                  <li key={key}>
-                    {key}: {String(value)}
-                  </li>
-                ))}
-              </ul>
+              <h1 className='text-9xl text-amber-650'>Hare Krishna{`,${devotee?.name}`}&nbsp;Dev</h1>
             </span>
         </div>
       </main>

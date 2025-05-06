@@ -24,20 +24,36 @@ CREATE TABLE IF NOT EXISTS spiritual_levels (
 CREATE TABLE IF NOT EXISTS devotees (
   id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
   name VARCHAR(100) NULL,
-  diksha_name VARCHAR(100) NULL,
+  initiated_name VARCHAR(100) NULL,
   status ENUM('active', 'inactive') NOT NULL,
   phone VARCHAR(21) NULL,
   phone_verified BOOLEAN NOT NULL DEFAULT false,
+  whatsapp_consent BOOLEAN NOT NULL DEFAULT false,
   phone_whatsapp VARCHAR(21) NULL,
   email VARCHAR(255) NULL,
   email_verified BOOLEAN NOT NULL DEFAULT false,
   role_id TINYINT UNSIGNED NOT NULL,
   spiritual_level TINYINT UNSIGNED NOT NULL,
   source VARCHAR(40) NOT NULL,
+  counsellor_id INT UNSIGNED NULL,
   gender ENUM('male', 'female', 'other') NULL,
   dob DATE NULL,
   occupation VARCHAR(21) NULL,
-  occupation_position VARCHAR(51) NULL,
+  occupation_position VARCHAR(100) NULL,
+  skills JSON NULL,
+  temple_memberships JSON NULL,
+  class_memberships JSON NULL,
+  address_line1 VARCHAR(255) NULL,
+  address_line2 VARCHAR(255) NULL,
+  address_society VARCHAR(255) NULL,
+  address_area VARCHAR(255) NULL,
+  address_gmap_url TEXT NULL,
+  address_city VARCHAR(100) NULL,
+  address_state VARCHAR(100) NULL,
+  address_pincode VARCHAR(20) NULL,
+  address_country VARCHAR(100) NULL,
+  language_preference VARCHAR(21) NULL,
+  marital_status BOOLEAN NOT NULL DEFAULT false,
   spouse_name VARCHAR(100) NULL,
   spouse_dob DATE NULL,
   spouse_marriage_anniversary DATE NULL,
@@ -62,3 +78,9 @@ CREATE TABLE IF NOT EXISTS devotees (
   FOREIGN KEY (role_id) REFERENCES system_roles(id),
   FOREIGN KEY (spiritual_level) REFERENCES spiritual_levels(id)
 );
+
+ALTER TABLE devotees
+ADD CONSTRAINT fk_counsellor
+  FOREIGN KEY (counsellor_id) REFERENCES devotees(id)
+  ON DELETE SET NULL
+  ON UPDATE CASCADE;

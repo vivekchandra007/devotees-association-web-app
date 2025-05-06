@@ -29,6 +29,12 @@ type Devotee = Prisma.devoteesGetPayload<{
         title_female: true,
         title_other: true
       };
+    },
+    devotees: {
+      select: {
+        id: true,
+        name: true
+      }
     }
   };
 }>;

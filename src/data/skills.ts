@@ -1,0 +1,23 @@
+export const SKILLS = [
+  "Coding/ Software Development",
+  "Graphic Designing",
+  "Rangoli",
+  "Flower Decoration",
+  "Stage Decoration",
+  "Temple Decoration",
+  "Drawing",
+  "Painting",
+  "Cooking",
+  "Driving",
+  "Teaching",
+  "Dancing",
+  "Singing",
+  "Musical Instruments Playing",
+  "Event Management",
+  "Public Relations",
+  "Printing/ Flex and Banners",
+  "Coding/ Frontend",
+  "Coding/ Backend",
+  "Coding/ Database",
+  "Coding/ Full Stack"
+]

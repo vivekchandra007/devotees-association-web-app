@@ -31,7 +31,6 @@ export async function GET(req: NextRequest) {
         }
       }, 
     });
-    console.log(devotee);
     if (!devotee) throw new Error();
 
     return NextResponse.json({ devotee });

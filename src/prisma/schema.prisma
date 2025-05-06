@@ -10,20 +10,36 @@ datasource db {
 model devotees {
   id                           Int              @id @default(autoincrement()) @db.UnsignedInt
   name                         String?          @db.VarChar(100)
-  diksha_name                  String?          @db.VarChar(100)
+  initiated_name               String?          @db.VarChar(100)
   status                       devotees_status
   phone                        String?          @unique(map: "phone") @db.VarChar(21)
   phone_verified               Boolean          @default(false)
+  whatsapp_consent             Boolean          @default(false)
   phone_whatsapp               String?          @db.VarChar(21)
   email                        String?          @unique(map: "email") @db.VarChar(255)
   email_verified               Boolean          @default(false)
   role_id                      Int              @db.UnsignedTinyInt
   spiritual_level              Int              @db.UnsignedTinyInt
   source                       String           @db.VarChar(40)
+  counsellor_id                Int?             @db.UnsignedInt
   gender                       devotees_gender?
   dob                          DateTime?        @db.Date
   occupation                   String?          @db.VarChar(21)
-  occupation_position          String?          @db.VarChar(51)
+  occupation_position          String?          @db.VarChar(100)
+  skills                       Json?
+  temple_memberships           Json?
+  class_memberships            Json?
+  address_line1                String?          @db.VarChar(255)
+  address_line2                String?          @db.VarChar(255)
+  address_society              String?          @db.VarChar(255)
+  address_area                 String?          @db.VarChar(255)
+  address_gmap_url             String?          @db.Text
+  address_city                 String?          @db.VarChar(100)
+  address_state                String?          @db.VarChar(100)
+  address_pincode              String?          @db.VarChar(20)
+  address_country              String?          @db.VarChar(100)
+  language_preference          String?          @db.VarChar(21)
+  marital_status               Boolean          @default(false)
   spouse_name                  String?          @db.VarChar(100)
   spouse_dob                   DateTime?        @db.Date
   spouse_marriage_anniversary  DateTime?        @db.Date
@@ -45,9 +61,12 @@ model devotees {
   updated_at                   DateTime         @default(now()) @db.Timestamp(0)
   system_roles                 system_roles     @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_1")
   spiritual_levels             spiritual_levels @relation(fields: [spiritual_level], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_2")
+  devotees                     devotees?        @relation("devoteesTodevotees", fields: [counsellor_id], references: [id], map: "fk_counsellor")
+  other_devotees               devotees[]       @relation("devoteesTodevotees")
 
   @@index([role_id], map: "fk_1")
   @@index([spiritual_level], map: "fk_2")
+  @@index([counsellor_id], map: "fk_counsellor")
 }
 
 model system_roles {

@@ -11,6 +11,7 @@ import Image from 'next/image';
 import { Menu } from 'primereact/menu';
 import { classNames } from 'primereact/utils';
 import { SYSTEM_ROLES } from '@/data/constants';
+import Devotee from './Devotee';
 
 type dialogueModalContentType = {
     header: string,
@@ -22,7 +23,14 @@ type dialogueModalContentType = {
 export default function TopNavBar() {
     const { devotee, systemRole, logout } = useAuth();
     const [inProgress] = useState<boolean>(false);
-    const [dialogueModalContent, setDialogueModalContent] = useState<dialogueModalContentType | null>(null);
+    const userProfileModalContent = {
+        header: 'Edit Profile',
+        content: (
+            devotee?.id? <Devotee devoteeId={devotee?.id} /> : <></>
+        )
+    }
+
+    const [dialogueModalContent, setDialogueModalContent] = useState<dialogueModalContentType | null>(userProfileModalContent);
     const userProfileActionsPanel = useRef<Menu>(null);
 
     const topMenuItems: MenuItem[] = [
@@ -59,16 +67,6 @@ export default function TopNavBar() {
             command: () => { setDialogueModalContent(ReferralsModalContent) }
         },
     ];
-    const userProfileModalContent = {
-        header: 'Edit Profile',
-        content: (
-            <>
-                <p className="capitalize"><strong>Name:</strong> {devotee?.name}</p>
-                <p><strong>Phone:</strong> {`+${devotee?.phone?.slice(0,2)}-${devotee?.phone?.slice(2)}` || ''}</p>
-                <p><strong>Role:</strong> {systemRole}</p>
-            </>
-        )
-    }
 
     const ReferralsModalContent = {
         header: 'Referrals',
@@ -85,7 +83,7 @@ export default function TopNavBar() {
     const ViewDevoteeDetailsModalContent = {
         header: 'View Devotee Details',
         content: (<p>View Devotee Component Form</p>),
-        width: '25.5vw'
+        width: '50vw'
     }
 
     const settingsModalContent = {
@@ -93,7 +91,7 @@ export default function TopNavBar() {
         content: (
             <p>Settings Component Modal</p>
         ),
-        width: '45vw'
+        width: '50vw'
     }
 
     const topRightMenuItems: MenuItem[] = [
@@ -144,10 +142,10 @@ export default function TopNavBar() {
                     <button onClick={(e) => options.onClick(e)} className={classNames(options.className, 'w-full p-link flex align-items-center')}>
                         <Avatar className="grid m-1" image="/devotee-user-icon.png" size="large" shape="circle" />
                         <div>
-                            <span className="font-bold">{devotee?.diksha_name || ''}
-                                <span className={classNames(devotee?.diksha_name? '' : 'font-bold','capitalize')}>
+                            <span className="font-bold">{devotee?.initiated_name || ''}
+                                <span className={classNames(devotee?.initiated_name? '' : 'font-bold','capitalize')}>
                                     {
-                                        (devotee?.diksha_name || '') + (devotee?.diksha_name ? 'aka. ' : '') + (devotee?.name || '') + ('    ') + (devotee?.gender ? devotee.spiritual_levels[`title_${devotee?.gender}`] : '' )
+                                        (devotee?.initiated_name || '') + (devotee?.initiated_name ? 'aka. ' : '') + (devotee?.name || '') + ('    ') + (devotee?.gender ? devotee.spiritual_levels[`title_${devotee?.gender}`] : '' )
                                     }
                                 </span>
                             </span>
