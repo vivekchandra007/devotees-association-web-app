@@ -26,7 +26,8 @@ type Devotee = Prisma.devoteesGetPayload<{
     spiritual_levels: {
       select: {
         title_male: true,
-        title_female: true
+        title_female: true,
+        title_other: true
       };
     }
   };

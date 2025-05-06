@@ -4,19 +4,20 @@ import { Menubar } from 'primereact/menubar';
 import { MenuItem } from 'primereact/menuitem';
 import { Dialog } from 'primereact/dialog';
 import { Avatar } from 'primereact/avatar';
-import {ProgressBar} from "primereact/progressbar";
+import { ProgressBar } from "primereact/progressbar";
 import { ReactElement, useRef, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth'; // your auth hook
 import Image from 'next/image';
 import { Menu } from 'primereact/menu';
 import { classNames } from 'primereact/utils';
+import { SYSTEM_ROLES } from '@/data/constants';
 
 type dialogueModalContentType = {
     header: string,
     content: ReactElement,
     width?: string,
     footer?: ReactElement
-  };
+};
 
 export default function TopNavBar() {
     const { devotee, systemRole, logout } = useAuth();
@@ -31,12 +32,13 @@ export default function TopNavBar() {
             url: '/'
         },
         {
-            label: 'My Profile',
+            label: 'Edit My Profile',
             icon: 'pi pi-fw pi-user-edit',
             command: () => { setDialogueModalContent(userProfileModalContent) }
         },
         {
             label: 'Devotees',
+            visible: systemRole !== SYSTEM_ROLES.member,
             icon: 'pi pi-fw pi-users',
             items: [
                 {
@@ -50,17 +52,28 @@ export default function TopNavBar() {
                     command: () => { setDialogueModalContent(ViewDevoteeDetailsModalContent) }
                 },
             ]
-        }
+        },
+        {
+            label: 'Referrals',
+            icon: 'pi pi-fw pi-share-alt',
+            command: () => { setDialogueModalContent(ReferralsModalContent) }
+        },
     ];
     const userProfileModalContent = {
         header: 'Edit Profile',
         content: (
             <>
-                <p><strong>Name:</strong> {devotee?.name}</p>
-                <p><strong>Phone:</strong> {devotee?.phone}</p>
+                <p className="capitalize"><strong>Name:</strong> {devotee?.name}</p>
+                <p><strong>Phone:</strong> {`+${devotee?.phone?.slice(0,2)}-${devotee?.phone?.slice(2)}` || ''}</p>
                 <p><strong>Role:</strong> {systemRole}</p>
             </>
         )
+    }
+
+    const ReferralsModalContent = {
+        header: 'Referrals',
+        content: (<p>Referrals Component Form</p>),
+        width: '50vw'
     }
 
     const AddNewDevoteeModalContent = {
@@ -75,16 +88,6 @@ export default function TopNavBar() {
         width: '25.5vw'
     }
 
-    const start = (
-        <Image
-            src="/logo.png"
-            alt="App logo"
-            width="48"
-            height="48"
-            priority
-        />
-    );
-
     const settingsModalContent = {
         header: 'Settings',
         content: (
@@ -95,40 +98,62 @@ export default function TopNavBar() {
 
     const topRightMenuItems: MenuItem[] = [
         {
-            label: 'Add New Devotee', icon: 'pi pi-fw pi-user-plus',
+            template: () => {
+                return (
+                    <span className="flex justify-center">
+                        <Image
+                            src="/chanting-animation-transparent.gif"
+                            alt="User Picture"
+                            height="190"
+                            width="190"
+                            unoptimized
+                        />
+                    </span>
+                )
+            }
+        },
+        {
+            label: 'Edit My Profile',
+            icon: 'pi pi-fw pi-user-edit',
+            command: () => { setDialogueModalContent(userProfileModalContent) }
+        },
+        {
+            label: 'Add New Devotee', 
+            visible: systemRole !== SYSTEM_ROLES.member,
+            icon: 'pi pi-fw pi-user-plus',
             command: () => { setDialogueModalContent(AddNewDevoteeModalContent) }
         },
         {
-            label: 'Edit My Profile', icon: 'pi pi-fw pi-user',
-            command: () => { setDialogueModalContent(userProfileModalContent) }
+            label: 'View Devotee',
+            visible: systemRole !== SYSTEM_ROLES.member,
+            icon: 'pi pi-fw pi-user',
+            command: () => { setDialogueModalContent(ViewDevoteeDetailsModalContent) }
+        },
+        {
+            label: 'Referrals',
+            icon: 'pi pi-fw pi-share-alt',
+            command: () => { setDialogueModalContent(ReferralsModalContent) }
         },
         { label: 'Settings', icon: 'pi pi-fw pi-cog', command: () => { setDialogueModalContent(settingsModalContent) } },
-        { label: 'Log out', icon: 'pi pi-sign-out', className: "", command: () => { logout() } },
+        { label: 'Log out', icon: 'pi pi-sign-out', className: "ml-1", command: () => { logout() } },
         { separator: true },
         {
             command: () => { alert('test') },
             template: (item, options) => {
                 return (
-                    <>
-                        <Image
-                            src="/chanting-animation.gif"
-                            alt="User Picture"
-                            height="190"
-                            width="190"
-                        />
-                        <button onClick={(e) => options.onClick(e)} className={classNames(options.className, 'w-full p-link flex align-items-center')}>
-                            <Avatar image="/devotee-user-icon.gif" className="mr-2" shape="circle" />
-                            <div className="flex flex-column align">
-                                <span className="font-bold">{devotee?.diksha_name || ''}</span>
-                                <span className={devotee?.diksha_name? '':'font-bold'}>
+                    <button onClick={(e) => options.onClick(e)} className={classNames(options.className, 'w-full p-link flex align-items-center')}>
+                        <Avatar className="grid m-1" image="/devotee-user-icon.png" size="large" shape="circle" />
+                        <div>
+                            <span className="font-bold">{devotee?.diksha_name || ''}
+                                <span className={classNames(devotee?.diksha_name? '' : 'font-bold','capitalize')}>
                                     {
-                                        (devotee?.diksha_name? 'aka. ':'') + (devotee?.name || 'Deva')
+                                        (devotee?.diksha_name || '') + (devotee?.diksha_name ? 'aka. ' : '') + (devotee?.name || '') + ('    ') + (devotee?.gender ? devotee.spiritual_levels[`title_${devotee?.gender}`] : '' )
                                     }
                                 </span>
-                                <span className="text-sm">{devotee?.phone || ''}</span>
-                            </div>
-                        </button>
-                    </>
+                            </span>
+                            <span className="flex text-sm">{`+${devotee?.phone?.slice(0,2)}-${devotee?.phone?.slice(2)}` || ''}</span>
+                        </div>
+                    </button>
                 )
             }
         }
@@ -136,9 +161,9 @@ export default function TopNavBar() {
 
     const end = (
         <div className="card flex justify-content-center">
-            <Avatar image="/devotee-user-icon.gif" size="large" shape="circle"
-                    onClick={e => userProfileActionsPanel?.current?.toggle(e)}/>
-            <Menu model={topRightMenuItems} popup ref={userProfileActionsPanel} style={{ width: '250px' }}/>
+            <Avatar className="p-1 border-2 border-amber-200 shadow-inner shadow-amber-200" image="/devotee-user-icon-transparent.gif" size="xlarge" shape="circle"
+                onClick={e => userProfileActionsPanel?.current?.toggle(e)} />
+            <Menu className="component-transparent" model={topRightMenuItems} popup ref={userProfileActionsPanel} style={{ width: '250px' }} />
         </div>
     );
 
@@ -148,9 +173,9 @@ export default function TopNavBar() {
 
     return (
         <div>
-            <Menubar model={topMenuItems} start={start} end={end} />
+            <Menubar className="component-transparent" model={topMenuItems} end={end} />
             {inProgress ? <ProgressBar mode="indeterminate" style={{ height: '2px' }}></ProgressBar> : ''}
-            
+
             <Dialog header={dialogueModalContent ? dialogueModalContent.header : ''}
                 visible={!!dialogueModalContent} style={{ width: dialogueModalContent?.width || '90vw' }}
                 onHide={hideDialogueModal} footer={dialogueModalContent?.footer || ''}>

@@ -7,14 +7,18 @@ export default function Footer() {
             <footer>
                 <div>
                     <div className="row text-center m-2">
-                        <div className="col-md-3 has-padding justify-center flex">
-                            <Image className="App-logo duration-30000" src="/logo-dark.png" alt="logo" width={128} height={128} priority/>
-                        </div>
                         <div className="col-md-9">
-                            <span className="footer-dark-special-text">
-                                ईश्वर: परम: कृष्ण: सच्चिदानंद विग्रह: ।<br/>
-                                अनादिरादिर्गोविंद: सर्वकारणकारणम् ।।
-                            </span>
+                            <div className="justify-center flex">
+                                <Image className="App-logo duration-30000" src="/logo-dark.png" alt="logo" width={128} height={128} priority/>
+                            </div>
+                            <br/>
+                            <a className="footer-dark-special-text hover:underline" href="https://vedabase.io/en/library/cc/adi/3/91/" target="_blank" rel="noopener noreferrer">
+                                द्वौ भूत​-सर्गौ लोके ऽस्मिन् <br />
+                                दैव आसुर एव च​  ।<br/>
+                                विष्णु-भक्तः स्मृतो दैव​ <br />
+                                आसुरस् तद्-विपर्ययः ।।<br/>
+                                <span className="underline text-sm">(Śrī Caitanya-Caritāmṛta Ādi 3.91)</span>
+                            </a>
                             <br/><br/>
                             <h3>{packageInfo.displayName} v{packageInfo.version}</h3>
                             <p>{packageInfo.description}</p>
@@ -33,8 +37,8 @@ export default function Footer() {
                                     </a>
                                 </li>
                                 <li>
-                                    <a className="underline" href="https://iskconpunebcec.com/#/newtemple" target="_blank" rel="noopener noreferrer">
-                                    <p className="pi pi-star text-amber-300"/>&nbsp;&nbsp;ISKCON (Baner) New Temple&nbsp;&nbsp;<p className="pi pi-star text-amber-300"/>
+                                    <a href="https://iskconpunebcec.com/#/newtemple" target="_blank" rel="noopener noreferrer">
+                                    <p className="pi pi-star-fill text-amber-200"/>&nbsp;&nbsp;<span className="underline">ISKCON (Baner) New Temple</span>&nbsp;&nbsp;<p className="pi pi-star-fill text-amber-200"/>
                                     </a>
                                 </li>
                                 <li>
@@ -59,12 +63,12 @@ export default function Footer() {
                         <div className="col-md-5 item text m-2">
                             <h3>ISKCON Bhakti Center for Education and Culture (BCEC)</h3>
                             <p>
-                                Formerly known as ISKCON Vishal Nagar Pune is ISKCON Camp&apos;s Extension Center in
+                                Formerly known as ISKCON Vishal Nagar, ISKCON BCEC is ISKCON Camp (Pune)&apos;s Extension Center in
                                 Vishal Nagar, Pimple Nilakh, Pune.
                                 <br/>It was started with a motive to fulfil the need of locally situated
                                 congregation, who could have an avenue for regular & daily nourishment in
                                 their spiritual practices.
-                                <br/>ISKCON Vishal Nagar is not an overnight establishment, but has taken
+                                <br/>ISKCON BCEC is not an overnight establishment, but has taken
                                 shape due to the consistent endeavour by the leadership of ISKCON Camp, Pune.
                             </p>
                             <br />
@@ -77,8 +81,19 @@ export default function Footer() {
                             </div>
                         </div>
                     </div>
+                    <span className="footer-dark-special-text">
+                        ईश्वर: परम: कृष्ण: सच्चिदानंद विग्रह: ।<br/>
+                        अनादिरादिर्गोविंद: सर्वकारणकारणम् ।।
+                    </span>
+                    <p className="copyright left">All glories to Guru and Gauranga</p>
                     <p className="copyright left">Developed with प्रेम❤️🙏भक्ति by {packageInfo.author}</p>
-                    <p className="copyright right">Copyright © 2025 Shri-Krishna - All Rights Reserved.</p>
+                    <p className="copyright right">
+                        Copyright © 2025 &nbsp;
+                        <a className="underline" href="https://shri-krishna.in/" target="_blank" rel="noopener noreferrer">
+                            Shri-Krishna.in
+                        </a>
+                        &nbsp;- All Rights Reserved.
+                    </p>
                 </div>
             </footer>
         </div>

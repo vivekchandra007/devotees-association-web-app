@@ -64,6 +64,7 @@ model spiritual_levels {
   id              Int        @id @default(autoincrement()) @db.UnsignedTinyInt
   title_male      String     @db.VarChar(20)
   title_female    String     @db.VarChar(20)
+  title_other     String?    @db.VarChar(20)
   hierarchy_level Int        @unique(map: "hierarchy_level") @db.UnsignedTinyInt
   description     String?    @db.Text
   created_at      DateTime   @default(now()) @db.Timestamp(0)

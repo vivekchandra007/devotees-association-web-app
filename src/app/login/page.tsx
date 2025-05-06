@@ -151,7 +151,7 @@ export default function LoginPage() {
             <div className="">
                 <Card title={title}
                     subTitle={subTitle} footer={footer} header={header}
-                    className="shadow-2xl w-93 md:w-110 text-center card-transparent">
+                    className="shadow-2xl w-93 md:w-110 text-center component-transparent">
                     <div>
                         <Button id="btn-sign-in" label="Login with your Mobile Number" severity="danger" raised
                             icon="pi pi-mobile" loading={authInProgress}
