@@ -23,15 +23,17 @@ type dialogueModalContentType = {
 export default function TopNavBar() {
     const { devotee, systemRole, logout } = useAuth();
     const [inProgress] = useState<boolean>(false);
-    const userProfileModalContent = {
-        header: 'Edit Profile',
-        content: (
-            devotee?.id? <Devotee devoteeId={devotee?.id} /> : <></>
-        ),
-        width: '99vw'
+    const userProfileModalContent = (firstTime: boolean) => {
+        return {
+            header: firstTime? 'Keep your profile up to date':'Edit Profile',
+            content: (
+                devotee?.id? <Devotee devoteeId={devotee?.id} /> : <></>
+            ),
+            width: '99vw'
+        }
     }
 
-    const [dialogueModalContent, setDialogueModalContent] = useState<dialogueModalContentType | null>(userProfileModalContent);
+    const [dialogueModalContent, setDialogueModalContent] = useState<dialogueModalContentType | null>(userProfileModalContent(true));
     const userProfileActionsPanel = useRef<Menu>(null);
 
     const topMenuItems: MenuItem[] = [
@@ -43,7 +45,7 @@ export default function TopNavBar() {
         {
             label: 'Edit My Profile',
             icon: 'pi pi-fw pi-user-edit',
-            command: () => { setDialogueModalContent(userProfileModalContent) }
+            command: () => { setDialogueModalContent(userProfileModalContent(false)) }
         },
         {
             label: 'Devotees',
@@ -114,7 +116,7 @@ export default function TopNavBar() {
         {
             label: 'Edit My Profile',
             icon: 'pi pi-fw pi-user-edit',
-            command: () => { setDialogueModalContent(userProfileModalContent) }
+            command: () => { setDialogueModalContent(userProfileModalContent(false)) }
         },
         {
             label: 'Add New Devotee', 

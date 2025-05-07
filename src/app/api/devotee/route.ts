@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma'; // adjust to your prisma client
 import { verifyAccessToken } from '@/lib/auth'; // your JWT verification function
 import { devoteeSchema } from '@/schema/devoteeFormSchema';
+import { convertDatesDatesIntoDateObject } from '@/lib/conversions';
 
 export async function POST(req: NextRequest) {
   try {
@@ -15,7 +16,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
     }
 
-    const body = await req.json();
+    let body = await req.json();
+    body = convertDatesDatesIntoDateObject(body);
     const parsed = devoteeSchema.safeParse(body);
 
     if (!parsed.success) {

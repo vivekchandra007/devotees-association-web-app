@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import api from '@/lib/axios';
 import axios from 'axios';
 import { Prisma } from '@prisma/client';
+import { convertDatesDatesIntoDateObject } from '@/lib/conversions';
 
 type AuthContextType = {
   devotee: Devotee | null;
@@ -50,7 +51,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       setAuthInProgress(true);
       const res = await api.get('/auth/me');
       if (res && res.status === 200 && res.data?.devotee) {
-        setDevotee(res.data.devotee);
+        const parsedDevotee: Devotee = convertDatesDatesIntoDateObject(res.data.devotee);
+        setDevotee(parsedDevotee);
         setSystemRole(res.data.devotee.system_roles.name);
       } else {
         throw new Error();

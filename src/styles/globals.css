@@ -48,7 +48,8 @@ body {
 }
 
 .navbar-dialogue .p-dialog-content {
-  padding-left: 0;
+  padding: 0;
+  padding-bottom: 1rem;
 }
 
 .form-field-error-icon-coloring {
