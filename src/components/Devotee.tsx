@@ -145,7 +145,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
 
     return (
         <form onSubmit={formik.handleSubmit} className="text-sm md:text-base">
-            <ScrollPanel className="w-full h-auto max-h-[65vh]">
+            <ScrollPanel className="w-full h-auto max-h-[60vh]">
                 <Fieldset legend={<span>Personal Details<i className="pi pi-user-edit pl-2"></i></span>} toggleable>
                     <div className="grid sm:grid-cols-12 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div className="p-inputgroup mt-2 sm:mt-7">
