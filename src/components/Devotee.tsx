@@ -473,7 +473,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                                     onChange={(e) => {
                                         formik.setFieldValue("spouse_name", e.target.value);
                                     }} />
-                                <label htmlFor="spouse_name">Spouse Name</label>
+                                <label htmlFor="spouse_name">Spouse&apos;s Name</label>
                             </span>
                         </div>
                         <div className="p-inputgroup mt-2 sm:mt-7">
@@ -490,7 +490,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                                         formik.setFieldValue("spouse_dob", e.target.value);
                                     }}
                                 />
-                                <label htmlFor="spouse_dob">Spouse Date of Birth</label>
+                                <label htmlFor="spouse_dob">Spouse&apos;s Date of Birth</label>
                             </span>
                         </div>
                         <div className="p-inputgroup mt-2 sm:mt-7">
@@ -502,12 +502,12 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                                     inputId="spouse_marriage_anniversary"
                                     name="spouse_marriage_anniversary"
                                     dateFormat="dd/mm/yy" maxDate={new Date()}
-                                    value={formik.values.spouse_dob}
+                                    value={formik.values.spouse_marriage_anniversary}
                                     onChange={(e) => {
                                         formik.setFieldValue("spouse_marriage_anniversary", e.target.value);
                                     }}
                                 />
-                                <label htmlFor="spouse_marriage_anniversary">Spouse Marriage Anniversary</label>
+                                <label htmlFor="spouse_marriage_anniversary">Spouse&apos;s Marriage Anniversary</label>
                             </span>
                         </div>
                         <div className="p-inputgroup mt-2 sm:mt-7">
