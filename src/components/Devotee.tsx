@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useRef, useState } from "react";
 
 import {InputText} from "primereact/inputtext";
-import { Dropdown } from 'primereact/dropdown';
+import {Dropdown} from 'primereact/dropdown';
 import {useFormik} from "formik";
 import {classNames} from "primereact/utils";
 import {Button} from "primereact/button";
@@ -13,7 +13,7 @@ import {ScrollPanel} from "primereact/scrollpanel";
 import {Calendar} from "primereact/calendar";
 import {Fieldset} from "primereact/fieldset";
 import {Checkbox} from "primereact/checkbox";
-import {AutoComplete} from "primereact/autocomplete";
+import {AutoComplete, AutoCompleteCompleteEvent} from "primereact/autocomplete";
 // import {Chip} from "primereact/chip";
 import {SKILLS} from "@/data/skills";
 import {CITIES} from "@/data/cities";
@@ -22,6 +22,8 @@ import {AREAS} from "@/data/areas";
 import api from "@/lib/axios";
 import { Toast } from "primereact/toast";
 import { MessageSeverity } from "primereact/api";
+import { ProgressBar } from "primereact/progressbar";
+import { devotees } from "@prisma/client";
 
 interface DevoteeProps {
     devoteeId: number; // Adjust the type as needed (e.g., number, string, etc.)
@@ -33,15 +35,14 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
     const { devotee } = useAuth();
     const self: boolean = devotee?.id === devoteeId;
 
-    const [filteredSkills, setFilteredSkills] = useState([]);
-    const [filteredCities, setFilteredCities] = useState([]);
-    const [filteredAreas, setFilteredAreas] = useState([]);
+    const [filteredSkills, setFilteredSkills] = useState<string[] | null[]>();
+    const [filteredCities, setFilteredCities] = useState<string[] | null[]>();
+    const [filteredAreas, setFilteredAreas] = useState<string[] | null[]>();
 
     const formik = useFormik({
         initialValues: devotee!,
         validate: (data) => {
             const errors = {};
-
             if (!data.name) {
                 _.set(errors, "name", 'Name is required');
             }
@@ -51,16 +52,21 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
 
             return errors;
         },
-        onSubmit: async (values, { setSubmitting }) => {
-            formik.validateForm();
+        onSubmit: async (values: typeof devotee, { setSubmitting }) => {
             try {
-                // eslint-disable-next-line
-              const { system_roles, spiritual_levels, created_at, updated_at, ...filteredValues} = values;
-              await api.post('/devotee', filteredValues); // automatically sends token
-              showToastMessage('Updated Successfully', `Profile`, MessageSeverity.SUCCESS, 5000, false);
-              setTimeout(()=> {
-                window.location.reload()
-              }, 2000);
+                for (const key in values) {
+                    if (_.isEqual(values[key as keyof devotees], formik.initialValues[key as keyof devotees])) {
+                        if (key !== 'id') {
+                            delete values[key as keyof devotees];
+                        }
+                    }
+                }
+                console.log(values);
+                await api.post('/devotee', values); // automatically sends token
+                showToastMessage('Updated Successfully', `Profile`, MessageSeverity.SUCCESS, 5000, false);
+                setTimeout(()=> {
+                    window.location.reload()
+                }, 2000);
             } catch {
               showToastMessage('Could not save details. Refresh page and try again.', `Profile`, MessageSeverity.ERROR, 5000, false);
             } finally {
@@ -68,23 +74,14 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
             }
         },
     });
-    
-    // eslint-disable-next-line
-    const isFormFieldInvalid = (name: string | number) => !!(formik.touched.name && formik.errors.name);
-    const getFormErrorMessage = (name: string | number) => {
-        return isFormFieldInvalid(name) ? <small className="p-error">{_.get(formik.errors, name)}</small> : '';
+
+    const formContainsError:boolean = Object.keys(formik.errors).length !== 0;
+    const formatFormErrorMessage = (errorMessage: string) => {
+        return <small className="p-error">{errorMessage}</small>;
     };
 
-    const save = () => {
-        //props.submitAction(formik.values, props.userID, props.self);
-        formik.handleSubmit();
-        //formik.resetForm();
-    }
-
-    // eslint-disable-next-line
-    const skillsSearch = (event: any) => {
-        // eslint-disable-next-line
-        let _filteredSkills:any;
+    const skillsSearch = (event: AutoCompleteCompleteEvent) => {
+        let _filteredSkills:string[] | null | undefined;
         if (!event.query.trim().length) {
             _filteredSkills = SKILLS;
         }
@@ -96,10 +93,8 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
         setFilteredSkills(_filteredSkills);
     }
 
-    // eslint-disable-next-line
-    const citiesSearch = (event: any) => {
-        // eslint-disable-next-line
-        let _filteredCities:any;
+    const citiesSearch = (event: AutoCompleteCompleteEvent) => {
+        let _filteredCities:string[];
         if (!event.query.trim().length) {
             _filteredCities = CITIES;
         }
@@ -111,10 +106,8 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
         setFilteredCities(_filteredCities);
     }
 
-    // eslint-disable-next-line
-    const areasSearch = (event: any) => {
-        // eslint-disable-next-line
-        let _filteredAreas: any;
+    const areasSearch = (event: AutoCompleteCompleteEvent) => {
+        let _filteredAreas: string[];
         const city: string = formik.values.address_city || '';
         if (city && _.get(AREAS, city.toUpperCase())) {
             if (!event.query.trim().length) {
@@ -129,8 +122,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
     }
     const setValidState = (selectedCity: string) => {
         if (selectedCity) {
-            // eslint-disable-next-line
-            const validCity:any = ALL_CITIES.filter((city: any) => {
+            const validCity:object = ALL_CITIES.filter((city: {city: string}) => {
                 return city.city.toLowerCase() === selectedCity.toLowerCase();
             });
             if (validCity && Array.isArray(validCity) && validCity[0]) {
@@ -152,11 +144,11 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
     }
 
     return (
-        <form onSubmit={formik.handleSubmit}>
-            <ScrollPanel style={{ width: '100%', height: 'auto', maxHeight: '60vh' }}>
-                <Fieldset legend={<span>Personal Details<i className="pi pi-user-edit pl-2"></i></span>} toggleable className="has-no-padding has-no-margin">
+        <form onSubmit={formik.handleSubmit} className="text-sm md:text-base">
+            <ScrollPanel className="w-full h-auto max-h-[65vh]">
+                <Fieldset legend={<span>Personal Details<i className="pi pi-user-edit pl-2"></i></span>} toggleable>
                     <div className="grid sm:grid-cols-12 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div className="p-inputgroup mt-7">
+                        <div className="p-inputgroup mt-2 sm:mt-7">
                             <span className="p-inputgroup-addon">
                                 <i className="pi pi-phone"></i>
                             </span>
@@ -172,19 +164,19 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                                 </span>
                             }
                         </div>
-                        <div className="p-inputgroup mt-7">
-                            <span className={classNames('p-inputgroup-addon', {'form-field-error-icon': isFormFieldInvalid("email") })}>
+                        <div className="p-inputgroup mt-2 sm:mt-7">
+                            <span className={classNames('p-inputgroup-addon', {'form-field-error-icon-coloring': !!formik.errors["email"] })}>
                                 <i className="pi pi-at"></i>
                             </span>
                             <span className="p-float-label">
-                                <InputText id="email" maxLength={90}
+                                <InputText id="email" maxLength={255}
                                            value={formik.values.email}
                                            onChange={(e) => {
                                                formik.setFieldValue("email", e.target.value);
                                            }}
-                                           className={classNames({ 'p-invalid': isFormFieldInvalid("email") })} />
+                                           className={classNames({ 'p-invalid': !!formik.errors["email"] })} />
                                 <label className="capitalize"
-                                       htmlFor="email">{getFormErrorMessage("email") || 'Email'}</label>
+                                       htmlFor="email">{formatFormErrorMessage(formik.errors["email"]!) || 'Email'}</label>
                             </span>
                             {   formik.values["email_verified"] &&
                                 <span className="p-inputgroup-addon border-0" title={'Verified'}>
@@ -192,22 +184,22 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                                 </span>
                             }
                         </div>
-                        <div className="p-inputgroup mt-7">
-                            <span className={classNames('p-inputgroup-addon', {'form-field-error-icon': isFormFieldInvalid("name") })}>
+                        <div className="p-inputgroup mt-2 sm:mt-7">
+                            <span className={classNames('p-inputgroup-addon', {'form-field-error-icon-coloring': !!formik.errors["name"] })}>
                                 <i className="pi pi-user"></i>
                             </span>
                             <span className="p-float-label">
-                                <InputText id="name" required maxLength={60}
+                                <InputText id="name" required maxLength={100}
                                            value={formik.values.name}
                                            onChange={(e) => {
                                                formik.setFieldValue("name", e.target.value);
                                            }}
-                                           className={classNames({ 'p-invalid': isFormFieldInvalid("name") })} />
+                                           className={classNames({ 'p-invalid': !!formik.errors["name"] })} />
                                 <label className="capitalize"
-                                       htmlFor="name">{getFormErrorMessage("name") || 'Name'}</label>
+                                       htmlFor="name">{formatFormErrorMessage(formik.errors["name"]!) || 'Name'}</label>
                             </span>
                         </div>
-                        <div className="p-inputgroup mt-7">
+                        <div className="p-inputgroup mt-2 sm:mt-7">
                             <span className="p-inputgroup-addon">
                                 <i className="pi pi-sun"></i>
                             </span>
@@ -222,7 +214,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                             {/*{getFormErrorMessage(COLLECTION.DEVOTEES.INITIATED_NAME)}*/}
                         </div>
 
-                        <div className="p-inputgroup mt-7">
+                        <div className="p-inputgroup mt-2 sm:mt-7">
                             <span className="p-inputgroup-addon">
                                 <i className="pi pi-calendar"></i>
                             </span>
@@ -239,7 +231,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                                 <label htmlFor="dob">Date of Birth</label>
                             </span>
                         </div>
-                        <div className="p-inputgroup mt-7">
+                        <div className="p-inputgroup mt-2 sm:mt-7">
                             <span className="p-inputgroup-addon">
                                 <i className="pi pi-heart"></i>
                             </span>
@@ -259,7 +251,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                                 <label htmlFor="gender">Gender</label>
                             </span>
                         </div>
-                        <div className="p-inputgroup mt-7">
+                        <div className="p-inputgroup mt-2 sm:mt-7">
                             <span className="p-inputgroup-addon">
                                 <i className="pi pi-heart-fill"></i>
                             </span>
@@ -278,7 +270,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                                 <label htmlFor="marital_status">Marital Status</label>
                             </span>
                         </div>
-                        <div className="p-inputgroup mt-7">
+                        <div className="p-inputgroup mt-2 sm:mt-7">
                             <span className="p-inputgroup-addon">
                                 <i className="pi pi-language"></i>
                             </span>
@@ -303,7 +295,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                                 <label htmlFor="language_preference">Language Preference</label>
                             </span>
                         </div>
-                        <div className="p-inputgroup mt-7">
+                        <div className="p-inputgroup mt-2 sm:mt-7">
                             <span className="p-inputgroup-addon">
                                 <i className="pi pi-briefcase"></i>
                             </span>
@@ -324,7 +316,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                                 <label htmlFor="occupation">Occupation</label>
                             </span>
                         </div>
-                        <div className="p-inputgroup mt-7">
+                        <div className="p-inputgroup mt-2 sm:mt-7">
                             <span className="p-inputgroup-addon">
                                 <i className="pi pi-user"></i>
                             </span>
@@ -340,9 +332,9 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                     </div>
                 </Fieldset>
                 <br />
-                <Fieldset legend={<span>Address<i className="pi pi-map-marker pl-2"></i></span>} toggleable collapsed className="has-no-padding has-no-margin">
+                <Fieldset legend={<span>Address<i className="pi pi-map-marker pl-2"></i></span>} toggleable collapsed >
                     <div className="grid sm:grid-cols-12 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div className="p-inputgroup mt-7">
+                        <div className="p-inputgroup mt-2 sm:mt-7">
                             <span className="p-inputgroup-addon">
                                 <i className="pi pi-home"></i>
                             </span>
@@ -355,7 +347,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                                 <label htmlFor="address_line1">Line 1</label>
                             </span>
                         </div>
-                        <div className="p-inputgroup mt-7">
+                        <div className="p-inputgroup mt-2 sm:mt-7">
                             <span className="p-inputgroup-addon">
                                 <i className="pi pi-building"></i>
                             </span>
@@ -368,7 +360,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                                 <label htmlFor="address_society">Residential Society</label>
                             </span>
                         </div>
-                        <div className="p-inputgroup mt-7">
+                        <div className="p-inputgroup mt-2 sm:mt-7">
                             <span className="p-inputgroup-addon">
                                 <i className="pi pi-truck"></i>
                             </span>
@@ -381,14 +373,14 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                                 <label htmlFor="address_line2">Line 2</label>
                             </span>
                         </div>
-                        <div className="p-inputgroup mt-7">
+                        <div className="p-inputgroup mt-2 sm:mt-7">
                             <span className="p-inputgroup-addon">
                                 <i className="pi pi-th-large"></i>
                             </span>
                             <span className="p-float-label">
                                 <AutoComplete id="address_city" forceSelection
                                               value={formik.values.address_city}
-                                              suggestions={filteredCities}
+                                              suggestions={filteredCities as null[]}
                                               completeMethod={citiesSearch}
                                               onChange={(e) => {
                                                   formik.setFieldValue("address_city", e.value);
@@ -397,20 +389,20 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                                 <label htmlFor="address_city">City</label>
                             </span>
                         </div>
-                        <div className="p-inputgroup mt-7">
+                        <div className="p-inputgroup mt-2 sm:mt-7">
                             <span className="p-inputgroup-addon">
                                 <i className="pi pi-map-marker"></i>
                             </span>
                             <span className="p-float-label">
                                 <AutoComplete id="address_area" disabled={!formik.values.address_city}
                                               value={formik.values.address_area}
-                                              suggestions={filteredAreas}
+                                              suggestions={filteredAreas as null[]}
                                               completeMethod={areasSearch}
                                               onChange={(e) => formik.setFieldValue("address_area", e.value)} />
                                 <label htmlFor="address_area">Area</label>
                             </span>
                         </div>
-                        <div className="p-inputgroup mt-7">
+                        <div className="p-inputgroup mt-2 sm:mt-7">
                             <span className="p-inputgroup-addon">
                                 <i className="pi pi-box"></i>
                             </span>
@@ -423,7 +415,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                                 <label htmlFor="address_pincode">Pin Code</label>
                             </span>
                         </div>
-                        <div className="p-inputgroup mt-7">
+                        <div className="p-inputgroup mt-2 sm:mt-7">
                             <span className="p-inputgroup-addon">
                                 <i className="pi pi-table"></i>
                             </span>
@@ -433,7 +425,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                                 <label htmlFor="address_state">State</label>
                             </span>
                         </div>
-                        <div className="p-inputgroup mt-7">
+                        <div className="p-inputgroup mt-2 sm:mt-7">
                             <span className="p-inputgroup-addon">
                                 <i className="pi pi-flag"></i>
                             </span>
@@ -453,7 +445,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                                 <label htmlFor="address_country">Country</label>
                             </span>
                         </div>
-                        <div className="p-inputgroup mt-7">
+                        <div className="p-inputgroup mt-2 sm:mt-7">
                             <span className="p-inputgroup-addon">
                                 <i className="pi pi-map"></i>
                             </span>
@@ -469,21 +461,22 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                     </div>
                 </Fieldset>
                 <br/>
-                <Fieldset legend={<span>Skills (as many as possible)<i className="pi pi-wrench pl-2"></i></span>} toggleable collapsed className="has-no-padding has-no-margin">
-                    <div className="p-inputgroup mt-4">
+                <Fieldset legend={<span>Skills (as many as possible)<i className="pi pi-wrench pl-2"></i></span>} toggleable collapsed >
+                    <div className="p-inputgroup mt-3">
                         <span className="p-float-label">
                             <AutoComplete id="skills" multiple
                                           value={formik.values.skills}
                                           suggestions={filteredSkills}
                                           completeMethod={skillsSearch}
                                           onChange={(e) => formik.setFieldValue("skills", e.value)} />
-                            <label htmlFor="skills">Start typing and choose skills from list, one by one. Choose as many as you feel you can serve Shri Shri Radha Krishna with</label>
+                            <label htmlFor="skills">Start typing and choose skills from list</label>
                         </span>
                     </div>
+                    <small>Note: Choose as many skills as you feel you can serve Shri Shri Radha Krishna with</small>
                 </Fieldset>
                 <br/>
-                <Fieldset legend={<span>Communication Preferences<i className="pi pi-megaphone pl-2"></i></span>} toggleable collapsed className="has-no-padding has-no-margin">
-                    <div className="p-inputgroup mt-4">
+                <Fieldset legend={<span>Communication Preferences<i className="pi pi-megaphone pl-2"></i></span>} toggleable collapsed >
+                    <div className="p-inputgroup ml-0.5">
                         <Checkbox
                             id="whatsapp_consent"
                             name="whatsapp_consent"
@@ -494,7 +487,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                         ></Checkbox>&nbsp;&nbsp;
                         <span>I provide my consent to be communicated via WhatsApp.</span>
                     </div>
-                    <div className="p-inputgroup mt-7">
+                    <div className="p-inputgroup mt-2 sm:mt-7">
                         <span className="p-inputgroup-addon">
                             <i className="pi pi-mobile"></i>
                         </span>
@@ -513,7 +506,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                     </div>
                 </Fieldset>
                 <br/>
-                <Fieldset legend={<span>Memberships<i className="pi pi-id-card pl-2"></i></span>} toggleable collapsed className="has-no-padding has-no-margin">
+                <Fieldset legend={<span>Memberships<i className="pi pi-id-card pl-2"></i></span>} toggleable collapsed >
                     Temple: &nbsp;
                     <a href="https://iskconpunebcec.com/#/Home" target="_blank" rel="noopener noreferrer" className="underline">
                         ISKCON BCEC
@@ -528,26 +521,58 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                     </div> */}
                 </Fieldset>
                 <br/>
-                <Fieldset legend={<span>For official purposes<i className="pi pi-lock pl-2"></i></span>} toggleable collapsed className="has-no-padding has-no-margin">
-                    <div className="grid sm:grid-cols-12 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Fieldset legend={<span>For official purposes<i className="pi pi-lock pl-2"></i></span>} toggleable collapsed >
+                    <div className="grid md:grid-cols-2 gap-4">
                         <div>
                             Counsellor ID: {formik.values.counsellor_id}
                         </div>
                         {
-                        self && 
-                        <div className="capitalize">
-                            Source: {formik.values.source}
-                        </div>
+                            self && 
+                            (
+                                <div className="capitalize">
+                                    Referred By: {formik.values.source}
+                                </div>
+                            )
                         }
                     </div>
                 </Fieldset>
             </ScrollPanel>
-            <div className="grid grid-cols-2 mt-7">
-                <div>
-                    <small className="float-left"><strong>Note: Phone Number</strong> and <strong>Email</strong> can only be updated from User <i className="pi pi-cog"></i> Settings Page because they need verification.</small>
+            <br />
+            {
+                formik.isSubmitting ? 
+                <ProgressBar mode="indeterminate" style={{ height: '2px' }}></ProgressBar> 
+                : 
+                <hr className="h-[2px] border-0 bg-gray-400 rounded-2xl"/>
+            }
+            <div className="grid grid-cols-12 items-center">
+                <div className="col-span-8 md:col-span-10 mt-4 ml-1">
+                    {
+                        formContainsError? 
+                        (
+                            <small className="text-red-700">
+                                <strong>Form contains errror. Please correct those and then save.</strong>
+                            </small>
+                        )
+                        :
+                        (
+                            <small>
+                                <strong>Note: Phone Number</strong> can only be updated from User&nbsp;
+                                <i className="pi pi-cog"></i>&nbsp;Settings Page because it need verification via OTP.
+                            </small>
+                        )
+                    }
                 </div>
-                <div className="mr-3">
-                    <Button label="Save" icon="pi pi-save" className="float-right p-button-danger" type="button" size="large" onClick={save}/>
+                <div className="col-span-4 md:col-span-2 mr-1 mt-4">
+                    <Button
+                        className="float-right"
+                        size="small"
+                        type="submit"
+                        label="Save"
+                        icon="pi pi-save"
+                        loading={formik.isSubmitting}
+                        disabled={!formik.dirty || formContainsError}
+                        raised
+                    />
                 </div>
             </div>
             <Toast ref={toast} position="top-center"/>

@@ -22,8 +22,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Validation failed', details: parsed.error.flatten() }, { status: 400 });
     }
 
-    if (parsed.data.id !== payload && parsed.data.role_id <= 1) {
-        // either it be devotee himself or a role_id > 1 i.e. a leader or admin who can make changes to some devotee's data
+    if (parsed.data.id !== payload) {
+      // TODO: either it be devotee himself or a role_id > 1 i.e. a leader or admin who can make changes to some devotee's data
       return NextResponse.json({ error: 'Forbidden: Mismatched devotee ID' }, { status: 403 });
     }
 

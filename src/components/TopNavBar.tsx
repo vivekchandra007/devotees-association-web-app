@@ -27,7 +27,8 @@ export default function TopNavBar() {
         header: 'Edit Profile',
         content: (
             devotee?.id? <Devotee devoteeId={devotee?.id} /> : <></>
-        )
+        ),
+        width: '99vw'
     }
 
     const [dialogueModalContent, setDialogueModalContent] = useState<dialogueModalContentType | null>(userProfileModalContent);
@@ -174,7 +175,7 @@ export default function TopNavBar() {
             <Menubar className="component-transparent" model={topMenuItems} end={end} />
             {inProgress ? <ProgressBar mode="indeterminate" style={{ height: '2px' }}></ProgressBar> : ''}
 
-            <Dialog header={dialogueModalContent ? dialogueModalContent.header : ''}
+            <Dialog className="navbar-dialogue" header={dialogueModalContent ? dialogueModalContent.header : ''}
                 visible={!!dialogueModalContent} style={{ width: dialogueModalContent?.width || '90vw' }}
                 onHide={hideDialogueModal} footer={dialogueModalContent?.footer || ''}>
                 <span className="mb-5">
