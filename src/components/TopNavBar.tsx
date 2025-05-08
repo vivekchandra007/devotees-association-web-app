@@ -145,10 +145,21 @@ export default function TopNavBar() {
                     <button onClick={(e) => options.onClick(e)} className={classNames(options.className, 'w-full p-link flex align-items-center')}>
                         <Avatar className="grid m-1" image="/devotee-user-icon.png" size="large" shape="circle" />
                         <div>
-                            <span className="font-bold">{devotee?.initiated_name || ''}
-                                <span className={classNames(devotee?.initiated_name? '' : 'font-bold','capitalize')}>
+                            {
+                                devotee?.initiated_name && 
+                                (
+                                <span className="flex font-bold capitalize">
+                                    {devotee?.initiated_name || ''}
+                                </span>
+                                )
+                            }
+                            <span className={classNames(devotee?.initiated_name? '' : 'font-bold')}>
+                                {
+                                    (devotee?.initiated_name ? 'aka. ' : '')
+                                }
+                                <span className="capitalize">
                                     {
-                                        (devotee?.initiated_name || '') + (devotee?.initiated_name ? 'aka. ' : '') + (devotee?.name || '') + ('    ') + (devotee?.gender ? devotee.spiritual_levels[`title_${devotee?.gender}`] : '' )
+                                        (devotee?.name || '') + ('    ') + (devotee?.gender && !devotee?.initiated_name ? devotee.spiritual_levels[`title_${devotee?.gender}`] : '' )
                                     }
                                 </span>
                             </span>

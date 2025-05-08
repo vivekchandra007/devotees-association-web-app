@@ -54,15 +54,16 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
         },
         onSubmit: async (values: typeof devotee, { setSubmitting }) => {
             try {
-                for (const key in values) {
-                    if (_.isEqual(values[key as keyof devotees], formik.initialValues[key as keyof devotees])) {
+                let editedValues: (typeof devotee | undefined) = values? {...values} : undefined;
+                for (const key in editedValues) {
+                    if (_.isEqual(editedValues[key as keyof devotees], formik.initialValues[key as keyof devotees])) {
                         if (key !== 'id') {
-                            delete values[key as keyof devotees];
+                            delete editedValues[key as keyof devotees];
                         }
                     }
                 }
-                values = convertDateObjectIntoDateString(values!);
-                await api.post('/devotee', values); // automatically sends token
+                editedValues = convertDateObjectIntoDateString(editedValues!);
+                await api.post('/devotee', editedValues); // automatically sends token
                 showToastMessage('Updated Successfully. Refreshing now to process changes.', `Profile`, MessageSeverity.SUCCESS, 4000, false);
                 setTimeout(() => {
                     window.location.reload();
