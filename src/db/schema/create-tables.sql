@@ -40,6 +40,8 @@ CREATE TABLE IF NOT EXISTS devotees (
   dob DATE NULL,
   occupation VARCHAR(21) NULL,
   occupation_position VARCHAR(100) NULL,
+  tax_80g_required BOOLEAN NOT NULL DEFAULT false,
+  tax_pan VARCHAR(10) NULL,
   skills JSON NULL,
   temple_memberships JSON NULL,
   class_memberships JSON NULL,
