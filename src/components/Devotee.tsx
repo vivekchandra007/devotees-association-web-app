@@ -14,7 +14,6 @@ import { Calendar } from "primereact/calendar";
 import { Fieldset } from "primereact/fieldset";
 import { Checkbox } from "primereact/checkbox";
 import { AutoComplete, AutoCompleteCompleteEvent } from "primereact/autocomplete";
-// import {Chip} from "primereact/chip";
 import { SKILLS } from "@/data/skills";
 import { CITIES } from "@/data/cities";
 import ALL_CITIES from "@/data/states.json";
@@ -26,7 +25,7 @@ import { ProgressBar } from "primereact/progressbar";
 import { devotees } from "@prisma/client";
 
 interface DevoteeProps {
-    devoteeId: number; // Adjust the type as needed (e.g., number, string, etc.)
+    devoteeId: number;
 }
 
 export default function Devotee({ devoteeId }: DevoteeProps) {
