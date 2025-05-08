@@ -12,6 +12,8 @@ export const devoteeSchema = z.object({
   gender: z.enum(['male', 'female', 'other']).nullable().optional(),
   occupation: z.string().max(21).nullable().optional(),
   occupation_position: z.string().max(51).nullable().optional(),
+  tax_80g_required: z.boolean().optional(),
+  tax_pan: z.string().max(10).nullable().optional(),
   skills: z.any().nullable().optional(),
   temple_memberships: z.any().nullable().optional(),
   class_memberships: z.any().nullable().optional(),

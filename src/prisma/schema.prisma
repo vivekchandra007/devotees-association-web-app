@@ -59,6 +59,8 @@ model devotees {
   internal_note                String?          @db.Text
   created_at                   DateTime         @default(now()) @db.Timestamp(0)
   updated_at                   DateTime         @default(now()) @db.Timestamp(0)
+  tax_80g_required             Boolean?         @default(false)
+  tax_pan                      String?          @db.VarChar(10)
   system_roles                 system_roles     @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_1")
   spiritual_levels             spiritual_levels @relation(fields: [spiritual_level], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_2")
   devotees                     devotees?        @relation("devoteesTodevotees", fields: [counsellor_id], references: [id], map: "fk_counsellor")

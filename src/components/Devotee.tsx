@@ -335,6 +335,34 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                     </Fieldset>
                     <br />
 
+                    <Fieldset legend={<span>Tax Benefits<i className="pi pi-file-check pl-2"></i></span>} toggleable collapsed >
+                        <div className="p-inputgroup ml-0.5">
+                            <Checkbox
+                                id="tax_80g_required"
+                                name="tax_80g_required"
+                                checked={formik.values.tax_80g_required!}
+                                onChange={(e) => {
+                                    formik.setFieldValue("tax_80g_required", e.checked);
+                                }}
+                            ></Checkbox>&nbsp;&nbsp;
+                            <span>80G certificate required</span>
+                        </div>
+                        <div className="p-inputgroup mt-2 sm:mt-7">
+                            <span className="p-inputgroup-addon">
+                                <i className="pi pi-id-card"></i>
+                            </span>
+                            <span className="p-float-label">
+                                <InputText id="tax_pan" maxLength={10} keyfilter={/^[a-zA-Z0-9]*$/} disabled={!formik.values.tax_80g_required}
+                                    value={formik.values.tax_pan} className="uppercase"
+                                    onChange={(e) => {
+                                        formik.setFieldValue("tax_pan", e.target.value);
+                                    }} />
+                                <label htmlFor="tax_pan">PAN Number (e.g. ABCDE1234F)</label>
+                            </span>
+                        </div>
+                    </Fieldset>
+                    <br />
+
                     <Fieldset legend={<span>Address<i className="pi pi-map-marker pl-2"></i></span>} toggleable collapsed >
                         <div className="grid sm:grid-cols-12 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div className="p-inputgroup mt-2 sm:mt-7">
@@ -464,7 +492,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                         </div>
                     </Fieldset>
                     <br />
-                    <Fieldset legend={<span>Family Details<i className="pi pi-user-edit pl-2"></i></span>} toggleable>
+                    <Fieldset legend={<span>Family Details<i className="pi pi-user-edit pl-2"></i></span>} toggleable collapsed>
                         <div className="grid sm:grid-cols-12 md:grid-cols-2 lg:grid-cols-4 gap-4">
                             <div className="p-inputgroup mt-2 sm:mt-7">
                                 <span className="p-inputgroup-addon">
@@ -810,7 +838,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                             (
                                 <small>
                                     <strong>Note: Phone Number</strong> can only be updated from User&nbsp;
-                                    <i className="pi pi-cog"></i>&nbsp;Settings Page because it need verification via OTP.
+                                    <i className="pi pi-cog"></i>&nbsp;Settings Page because it needs verification via OTP.
                                 </small>
                             )
                     }
