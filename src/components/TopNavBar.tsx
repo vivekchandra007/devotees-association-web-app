@@ -95,7 +95,7 @@ export default function TopNavBar() {
     const ReferralsModalContent = {
         header: 'Referrals',
         content: (<Referrals />),
-        width: '50vw'
+        width: '90vw'
     }
 
     const AddNewDevoteeModalContent = {

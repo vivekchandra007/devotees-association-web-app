@@ -37,16 +37,16 @@ export default function Referrals() {
 
     return (
         <div className="p-4 space-y-4">
-            <h2 className="text-lg font-semibold">Your Referral Link</h2>
+            <h2 className="text-lg font-semibold">Your Personal Referral Link and QR Code</h2>
             <div className="flex gap-2 items-center">
-                <InputText value={referralLink} readOnly className="w-full" />
-                <Button icon="pi pi-copy" onClick={copyToClipboard} tooltip="Copy" />
                 <Button
                     icon="pi pi-qrcode"
                     className="p-button-secondary"
                     onClick={() => setShowQR(true)}
                     tooltip="Show QR Code"
                 />
+                <InputText value={referralLink} readOnly className="w-full" />
+                <Button icon="pi pi-copy" onClick={copyToClipboard} tooltip="Copy" />
             </div>
 
             <Dialog
@@ -60,7 +60,7 @@ export default function Referrals() {
                 </div>
             </Dialog>
 
-            <small>Note: You can share it anyone, over any platform and if they login using this link, they will appear in below list</small>
+            <small>Note: You can share the above QR code or link with anyone, over any platform and if they login using this link, they will appear in below list</small>
 
 
             <h2 className="text-lg font-semibold mt-4">Referred Devotees</h2>
