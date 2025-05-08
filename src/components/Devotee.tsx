@@ -64,12 +64,22 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                 }
                 editedValues = convertDateObjectIntoDateString(editedValues!);
                 await api.post('/devotee', editedValues); // automatically sends token
-                showToastMessage('Updated Successfully. Refreshing now to process changes.', `Profile`, MessageSeverity.SUCCESS, 4000, false);
+                toast.current?.show({
+                    severity: MessageSeverity.SUCCESS,
+                    summary: `Profile`,
+                    detail: 'Updated Successfully. Refreshing now to process changes.', 
+                    life: 4000
+                });
                 setTimeout(() => {
                     window.location.reload();
-                }, 4000);
+                }, 4100);
             } catch {
-                showToastMessage('Could not save your details. Try again or ultimately Refresh the page.', `Profile`, MessageSeverity.ERROR, 10000, false);
+                toast.current?.show({
+                    severity: MessageSeverity.ERROR,
+                    summary: `Profile`,
+                    detail:  'Could not save your details. Try saving again or ultimately Refresh the page.', 
+                    life: 10000
+                });
             } finally {
                 setSubmitting(false);
             }
@@ -132,16 +142,6 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
         } else {
             formik.values.address_state = '';
         }
-    }
-
-    const showToastMessage = (message: string, summary?: string, severity?: MessageSeverity, life?: number, sticky?: boolean) => {
-        toast.current?.show({
-            severity: severity || MessageSeverity.ERROR,
-            summary: (summary || MessageSeverity.ERROR).toUpperCase(),
-            detail: message,
-            life: life || 3000,
-            sticky
-        });
     }
 
     return (
