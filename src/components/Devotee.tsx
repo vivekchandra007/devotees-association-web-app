@@ -54,7 +54,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
         },
         onSubmit: async (values: typeof devotee, { setSubmitting }) => {
             try {
-                let editedValues: (typeof devotee | undefined) = values? {...values} : undefined;
+                let editedValues: (typeof devotee | undefined) = values ? { ...values } : undefined;
                 for (const key in editedValues) {
                     if (_.isEqual(editedValues[key as keyof devotees], formik.initialValues[key as keyof devotees])) {
                         if (key !== 'id') {
@@ -78,7 +78,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
 
     const formContainsError: boolean = Object.keys(formik.errors).length !== 0;
     const formatFormErrorMessage = (errorMessage: string) => {
-        return <small className="p-error">{errorMessage}</small>;
+        return errorMessage ? <small className="p-error">{errorMessage}</small> : null;
     };
 
     const skillsSearch = (event: AutoCompleteCompleteEvent) => {
@@ -146,624 +146,624 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
 
     return (
         <form onSubmit={formik.handleSubmit} className="text-sm md:text-base">
-            { !formik.isSubmitting && 
-            <ScrollPanel className="w-full h-auto max-h-[55vh]">
-                <Fieldset legend={<span>Personal Details<i className="pi pi-user-edit pl-2"></i></span>} toggleable>
-                    <div className="grid sm:grid-cols-12 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-phone"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <InputText id="phone" disabled maxLength={14}
-                                    value={formik.values.phone?.slice(2)} />
-                                <label className="capitalize"
-                                    htmlFor="phone">Phone Number</label>
-                            </span>
-                            {formik.values.phone_verified &&
-                                <span className="p-inputgroup-addon border-0" title={'Verified'}>
-                                    <i className="pi pi-check-circle text-green-500"></i>
+            {!formik.isSubmitting &&
+                <ScrollPanel className="w-full h-auto max-h-[55vh]">
+                    <Fieldset legend={<span>Personal Details<i className="pi pi-user-edit pl-2"></i></span>} toggleable>
+                        <div className="grid sm:grid-cols-12 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-phone"></i>
                                 </span>
-                            }
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className={classNames('p-inputgroup-addon', { 'form-field-error-icon-coloring': !!formik.errors["email"] })}>
-                                <i className="pi pi-at"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <InputText id="email" maxLength={255}
-                                    value={formik.values.email}
-                                    onChange={(e) => {
-                                        formik.setFieldValue("email", e.target.value);
-                                    }}
-                                    className={classNames({ 'p-invalid': !!formik.errors["email"] })} />
-                                <label className="capitalize"
-                                    htmlFor="email">{formatFormErrorMessage(formik.errors["email"]!) || 'Email'}</label>
-                            </span>
-                            {formik.values["email_verified"] &&
-                                <span className="p-inputgroup-addon border-0" title={'Verified'}>
-                                    <i className="pi pi-check-circle text-green-500"></i>
+                                <span className="p-float-label">
+                                    <InputText id="phone" disabled maxLength={14}
+                                        value={formik.values.phone?.slice(2)} />
+                                    <label className="capitalize"
+                                        htmlFor="phone">Phone Number</label>
                                 </span>
-                            }
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className={classNames('p-inputgroup-addon', { 'form-field-error-icon-coloring': !!formik.errors["name"] })}>
-                                <i className="pi pi-user"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <InputText id="name" required maxLength={100}
-                                    value={formik.values.name}
-                                    onChange={(e) => {
-                                        formik.setFieldValue("name", e.target.value);
-                                    }}
-                                    className={classNames({ 'p-invalid': !!formik.errors["name"] })} />
-                                <label className="capitalize"
-                                    htmlFor="name">{formatFormErrorMessage(formik.errors["name"]!) || 'Name'}</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-sun"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <InputText id="initiated_name" maxLength={90}
-                                    value={formik.values.initiated_name}
-                                    onChange={(e) => {
-                                        formik.setFieldValue("initiated_name", e.target.value);
-                                    }} />
-                                <label htmlFor="initiated_name">Initiated Name</label>
-                            </span>
-                            {/*{getFormErrorMessage(COLLECTION.DEVOTEES.INITIATED_NAME)}*/}
-                        </div>
-
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-calendar"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <Calendar
-                                    inputId="dob"
-                                    name="dob"
-                                    dateFormat="dd/mm/yy" maxDate={new Date()}
-                                    value={formik.values.dob}
-                                    onChange={(e) => {
-                                        formik.setFieldValue("dob", e.target.value);
-                                    }}
-                                />
-                                <label htmlFor="dob">Date of Birth</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-heart"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <Dropdown id="gender" showClear
-                                    value={formik.values.gender}
-                                    options={[
-                                        { name: 'Female', code: 'female' },
-                                        { name: 'Male', code: 'male' },
-                                        { name: 'Other', code: 'other' }
-                                    ]}
-                                    optionLabel="name" optionValue="code"
-                                    onChange={(e) => {
-                                        formik.setFieldValue("gender", e.value);
-                                    }}
-                                    placeholder="You identify as" />
-                                <label htmlFor="gender">Gender</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-heart-fill"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <Dropdown id="marital_status" showClear
-                                    value={formik.values.marital_status}
-                                    options={[
-                                        { name: 'Yes', code: true },
-                                        { name: 'No', code: false }
-                                    ]}
-                                    optionLabel="name" optionValue="code"
-                                    onChange={(e) => {
-                                        formik.setFieldValue("marital_status", e.value);
-                                    }}
-                                    placeholder="Are you married" />
-                                <label htmlFor="marital_status">Marital Status</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-language"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <Dropdown id="language_preference" showClear
-                                    value={formik.values.language_preference}
-                                    options={[
-                                        { name: 'Hindi', code: 'hindi' },
-                                        { name: 'English', code: 'english' },
-                                        { name: 'Marathi', code: 'marathi' },
-                                        { name: 'Tamil', code: 'tamil' },
-                                        { name: 'Telegu', code: 'telegu' },
-                                        { name: 'Gujarati', code: 'gujarati' },
-                                        { name: 'Kannada', code: 'kannada' },
-                                        { name: 'Other', code: 'other' },
-                                    ]}
-                                    optionLabel="name" optionValue="code"
-                                    onChange={(e) => {
-                                        formik.setFieldValue("language_preference", e.value);
-                                    }}
-                                    placeholder="Preferred Language for Class" />
-                                <label htmlFor="language_preference">Language Preference</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-briefcase"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <Dropdown id="occupation" showClear
-                                    value={formik.values.occupation}
-                                    options={[
-                                        { name: 'Service', code: 'Service' },
-                                        { name: 'Business', code: 'Business' },
-                                        { name: 'Professional', code: 'Professional' },
-                                        { name: 'Others', code: 'Others' }
-                                    ]}
-                                    optionLabel="name" optionValue="code"
-                                    onChange={(e) => {
-                                        formik.setFieldValue("occupation", e.value);
-                                    }}
-                                    placeholder="Your occupation" />
-                                <label htmlFor="occupation">Occupation</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-user"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <InputText id="occupation_position" maxLength={100}
-                                    value={formik.values.occupation_position}
-                                    onChange={(e) => {
-                                        formik.setFieldValue("occupation_position", e.target.value);
-                                    }} />
-                                <label htmlFor="occupation_position">Occupation Position</label>
-                            </span>
-                        </div>
-                    </div>
-                </Fieldset>
-                <br />
-                
-                <Fieldset legend={<span>Address<i className="pi pi-map-marker pl-2"></i></span>} toggleable collapsed >
-                    <div className="grid sm:grid-cols-12 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-home"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <InputText id="address_line1" maxLength={255}
-                                    value={formik.values.address_line1}
-                                    onChange={(e) => {
-                                        formik.setFieldValue("address_line1", e.target.value);
-                                    }} />
-                                <label htmlFor="address_line1">Line 1</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-building"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <InputText id="address_society" maxLength={255}
-                                    value={formik.values.address_society}
-                                    onChange={(e) => {
-                                        formik.setFieldValue("address_society", e.target.value);
-                                    }} />
-                                <label htmlFor="address_society">Residential Society</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-truck"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <InputText id="address_line2" maxLength={255}
-                                    value={formik.values.address_line2}
-                                    onChange={(e) => {
-                                        formik.setFieldValue("address_line2", e.target.value);
-                                    }} />
-                                <label htmlFor="address_line2">Line 2</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-th-large"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <AutoComplete id="address_city" forceSelection
-                                    value={formik.values.address_city}
-                                    suggestions={filteredCities as null[]}
-                                    completeMethod={citiesSearch}
-                                    onChange={(e) => {
-                                        formik.setFieldValue("address_city", e.value);
-                                        setValidState(e.target.value!);
-                                    }} />
-                                <label htmlFor="address_city">City</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-map-marker"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <AutoComplete id="address_area" disabled={!formik.values.address_city}
-                                    value={formik.values.address_area}
-                                    suggestions={filteredAreas as null[]}
-                                    completeMethod={areasSearch}
-                                    onChange={(e) => formik.setFieldValue("address_area", e.value)} />
-                                <label htmlFor="address_area">Area</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-box"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <InputText id="address_pincode" maxLength={6} keyfilter="int"
-                                    value={formik.values.address_pincode}
-                                    onChange={(e) => {
-                                        formik.setFieldValue("address_pincode", e.target.value);
-                                    }} />
-                                <label htmlFor="address_pincode">Pin Code</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-table"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <InputText id="address_state" disabled
-                                    value={formik.values.address_state} />
-                                <label htmlFor="address_state">State</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-flag"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <Dropdown id="address_country" showClear
-                                    value={formik.values.address_country}
-                                    options={[
-                                        { name: 'India', code: 'India' },
-                                        { name: 'USA', code: 'USA' },
-                                        { name: 'Others', code: 'Others' }
-                                    ]}
-                                    optionLabel="name" optionValue="code"
-                                    onChange={(e) => {
-                                        formik.setFieldValue("address_country", e.value);
-                                    }}
-                                    placeholder="Your country" />
-                                <label htmlFor="address_country">Country</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-map"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <InputText id="address_gmap_url" maxLength={1000}
-                                    value={formik.values.address_gmap_url}
-                                    onChange={(e) => {
-                                        formik.setFieldValue("address_gmap_url", e.target.value);
-                                    }} />
-                                <label htmlFor="address_gmap_url">Google Maps URL</label>
-                            </span>
-                        </div>
-                    </div>
-                </Fieldset>
-                <br />
-                <Fieldset legend={<span>Family Details<i className="pi pi-user-edit pl-2"></i></span>} toggleable>
-                    <div className="grid sm:grid-cols-12 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-user"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <InputText id="spouse_name" maxLength={100}
-                                    value={formik.values.spouse_name}
-                                    onChange={(e) => {
-                                        formik.setFieldValue("spouse_name", e.target.value);
-                                    }} />
-                                <label htmlFor="spouse_name">Spouse&apos;s Name</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-calendar"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <Calendar
-                                    inputId="spouse_dob"
-                                    name="spouse_dob"
-                                    dateFormat="dd/mm/yy" maxDate={new Date()}
-                                    value={formik.values.spouse_dob}
-                                    onChange={(e) => {
-                                        formik.setFieldValue("spouse_dob", e.target.value);
-                                    }}
-                                />
-                                <label htmlFor="spouse_dob">Spouse&apos;s Date of Birth</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-calendar"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <Calendar
-                                    inputId="spouse_marriage_anniversary"
-                                    name="spouse_marriage_anniversary"
-                                    dateFormat="dd/mm/yy" maxDate={new Date()}
-                                    value={formik.values.spouse_marriage_anniversary}
-                                    onChange={(e) => {
-                                        formik.setFieldValue("spouse_marriage_anniversary", e.target.value);
-                                    }}
-                                />
-                                <label htmlFor="spouse_marriage_anniversary">Spouse&apos;s Marriage Anniversary</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-user"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <InputText id="parents_father_name" maxLength={100}
-                                    value={formik.values.parents_father_name}
-                                    onChange={(e) => {
-                                        formik.setFieldValue("parents_father_name", e.target.value);
-                                    }} />
-                                <label htmlFor="parents_father_name">Father&apos;s Name</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-calendar"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <Calendar
-                                    inputId="parents_father_dob"
-                                    name="parents_father_dob"
-                                    dateFormat="dd/mm/yy" maxDate={new Date()}
-                                    value={formik.values.parents_father_dob}
-                                    onChange={(e) => {
-                                        formik.setFieldValue("parents_father_dob", e.target.value);
-                                    }}
-                                />
-                                <label htmlFor="parents_father_dob">Father&apos;s Date of Birth</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-user"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <InputText id="parents_mother_name" maxLength={100}
-                                    value={formik.values.parents_mother_name}
-                                    onChange={(e) => {
-                                        formik.setFieldValue("parents_mother_name", e.target.value);
-                                    }} />
-                                <label htmlFor="parents_mother_name">Mother&apos;s Name</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-calendar"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <Calendar
-                                    inputId="parents_mother_dob"
-                                    name="parents_mother_dob"
-                                    dateFormat="dd/mm/yy" maxDate={new Date()}
-                                    value={formik.values.parents_mother_dob}
-                                    onChange={(e) => {
-                                        formik.setFieldValue("parents_mother_dob", e.target.value);
-                                    }}
-                                />
-                                <label htmlFor="parents_mother_dob">Mother&apos;s Date of Birth</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-calendar"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <Calendar
-                                    inputId="parents_marriage_anniversary"
-                                    name="parents_marriage_anniversary"
-                                    dateFormat="dd/mm/yy" maxDate={new Date()}
-                                    value={formik.values.parents_marriage_anniversary}
-                                    onChange={(e) => {
-                                        formik.setFieldValue("parents_marriage_anniversary", e.target.value);
-                                    }}
-                                />
-                                <label htmlFor="parents_marriage_anniversary">Parent&apos;s Marriage Anniversary</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-user"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <InputText id="children_1_name" maxLength={100}
-                                    value={formik.values.children_1_name}
-                                    onChange={(e) => {
-                                        formik.setFieldValue("children_1_name", e.target.value);
-                                    }} />
-                                <label htmlFor="children_1_name">1st Child&apos;s Name</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-calendar"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <Calendar
-                                    inputId="children_1_dob"
-                                    name="children_1_dob"
-                                    dateFormat="dd/mm/yy" maxDate={new Date()}
-                                    value={formik.values.children_1_dob}
-                                    onChange={(e) => {
-                                        formik.setFieldValue("children_1_dob", e.target.value);
-                                    }}
-                                />
-                                <label htmlFor="children_1_dob">1st Child&apos;s Date of Birth</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-user"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <InputText id="children_2_name" maxLength={100}
-                                    value={formik.values.children_2_name}
-                                    onChange={(e) => {
-                                        formik.setFieldValue("children_2_name", e.target.value);
-                                    }} />
-                                <label htmlFor="children_2_name">2nd Child&apos;s Name</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-calendar"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <Calendar
-                                    inputId="children_2_dob"
-                                    name="children_2_dob"
-                                    dateFormat="dd/mm/yy" maxDate={new Date()}
-                                    value={formik.values.children_2_dob}
-                                    onChange={(e) => {
-                                        formik.setFieldValue("children_2_dob", e.target.value);
-                                    }}
-                                />
-                                <label htmlFor="children_2_dob">2nd Child&apos;s Date of Birth</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-user"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <InputText id="children_3_name" maxLength={100}
-                                    value={formik.values.children_3_name}
-                                    onChange={(e) => {
-                                        formik.setFieldValue("children_3_name", e.target.value);
-                                    }} />
-                                <label htmlFor="children_3_name">3rd Child&apos;s Name</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-calendar"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <Calendar
-                                    inputId="children_3_dob"
-                                    name="children_3_dob"
-                                    dateFormat="dd/mm/yy" maxDate={new Date()}
-                                    value={formik.values.children_3_dob}
-                                    onChange={(e) => {
-                                        formik.setFieldValue("children_3_dob", e.target.value);
-                                    }}
-                                />
-                                <label htmlFor="children_3_dob">3rd Child&apos;s Date of Birth</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-user"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <InputText id="children_4_name" maxLength={100}
-                                    value={formik.values.children_4_name}
-                                    onChange={(e) => {
-                                        formik.setFieldValue("children_4_name", e.target.value);
-                                    }} />
-                                <label htmlFor="children_4_name">4th Child&apos;s Name</label>
-                            </span>
-                        </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
-                            <span className="p-inputgroup-addon">
-                                <i className="pi pi-calendar"></i>
-                            </span>
-                            <span className="p-float-label">
-                                <Calendar
-                                    inputId="children_4_dob"
-                                    name="children_4_dob"
-                                    dateFormat="dd/mm/yy" maxDate={new Date()}
-                                    value={formik.values.children_4_dob}
-                                    onChange={(e) => {
-                                        formik.setFieldValue("children_4_dob", e.target.value);
-                                    }}
-                                />
-                                <label htmlFor="children_4_dob">4th Child&apos;s Date of Birth</label>
-                            </span>
-                        </div>
-                    </div>
-                </Fieldset>
-                <br />
-                <Fieldset legend={<span>Skills (as many as possible)<i className="pi pi-wrench pl-2"></i></span>} toggleable collapsed >
-                    <div className="p-inputgroup mt-3">
-                        <span className="p-float-label">
-                            <AutoComplete id="skills" multiple
-                                value={formik.values.skills}
-                                suggestions={filteredSkills}
-                                completeMethod={skillsSearch}
-                                onChange={(e) => formik.setFieldValue("skills", e.value)} />
-                            <label htmlFor="skills">Start typing and choose skills from list</label>
-                        </span>
-                    </div>
-                    <small>Note: Choose as many skills as you feel you can serve Shri Shri Radha Krishna with</small>
-                </Fieldset>
-                <br />
-                <Fieldset legend={<span>Communication Preferences<i className="pi pi-megaphone pl-2"></i></span>} toggleable collapsed >
-                    <div className="p-inputgroup ml-0.5">
-                        <Checkbox
-                            id="whatsapp_consent"
-                            name="whatsapp_consent"
-                            checked={formik.values.whatsapp_consent}
-                            onChange={(e) => {
-                                formik.setFieldValue("whatsapp_consent", e.checked);
-                            }}
-                        ></Checkbox>&nbsp;&nbsp;
-                        <span>I provide my consent to be communicated via WhatsApp.</span>
-                    </div>
-                    <div className="p-inputgroup mt-2 sm:mt-7">
-                        <span className="p-inputgroup-addon">
-                            <i className="pi pi-mobile"></i>
-                        </span>
-                        <span className="p-float-label">
-                            <InputText id="phone_whatsapp" maxLength={14} keyfilter="int" disabled={!formik.values.whatsapp_consent}
-                                value=
-                                {
-                                    !formik.values.whatsapp_consent ? '' :
-                                        (formik.values.phone_whatsapp?.slice(2) || formik.values.phone?.slice(2))
+                                {formik.values.phone_verified &&
+                                    <span className="p-inputgroup-addon border-0" title={'Verified'}>
+                                        <i className="pi pi-check-circle text-green-500"></i>
+                                    </span>
                                 }
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className={classNames('p-inputgroup-addon', { 'form-field-error-icon-coloring': !!formik.errors["email"] })}>
+                                    <i className="pi pi-at"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <InputText id="email" maxLength={255}
+                                        value={formik.values.email}
+                                        onChange={(e) => {
+                                            formik.setFieldValue("email", e.target.value);
+                                        }}
+                                        className={classNames({ 'p-invalid': !!formik.errors["email"] })} />
+                                    <label className="capitalize"
+                                        htmlFor="email">{formatFormErrorMessage(formik.errors["email"]!) || 'Email'}</label>
+                                </span>
+                                {formik.values["email_verified"] &&
+                                    <span className="p-inputgroup-addon border-0" title={'Verified'}>
+                                        <i className="pi pi-check-circle text-green-500"></i>
+                                    </span>
+                                }
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className={classNames('p-inputgroup-addon', { 'form-field-error-icon-coloring': !!formik.errors["name"] })}>
+                                    <i className="pi pi-user"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <InputText id="name" required maxLength={100}
+                                        value={formik.values.name}
+                                        onChange={(e) => {
+                                            formik.setFieldValue("name", e.target.value);
+                                        }}
+                                        className={classNames({ 'p-invalid': !!formik.errors["name"] })} />
+                                    <label className="capitalize"
+                                        htmlFor="name">{formatFormErrorMessage(formik.errors["name"]!) || 'Name'}</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-sun"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <InputText id="initiated_name" maxLength={90}
+                                        value={formik.values.initiated_name}
+                                        onChange={(e) => {
+                                            formik.setFieldValue("initiated_name", e.target.value);
+                                        }} />
+                                    <label htmlFor="initiated_name">Initiated Name</label>
+                                </span>
+                                {/*{getFormErrorMessage(COLLECTION.DEVOTEES.INITIATED_NAME)}*/}
+                            </div>
+
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-calendar"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <Calendar
+                                        inputId="dob"
+                                        name="dob"
+                                        dateFormat="dd/mm/yy" maxDate={new Date()}
+                                        value={formik.values.dob}
+                                        onChange={(e) => {
+                                            formik.setFieldValue("dob", e.target.value);
+                                        }}
+                                    />
+                                    <label htmlFor="dob">Date of Birth</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-heart"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <Dropdown id="gender" showClear
+                                        value={formik.values.gender}
+                                        options={[
+                                            { name: 'Female', code: 'female' },
+                                            { name: 'Male', code: 'male' },
+                                            { name: 'Other', code: 'other' }
+                                        ]}
+                                        optionLabel="name" optionValue="code"
+                                        onChange={(e) => {
+                                            formik.setFieldValue("gender", e.value);
+                                        }}
+                                        placeholder="You identify as" />
+                                    <label htmlFor="gender">Gender</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-heart-fill"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <Dropdown id="marital_status" showClear
+                                        value={formik.values.marital_status}
+                                        options={[
+                                            { name: 'Yes', code: true },
+                                            { name: 'No', code: false }
+                                        ]}
+                                        optionLabel="name" optionValue="code"
+                                        onChange={(e) => {
+                                            formik.setFieldValue("marital_status", e.value);
+                                        }}
+                                        placeholder="Are you married" />
+                                    <label htmlFor="marital_status">Marital Status</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-language"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <Dropdown id="language_preference" showClear
+                                        value={formik.values.language_preference}
+                                        options={[
+                                            { name: 'Hindi', code: 'hindi' },
+                                            { name: 'English', code: 'english' },
+                                            { name: 'Marathi', code: 'marathi' },
+                                            { name: 'Tamil', code: 'tamil' },
+                                            { name: 'Telegu', code: 'telegu' },
+                                            { name: 'Gujarati', code: 'gujarati' },
+                                            { name: 'Kannada', code: 'kannada' },
+                                            { name: 'Other', code: 'other' },
+                                        ]}
+                                        optionLabel="name" optionValue="code"
+                                        onChange={(e) => {
+                                            formik.setFieldValue("language_preference", e.value);
+                                        }}
+                                        placeholder="Preferred Language for Class" />
+                                    <label htmlFor="language_preference">Language Preference</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-briefcase"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <Dropdown id="occupation" showClear
+                                        value={formik.values.occupation}
+                                        options={[
+                                            { name: 'Service', code: 'Service' },
+                                            { name: 'Business', code: 'Business' },
+                                            { name: 'Professional', code: 'Professional' },
+                                            { name: 'Others', code: 'Others' }
+                                        ]}
+                                        optionLabel="name" optionValue="code"
+                                        onChange={(e) => {
+                                            formik.setFieldValue("occupation", e.value);
+                                        }}
+                                        placeholder="Your occupation" />
+                                    <label htmlFor="occupation">Occupation</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-user"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <InputText id="occupation_position" maxLength={100}
+                                        value={formik.values.occupation_position}
+                                        onChange={(e) => {
+                                            formik.setFieldValue("occupation_position", e.target.value);
+                                        }} />
+                                    <label htmlFor="occupation_position">Occupation Position</label>
+                                </span>
+                            </div>
+                        </div>
+                    </Fieldset>
+                    <br />
+
+                    <Fieldset legend={<span>Address<i className="pi pi-map-marker pl-2"></i></span>} toggleable collapsed >
+                        <div className="grid sm:grid-cols-12 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-home"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <InputText id="address_line1" maxLength={255}
+                                        value={formik.values.address_line1}
+                                        onChange={(e) => {
+                                            formik.setFieldValue("address_line1", e.target.value);
+                                        }} />
+                                    <label htmlFor="address_line1">Line 1</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-building"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <InputText id="address_society" maxLength={255}
+                                        value={formik.values.address_society}
+                                        onChange={(e) => {
+                                            formik.setFieldValue("address_society", e.target.value);
+                                        }} />
+                                    <label htmlFor="address_society">Residential Society</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-truck"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <InputText id="address_line2" maxLength={255}
+                                        value={formik.values.address_line2}
+                                        onChange={(e) => {
+                                            formik.setFieldValue("address_line2", e.target.value);
+                                        }} />
+                                    <label htmlFor="address_line2">Line 2</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-th-large"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <AutoComplete id="address_city" forceSelection
+                                        value={formik.values.address_city}
+                                        suggestions={filteredCities as null[]}
+                                        completeMethod={citiesSearch}
+                                        onChange={(e) => {
+                                            formik.setFieldValue("address_city", e.value);
+                                            setValidState(e.target.value!);
+                                        }} />
+                                    <label htmlFor="address_city">City</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-map-marker"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <AutoComplete id="address_area" disabled={!formik.values.address_city}
+                                        value={formik.values.address_area}
+                                        suggestions={filteredAreas as null[]}
+                                        completeMethod={areasSearch}
+                                        onChange={(e) => formik.setFieldValue("address_area", e.value)} />
+                                    <label htmlFor="address_area">Area</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-box"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <InputText id="address_pincode" maxLength={6} keyfilter="int"
+                                        value={formik.values.address_pincode}
+                                        onChange={(e) => {
+                                            formik.setFieldValue("address_pincode", e.target.value);
+                                        }} />
+                                    <label htmlFor="address_pincode">Pin Code</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-table"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <InputText id="address_state" disabled
+                                        value={formik.values.address_state} />
+                                    <label htmlFor="address_state">State</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-flag"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <Dropdown id="address_country" showClear
+                                        value={formik.values.address_country}
+                                        options={[
+                                            { name: 'India', code: 'India' },
+                                            { name: 'USA', code: 'USA' },
+                                            { name: 'Others', code: 'Others' }
+                                        ]}
+                                        optionLabel="name" optionValue="code"
+                                        onChange={(e) => {
+                                            formik.setFieldValue("address_country", e.value);
+                                        }}
+                                        placeholder="Your country" />
+                                    <label htmlFor="address_country">Country</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-map"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <InputText id="address_gmap_url" maxLength={1000}
+                                        value={formik.values.address_gmap_url}
+                                        onChange={(e) => {
+                                            formik.setFieldValue("address_gmap_url", e.target.value);
+                                        }} />
+                                    <label htmlFor="address_gmap_url">Google Maps URL</label>
+                                </span>
+                            </div>
+                        </div>
+                    </Fieldset>
+                    <br />
+                    <Fieldset legend={<span>Family Details<i className="pi pi-user-edit pl-2"></i></span>} toggleable>
+                        <div className="grid sm:grid-cols-12 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-user"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <InputText id="spouse_name" maxLength={100}
+                                        value={formik.values.spouse_name}
+                                        onChange={(e) => {
+                                            formik.setFieldValue("spouse_name", e.target.value);
+                                        }} />
+                                    <label htmlFor="spouse_name">Spouse&apos;s Name</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-calendar"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <Calendar
+                                        inputId="spouse_dob"
+                                        name="spouse_dob"
+                                        dateFormat="dd/mm/yy" maxDate={new Date()}
+                                        value={formik.values.spouse_dob}
+                                        onChange={(e) => {
+                                            formik.setFieldValue("spouse_dob", e.target.value);
+                                        }}
+                                    />
+                                    <label htmlFor="spouse_dob">Spouse&apos;s Date of Birth</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-calendar"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <Calendar
+                                        inputId="spouse_marriage_anniversary"
+                                        name="spouse_marriage_anniversary"
+                                        dateFormat="dd/mm/yy" maxDate={new Date()}
+                                        value={formik.values.spouse_marriage_anniversary}
+                                        onChange={(e) => {
+                                            formik.setFieldValue("spouse_marriage_anniversary", e.target.value);
+                                        }}
+                                    />
+                                    <label htmlFor="spouse_marriage_anniversary">Spouse&apos;s Marriage Anniversary</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-user"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <InputText id="parents_father_name" maxLength={100}
+                                        value={formik.values.parents_father_name}
+                                        onChange={(e) => {
+                                            formik.setFieldValue("parents_father_name", e.target.value);
+                                        }} />
+                                    <label htmlFor="parents_father_name">Father&apos;s Name</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-calendar"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <Calendar
+                                        inputId="parents_father_dob"
+                                        name="parents_father_dob"
+                                        dateFormat="dd/mm/yy" maxDate={new Date()}
+                                        value={formik.values.parents_father_dob}
+                                        onChange={(e) => {
+                                            formik.setFieldValue("parents_father_dob", e.target.value);
+                                        }}
+                                    />
+                                    <label htmlFor="parents_father_dob">Father&apos;s Date of Birth</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-user"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <InputText id="parents_mother_name" maxLength={100}
+                                        value={formik.values.parents_mother_name}
+                                        onChange={(e) => {
+                                            formik.setFieldValue("parents_mother_name", e.target.value);
+                                        }} />
+                                    <label htmlFor="parents_mother_name">Mother&apos;s Name</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-calendar"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <Calendar
+                                        inputId="parents_mother_dob"
+                                        name="parents_mother_dob"
+                                        dateFormat="dd/mm/yy" maxDate={new Date()}
+                                        value={formik.values.parents_mother_dob}
+                                        onChange={(e) => {
+                                            formik.setFieldValue("parents_mother_dob", e.target.value);
+                                        }}
+                                    />
+                                    <label htmlFor="parents_mother_dob">Mother&apos;s Date of Birth</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-calendar"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <Calendar
+                                        inputId="parents_marriage_anniversary"
+                                        name="parents_marriage_anniversary"
+                                        dateFormat="dd/mm/yy" maxDate={new Date()}
+                                        value={formik.values.parents_marriage_anniversary}
+                                        onChange={(e) => {
+                                            formik.setFieldValue("parents_marriage_anniversary", e.target.value);
+                                        }}
+                                    />
+                                    <label htmlFor="parents_marriage_anniversary">Parent&apos;s Marriage Anniversary</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-user"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <InputText id="children_1_name" maxLength={100}
+                                        value={formik.values.children_1_name}
+                                        onChange={(e) => {
+                                            formik.setFieldValue("children_1_name", e.target.value);
+                                        }} />
+                                    <label htmlFor="children_1_name">1st Child&apos;s Name</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-calendar"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <Calendar
+                                        inputId="children_1_dob"
+                                        name="children_1_dob"
+                                        dateFormat="dd/mm/yy" maxDate={new Date()}
+                                        value={formik.values.children_1_dob}
+                                        onChange={(e) => {
+                                            formik.setFieldValue("children_1_dob", e.target.value);
+                                        }}
+                                    />
+                                    <label htmlFor="children_1_dob">1st Child&apos;s Date of Birth</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-user"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <InputText id="children_2_name" maxLength={100}
+                                        value={formik.values.children_2_name}
+                                        onChange={(e) => {
+                                            formik.setFieldValue("children_2_name", e.target.value);
+                                        }} />
+                                    <label htmlFor="children_2_name">2nd Child&apos;s Name</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-calendar"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <Calendar
+                                        inputId="children_2_dob"
+                                        name="children_2_dob"
+                                        dateFormat="dd/mm/yy" maxDate={new Date()}
+                                        value={formik.values.children_2_dob}
+                                        onChange={(e) => {
+                                            formik.setFieldValue("children_2_dob", e.target.value);
+                                        }}
+                                    />
+                                    <label htmlFor="children_2_dob">2nd Child&apos;s Date of Birth</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-user"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <InputText id="children_3_name" maxLength={100}
+                                        value={formik.values.children_3_name}
+                                        onChange={(e) => {
+                                            formik.setFieldValue("children_3_name", e.target.value);
+                                        }} />
+                                    <label htmlFor="children_3_name">3rd Child&apos;s Name</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-calendar"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <Calendar
+                                        inputId="children_3_dob"
+                                        name="children_3_dob"
+                                        dateFormat="dd/mm/yy" maxDate={new Date()}
+                                        value={formik.values.children_3_dob}
+                                        onChange={(e) => {
+                                            formik.setFieldValue("children_3_dob", e.target.value);
+                                        }}
+                                    />
+                                    <label htmlFor="children_3_dob">3rd Child&apos;s Date of Birth</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-user"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <InputText id="children_4_name" maxLength={100}
+                                        value={formik.values.children_4_name}
+                                        onChange={(e) => {
+                                            formik.setFieldValue("children_4_name", e.target.value);
+                                        }} />
+                                    <label htmlFor="children_4_name">4th Child&apos;s Name</label>
+                                </span>
+                            </div>
+                            <div className="p-inputgroup mt-2 sm:mt-7">
+                                <span className="p-inputgroup-addon">
+                                    <i className="pi pi-calendar"></i>
+                                </span>
+                                <span className="p-float-label">
+                                    <Calendar
+                                        inputId="children_4_dob"
+                                        name="children_4_dob"
+                                        dateFormat="dd/mm/yy" maxDate={new Date()}
+                                        value={formik.values.children_4_dob}
+                                        onChange={(e) => {
+                                            formik.setFieldValue("children_4_dob", e.target.value);
+                                        }}
+                                    />
+                                    <label htmlFor="children_4_dob">4th Child&apos;s Date of Birth</label>
+                                </span>
+                            </div>
+                        </div>
+                    </Fieldset>
+                    <br />
+                    <Fieldset legend={<span>Skills (as many as possible)<i className="pi pi-wrench pl-2"></i></span>} toggleable collapsed >
+                        <div className="p-inputgroup mt-3">
+                            <span className="p-float-label">
+                                <AutoComplete id="skills" multiple
+                                    value={formik.values.skills}
+                                    suggestions={filteredSkills}
+                                    completeMethod={skillsSearch}
+                                    onChange={(e) => formik.setFieldValue("skills", e.value)} />
+                                <label htmlFor="skills">Start typing and choose skills from list</label>
+                            </span>
+                        </div>
+                        <small>Note: Choose as many skills as you feel you can serve Shri Shri Radha Krishna with</small>
+                    </Fieldset>
+                    <br />
+                    <Fieldset legend={<span>Communication Preferences<i className="pi pi-megaphone pl-2"></i></span>} toggleable collapsed >
+                        <div className="p-inputgroup ml-0.5">
+                            <Checkbox
+                                id="whatsapp_consent"
+                                name="whatsapp_consent"
+                                checked={formik.values.whatsapp_consent}
                                 onChange={(e) => {
-                                    formik.setFieldValue("phone_whatsapp", "91" + e.target.value);
-                                }} />
-                            <label htmlFor="phone_whatsapp">WhatsApp Phone Number</label>
-                        </span>
-                    </div>
-                </Fieldset>
-                <br />
-                <Fieldset legend={<span>Memberships<i className="pi pi-id-card pl-2"></i></span>} toggleable collapsed >
-                    Temple: &nbsp;
-                    <a href="https://iskconpunebcec.com/#/Home" target="_blank" rel="noopener noreferrer" className="underline">
-                        ISKCON BCEC
-                    </a>
-                    {/* <div className="grid">
+                                    formik.setFieldValue("whatsapp_consent", e.checked);
+                                }}
+                            ></Checkbox>&nbsp;&nbsp;
+                            <span>I provide my consent to be communicated via WhatsApp.</span>
+                        </div>
+                        <div className="p-inputgroup mt-2 sm:mt-7">
+                            <span className="p-inputgroup-addon">
+                                <i className="pi pi-mobile"></i>
+                            </span>
+                            <span className="p-float-label">
+                                <InputText id="phone_whatsapp" maxLength={14} keyfilter="int" disabled={!formik.values.whatsapp_consent}
+                                    value=
+                                    {
+                                        !formik.values.whatsapp_consent ? '' :
+                                            (formik.values.phone_whatsapp?.slice(2) || formik.values.phone?.slice(2))
+                                    }
+                                    onChange={(e) => {
+                                        formik.setFieldValue("phone_whatsapp", "91" + e.target.value);
+                                    }} />
+                                <label htmlFor="phone_whatsapp">WhatsApp Phone Number</label>
+                            </span>
+                        </div>
+                    </Fieldset>
+                    <br />
+                    <Fieldset legend={<span>Memberships<i className="pi pi-id-card pl-2"></i></span>} toggleable collapsed >
+                        Temple: &nbsp;
+                        <a href="https://iskconpunebcec.com/#/Home" target="_blank" rel="noopener noreferrer" className="underline">
+                            ISKCON BCEC
+                        </a>
+                        {/* <div className="grid">
                         <div className="col-12">
                             Temples: {templeMemberships}
                         </div>
@@ -771,24 +771,24 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                             Classes: {classMemberships}
                         </div>
                     </div> */}
-                </Fieldset>
-                <br />
-                <Fieldset legend={<span>For official purposes<i className="pi pi-lock pl-2"></i></span>} toggleable collapsed >
-                    <div className="grid md:grid-cols-2 gap-4">
-                        <div>
-                            Counsellor ID: {formik.values.counsellor_id}
+                    </Fieldset>
+                    <br />
+                    <Fieldset legend={<span>For official purposes<i className="pi pi-lock pl-2"></i></span>} toggleable collapsed >
+                        <div className="grid md:grid-cols-2 gap-4">
+                            <div>
+                                Counsellor ID: {formik.values.counsellor_id}
+                            </div>
+                            {
+                                self &&
+                                (
+                                    <div className="capitalize">
+                                        Referred By: {formik.values.source}
+                                    </div>
+                                )
+                            }
                         </div>
-                        {
-                            self &&
-                            (
-                                <div className="capitalize">
-                                    Referred By: {formik.values.source}
-                                </div>
-                            )
-                        }
-                    </div>
-                </Fieldset>
-            </ScrollPanel>
+                    </Fieldset>
+                </ScrollPanel>
             }
             <br />
             {
@@ -820,7 +820,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                         className="float-right"
                         size="small"
                         type="submit"
-                        label={formik.isSubmitting? "Saving..." : "Save"}
+                        label={formik.isSubmitting ? "Saving..." : "Save"}
                         icon="pi pi-save"
                         loading={formik.isSubmitting}
                         disabled={!formik.dirty || formContainsError}
