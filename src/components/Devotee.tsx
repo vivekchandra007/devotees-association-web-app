@@ -63,7 +63,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                 }
                 values = convertDateObjectIntoDateString(values!);
                 await api.post('/devotee', values); // automatically sends token
-                showToastMessage('Updated Successfully. Page will now refresh.', `Profile`, MessageSeverity.SUCCESS, 4000, false);
+                showToastMessage('Updated Successfully. Refreshing now to process changes.', `Profile`, MessageSeverity.SUCCESS, 4000, false);
                 setTimeout(() => {
                     window.location.reload();
                 }, 4000);
@@ -145,6 +145,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
 
     return (
         <form onSubmit={formik.handleSubmit} className="text-sm md:text-base">
+            { !formik.isSubmitting && 
             <ScrollPanel className="w-full h-auto max-h-[55vh]">
                 <Fieldset legend={<span>Personal Details<i className="pi pi-user-edit pl-2"></i></span>} toggleable>
                     <div className="grid sm:grid-cols-12 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -787,6 +788,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                     </div>
                 </Fieldset>
             </ScrollPanel>
+            }
             <br />
             {
                 formik.isSubmitting ?
@@ -817,7 +819,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                         className="float-right"
                         size="small"
                         type="submit"
-                        label="Save"
+                        label={formik.isSubmitting? "Saving..." : "Save"}
                         icon="pi pi-save"
                         loading={formik.isSubmitting}
                         disabled={!formik.dirty || formContainsError}
