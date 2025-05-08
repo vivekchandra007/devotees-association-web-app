@@ -69,7 +69,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                     window.location.reload();
                 }, 4000);
             } catch {
-                showToastMessage('Could not save your details. Try again or Refresh the page.', `Profile`, MessageSeverity.ERROR, 5000, false);
+                showToastMessage('Could not save your details. Try again or ultimately Refresh the page.', `Profile`, MessageSeverity.ERROR, 10000, false);
             } finally {
                 setSubmitting(false);
             }
