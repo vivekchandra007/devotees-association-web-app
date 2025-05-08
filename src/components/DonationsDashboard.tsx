@@ -2,11 +2,10 @@
 
 import { useRef, useState } from 'react'
 import * as XLSX from 'xlsx'
-import { FileUpload } from 'primereact/fileupload'
+import { FileUpload, FileUploadFilesEvent } from 'primereact/fileupload'
 import { DataTable } from 'primereact/datatable'
 import { Column } from 'primereact/column'
-import { Button } from 'primereact/button'
-import axios from '@/lib/axios'
+import api from '@/lib/axios'
 import { Toast } from "primereact/toast";
 import { MessageSeverity } from "primereact/api";
 
@@ -23,7 +22,7 @@ export default function DonationsDashboard() {
   const [donations, setDonations] = useState<Donation[]>([])
   const toast = useRef<Toast>(null);
 
-  const handleUpload = async (e: any) => {
+  const handleUpload = async (e: FileUploadFilesEvent) => {
     const file = e.files[0]
     const reader = new FileReader()
 
@@ -31,18 +30,18 @@ export default function DonationsDashboard() {
       const data = new Uint8Array(evt.target?.result as ArrayBuffer)
       const workbook = XLSX.read(data, { type: 'array' })
       const sheet = workbook.Sheets[workbook.SheetNames[0]]
-      const json: any[] = XLSX.utils.sheet_to_json(sheet)
+      const json = XLSX.utils.sheet_to_json(sheet)
 
       // Format and upload each row
       try {
-        await axios.post('/api/donations/bulk', { rows: json });
+        await api.post('/donations/bulk', { rows: json });
         toast.current?.show({
             severity: MessageSeverity.SUCCESS,
             detail: 'Donations uploaded successfully',
             life: 4000
         });
         fetchDonations()
-      } catch (err) {
+      } catch {
         toast.current?.show({
             severity: MessageSeverity.ERROR,
             detail: 'Error uploading donations',
@@ -55,7 +54,7 @@ export default function DonationsDashboard() {
   }
 
   const fetchDonations = async () => {
-    const res = await axios.get('/api/donations')
+    const res = await api.get('/donations')
     setDonations(res.data)
   }
 

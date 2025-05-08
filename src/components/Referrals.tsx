@@ -14,7 +14,7 @@ export default function Referrals() {
 
     const { devotee } = useAuth();
     const toast = useRef<Toast>(null);
-    const [referredList, setReferredList] = useState<any[]>([])
+    const [referredList, setReferredList] = useState([])
     const [showQR, setShowQR] = useState(false)
     const referralLink = `${window.location.origin}/?ref=${devotee?.id}`
 
@@ -66,9 +66,9 @@ export default function Referrals() {
             <h2 className="text-lg font-semibold mt-4">Referred Devotees</h2>
             {referredList.length > 0 ? (
                 <ul className="list-disc ml-5">
-                    {referredList.map((ref) => (
+                    {/* {referredList.map((ref) => (
                         <li key={ref.id}>{ref.name || ref.phone}</li>
-                    ))}
+                    ))} */}
                 </ul>
             ) : (
                 <p>No referrals yet.</p>

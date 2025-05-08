@@ -3,9 +3,6 @@
 import { useAuth } from '@/hooks/useAuth';
 import FullPageSpinner from '@/components/FullPageSpinner';
 import TopNavBar from '@/components/TopNavBar';
-import { Button } from 'primereact/button';
-import { Card } from 'primereact/card';
-import { ScrollPanel } from 'primereact/scrollpanel';
 
 export default function Home() {
   const { devotee, isAuthenticated } = useAuth();
