@@ -137,7 +137,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                 return city.city.toLowerCase() === selectedCity.toLowerCase();
             });
             if (validCity && Array.isArray(validCity) && validCity[0]) {
-                formik.setFieldValue("state", validCity[0].state);
+                formik.setFieldValue("address_state", validCity[0].state);
             }
         } else {
             formik.values.address_state = '';
