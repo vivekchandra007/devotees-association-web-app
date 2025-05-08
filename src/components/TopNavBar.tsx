@@ -12,6 +12,8 @@ import { Menu } from 'primereact/menu';
 import { classNames } from 'primereact/utils';
 import { SYSTEM_ROLES } from '@/data/constants';
 import Devotee from './Devotee';
+import Referrals from './Referrals';
+import DonationsDashboard from './DonationsDashboard';
 
 type dialogueModalContentType = {
     header: string,
@@ -32,6 +34,8 @@ export default function TopNavBar() {
             width: '99vw'
         }
     }
+
+    const underConstructionPlaceholder = ' (under construction, not yet live)';
 
     const [dialogueModalContent, setDialogueModalContent] = useState<dialogueModalContentType | null>(userProfileModalContent(true));
     const userProfileActionsPanel = useRef<Menu>(null);
@@ -65,6 +69,23 @@ export default function TopNavBar() {
             ]
         },
         {
+            label: 'Admin Tasks',
+            visible: systemRole === SYSTEM_ROLES.admin,
+            icon: 'pi pi-fw pi-users',
+            items: [
+                {
+                    label: "Devotees Data",
+                    icon: 'pi pi-fw pi-user-edit',
+                    command: () => { setDialogueModalContent(ViewDevoteesDataModalContent) }
+                },
+                {
+                    label: 'Donations Data',
+                    icon: 'pi pi-fw pi-user',
+                    command: () => { setDialogueModalContent(ViewDonationsDataModalContent) }
+                },
+            ]
+        },
+        {
             label: 'Referrals',
             icon: 'pi pi-fw pi-share-alt',
             command: () => { setDialogueModalContent(ReferralsModalContent) }
@@ -73,24 +94,36 @@ export default function TopNavBar() {
 
     const ReferralsModalContent = {
         header: 'Referrals',
-        content: (<p>Referrals Component Form</p>),
+        content: (<Referrals />),
         width: '50vw'
     }
 
     const AddNewDevoteeModalContent = {
-        header: 'Add New Devotee',
+        header: 'Add New Devotee' + underConstructionPlaceholder,
         content: (<p>Add New Devotee Component Form</p>),
         width: '50vw'
     }
 
     const ViewDevoteeDetailsModalContent = {
-        header: 'View Devotee Details',
+        header: 'View Devotee Details' + underConstructionPlaceholder,
         content: (<p>View Devotee Component Form</p>),
         width: '50vw'
     }
 
+    const ViewDevoteesDataModalContent = {
+        header: 'All Devotees' + underConstructionPlaceholder,
+        content: (<p>View All Devotees Component Form</p>),
+        width: '50vw'
+    }
+
+    const ViewDonationsDataModalContent = {
+        header: 'Donations' + underConstructionPlaceholder,
+        content: (<DonationsDashboard />),
+        width: '50vw'
+    }
+
     const settingsModalContent = {
-        header: 'Settings',
+        header: 'Settings' + underConstructionPlaceholder,
         content: (
             <p>Settings Component Modal</p>
         ),
@@ -117,18 +150,6 @@ export default function TopNavBar() {
             label: 'Edit My Profile',
             icon: 'pi pi-fw pi-user-edit',
             command: () => { setDialogueModalContent(userProfileModalContent(false)) }
-        },
-        {
-            label: 'Add New Devotee', 
-            visible: systemRole !== SYSTEM_ROLES.member,
-            icon: 'pi pi-fw pi-user-plus',
-            command: () => { setDialogueModalContent(AddNewDevoteeModalContent) }
-        },
-        {
-            label: 'View Devotee',
-            visible: systemRole !== SYSTEM_ROLES.member,
-            icon: 'pi pi-fw pi-user',
-            command: () => { setDialogueModalContent(ViewDevoteeDetailsModalContent) }
         },
         {
             label: 'Referrals',

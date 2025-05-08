@@ -3,6 +3,9 @@
 import { useAuth } from '@/hooks/useAuth';
 import FullPageSpinner from '@/components/FullPageSpinner';
 import TopNavBar from '@/components/TopNavBar';
+import { Button } from 'primereact/button';
+import { Card } from 'primereact/card';
+import { ScrollPanel } from 'primereact/scrollpanel';
 
 export default function Home() {
   const { devotee, isAuthenticated } = useAuth();
@@ -13,7 +16,10 @@ export default function Home() {
     <>
       <TopNavBar />
       <div className="grid md:items-center text-center min-h-screen">
-        <h1 className='text-3xl text-amber-650'>Hare Krishna{`,${devotee?.name}`}&nbsp;Dev</h1>
+        <h1 className="text-xl text-amber-650 bg-amber-50 h-14">Hare Krishna
+          <br/>
+          {devotee?.name}&nbsp;Dev
+        </h1>
       </div>
     </>
   );
