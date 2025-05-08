@@ -27,11 +27,20 @@ type Devotee = Prisma.devoteesGetPayload<{
   };
 }>;
 
-export function convertDatesDatesIntoDateObject(body: Devotee) {
+export function convertDateStringIntoDateObject(body: Devotee) {
   for (const key in body) {
       if (devoteeFormDateFields.includes(key) && _.get(body,key)) {
         _.set(body, key, new Date(_.get(body,key)));
       }
   }
   return body;
+}
+
+export function convertDateObjectIntoDateString(devoteeDetails: Devotee) {
+    for (const key in devoteeDetails) {
+        if (devoteeFormDateFields.includes(key) && _.get(devoteeDetails,key)) {
+            _.set(devoteeDetails, key, _.get(devoteeDetails,key).toLocaleDateString('en-CA'));
+        }
+    }
+    return devoteeDetails;
 }

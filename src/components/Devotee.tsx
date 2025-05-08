@@ -23,6 +23,7 @@ import { Toast } from "primereact/toast";
 import { MessageSeverity } from "primereact/api";
 import { ProgressBar } from "primereact/progressbar";
 import { devotees } from "@prisma/client";
+import { convertDateObjectIntoDateString } from "@/lib/conversions";
 
 interface DevoteeProps {
     devoteeId: number;
@@ -60,6 +61,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                         }
                     }
                 }
+                values = convertDateObjectIntoDateString(values!);
                 await api.post('/devotee', values); // automatically sends token
                 showToastMessage('Updated Successfully. Page will now refresh.', `Profile`, MessageSeverity.SUCCESS, 4000, false);
                 setTimeout(() => {
