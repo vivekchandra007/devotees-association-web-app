@@ -347,7 +347,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                             ></Checkbox>&nbsp;&nbsp;
                             <span>80G certificate required</span>
                         </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
+                        <div className="p-inputgroup mt-7">
                             <span className="p-inputgroup-addon">
                                 <i className="pi pi-id-card"></i>
                             </span>
@@ -767,7 +767,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                             ></Checkbox>&nbsp;&nbsp;
                             <span>I provide my consent to be communicated via WhatsApp.</span>
                         </div>
-                        <div className="p-inputgroup mt-2 sm:mt-7">
+                        <div className="p-inputgroup mt-7">
                             <span className="p-inputgroup-addon">
                                 <i className="pi pi-mobile"></i>
                             </span>
