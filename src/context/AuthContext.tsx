@@ -1,7 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import api from '@/lib/axios';
 import axios from 'axios';
 import { Prisma } from '@prisma/client';
@@ -45,6 +45,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [systemRole, setSystemRole] = useState<string | null>(null);
   const [authInProgress, setAuthInProgress] = useState<boolean>(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const fetchMe = async () => {
     try {
@@ -74,7 +75,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     localStorage.removeItem('access_token');
     await axios.post('/api/auth/logout'); // NOTE: use raw axios, not the wrapped one
     setDevotee(null);
-    router.push('/login');
+    const queryParams = searchParams.toString();
+    router.push(`/login${queryParams ? `?${queryParams}` : ''}`)
   };
 
   useEffect(() => {

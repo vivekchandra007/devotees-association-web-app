@@ -20,7 +20,7 @@ model devotees {
   email_verified               Boolean          @default(false)
   role_id                      Int              @db.UnsignedTinyInt
   spiritual_level              Int              @db.UnsignedTinyInt
-  source                       String           @db.VarChar(40)
+  source                       String           @db.VarChar(100)
   counsellor_id                Int?             @db.UnsignedInt
   gender                       devotees_gender?
   dob                          DateTime?        @db.Date
@@ -61,6 +61,7 @@ model devotees {
   updated_at                   DateTime         @default(now()) @db.Timestamp(0)
   tax_80g_required             Boolean?         @default(false)
   tax_pan                      String?          @db.VarChar(10)
+  referred_by                  Int?             @db.UnsignedInt
   system_roles                 system_roles     @relation(fields: [role_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_1")
   spiritual_levels             spiritual_levels @relation(fields: [spiritual_level], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_2")
   devotees                     devotees?        @relation("devoteesTodevotees", fields: [counsellor_id], references: [id], map: "fk_counsellor")

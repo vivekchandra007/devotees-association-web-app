@@ -7,6 +7,7 @@ import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import Footer from "@/components/Footer";
 import { AuthProvider } from "@/context/AuthContext";
+import { Suspense } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,7 +34,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <AuthProvider>{children}</AuthProvider>
+        <Suspense>
+          <AuthProvider>{children}</AuthProvider>
+        </Suspense>
         <Footer />
         <Image
           className="absolute -z-10 top-0 left-0 w-full h-full object-cover"

@@ -15,7 +15,7 @@ export default function Home() {
       <div className="grid md:items-center text-center min-h-screen">
         <h1 className="text-xl text-amber-650 bg-amber-50 h-14">Hare Krishna
           <br/>
-          {devotee?.name}&nbsp;Dev
+          {devotee?.name}{devotee?.gender ? `, ${devotee.spiritual_levels[`title_${devotee?.gender}`]}` : '' } 🙏🏻
         </h1>
       </div>
     </>

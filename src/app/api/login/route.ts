@@ -5,6 +5,9 @@ import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
     const authHeader = request.headers.get("Authorization");
+    const body = await request.json()
+    const referralCode:number | null = Number.parseInt(body.ref?.slice(11));
+    const source:string | null = body.source;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
         return Response.json({ error: "Unauthorized" }, { status: 401 });
@@ -26,7 +29,7 @@ export async function POST(request: Request) {
         if (response.status === 200 && response.data.type === "success" && response.data.message) {
             // if the MSG verification is successful, phone number will be present in the response.data.message
             // insert this verified phone number in DB if it doesn't exist already or fetch other details from "devotees" table corresponding to this phone number, if it already exists. 
-            return insertOrFetchDevotee(response.data.message);
+            return insertOrFetchDevotee(response.data.message, referralCode, source);
             //return Response.json(response.data, { status: 200 });
         } else {
             console.error("Error verifying MSG91 access token", response.data);
@@ -38,7 +41,7 @@ export async function POST(request: Request) {
     }
 }
 
-async function insertOrFetchDevotee(phoneNumber: string) {
+async function insertOrFetchDevotee(phoneNumber: string, referralCode: number|null, source: string|null) {
     try {
         let devotee = await prisma.devotees.findFirst({
             where: { phone: phoneNumber },
@@ -53,7 +56,8 @@ async function insertOrFetchDevotee(phoneNumber: string) {
                     status: "active",
                     role_id: 1,
                     spiritual_level: 1,
-                    source: "self"
+                    source: source || "self",
+                    referred_by: referralCode
                 },
             });
         }

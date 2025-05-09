@@ -6,7 +6,7 @@ import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import { Divider } from "primereact/divider";
 import axios from "axios";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import FullPageSpinner from "@/components/FullPageSpinner";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -20,6 +20,9 @@ export default function LoginPage() {
     const { login } = useAuth();
     const router = useRouter();
     const [authInProgress, setAuthInProgress] = useState<boolean>(false);
+    const searchParams = useSearchParams();
+    const referralCode:string | null = searchParams.get('ref');
+    const source:string | null = searchParams.get('source');
 
     const getVerifiedNumber = async (verifiedPhoneAccessToken: string) => {
         setAuthInProgress(true);
@@ -27,7 +30,10 @@ export default function LoginPage() {
             // use raw axios, not the wrapped one, coz we need to pass the MSG91_SERVER verified phone access-token in the header
             const response = await axios.post(
                 '/api/login',
-                {},
+                {
+                    ref: referralCode,
+                    source
+                },
                 {
                     headers: {
                         Authorization: `Bearer ${verifiedPhoneAccessToken}`,

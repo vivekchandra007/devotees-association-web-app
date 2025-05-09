@@ -16,7 +16,7 @@ export default function Referrals() {
     const toast = useRef<Toast>(null);
     const [referredList, setReferredList] = useState([])
     const [showQR, setShowQR] = useState(false)
-    const referralLink = `${window.location.origin}/?ref=${devotee?.id}`
+    const referralLink = `${window.location.origin}/?ref=${generateAppendCode() + devotee?.id}`
 
     const copyToClipboard = async () => {
         await navigator.clipboard.writeText(referralLink);
@@ -25,6 +25,11 @@ export default function Referrals() {
             detail: 'Referral link copied!',
             life: 4000
         });
+    }
+
+    function generateAppendCode(length = 11) {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+        return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
     }
 
     useEffect(() => {
@@ -60,7 +65,9 @@ export default function Referrals() {
                 </div>
             </Dialog>
 
-            <small>Note: You can share the above QR code or link with anyone, over any platform and if they login using this link, they will appear in below list</small>
+            <small>Note: You can share the above QR code or link with anyone, over any platform and if they login using this link, they will be linked to you and appear in below list. 
+                <br />So, let&apos;s spread the word{devotee?.gender ? `, ${devotee.spiritual_levels[`title_${devotee?.gender}`]}` : '' } 🙏🏻
+            </small>
 
 
             <h2 className="text-lg font-semibold mt-4">Referred Devotees</h2>

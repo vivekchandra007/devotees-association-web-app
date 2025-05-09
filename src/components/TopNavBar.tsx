@@ -26,9 +26,9 @@ export default function TopNavBar() {
     const [inProgress] = useState<boolean>(false);
     const userProfileModalContent = (firstTime: boolean) => {
         return {
-            header: firstTime? 'Keep your profile up to date':'Edit Profile',
+            header: firstTime ? 'Keep your profile up to date' : 'Edit Profile',
             content: (
-                devotee?.id? <Devotee devoteeId={devotee?.id} /> : <></>
+                devotee?.id ? <Devotee devoteeId={devotee?.id} /> : <></>
             )
         }
     }
@@ -50,38 +50,22 @@ export default function TopNavBar() {
             command: () => { setDialogueModalContent(userProfileModalContent(false)) }
         },
         {
-            label: 'Devotees',
+            label: 'View Devotee',
             visible: systemRole !== SYSTEM_ROLES.member,
-            icon: 'pi pi-fw pi-users',
-            items: [
-                {
-                    label: 'Add New Devotee',
-                    icon: 'pi pi-fw pi-user-plus',
-                    command: () => { setDialogueModalContent(AddNewDevoteeModalContent) }
-                },
-                {
-                    label: 'View Devotee',
-                    icon: 'pi pi-fw pi-user',
-                    command: () => { setDialogueModalContent(ViewDevoteeDetailsModalContent) }
-                },
-            ]
+            icon: 'pi pi-fw pi-user',
+            command: () => { setDialogueModalContent(ViewDevoteeDetailsModalContent) }
         },
         {
-            label: 'Admin Tasks',
+            label: "Devotees Dashboard",
+            visible: systemRole === SYSTEM_ROLES.admin, 
+            icon: 'pi pi-fw pi-user-edit',
+            command: () => { setDialogueModalContent(ViewDevoteesDataModalContent) }
+        },
+        {
+            label: 'Donations Dashboard',
             visible: systemRole === SYSTEM_ROLES.admin,
-            icon: 'pi pi-fw pi-users',
-            items: [
-                {
-                    label: "Devotees Data",
-                    icon: 'pi pi-fw pi-user-edit',
-                    command: () => { setDialogueModalContent(ViewDevoteesDataModalContent) }
-                },
-                {
-                    label: 'Donations Data',
-                    icon: 'pi pi-fw pi-user',
-                    command: () => { setDialogueModalContent(ViewDonationsDataModalContent) }
-                },
-            ]
+            icon: 'pi pi-fw pi-user',
+            command: () => { setDialogueModalContent(ViewDonationsDataModalContent) }
         },
         {
             label: 'Referrals',
@@ -93,11 +77,6 @@ export default function TopNavBar() {
     const ReferralsModalContent = {
         header: 'Referrals',
         content: (<Referrals />)
-    }
-
-    const AddNewDevoteeModalContent = {
-        header: 'Add New Devotee' + underConstructionPlaceholder,
-        content: (<p>Add New Devotee Component Form</p>)
     }
 
     const ViewDevoteeDetailsModalContent = {
@@ -159,24 +138,24 @@ export default function TopNavBar() {
                         <Avatar className="grid m-1" image="/devotee-user-icon.png" size="large" shape="circle" />
                         <div>
                             {
-                                devotee?.initiated_name && 
+                                devotee?.initiated_name &&
                                 (
-                                <span className="flex font-bold capitalize">
-                                    {devotee?.initiated_name || ''}
-                                </span>
+                                    <span className="flex font-bold capitalize">
+                                        {devotee?.initiated_name || ''}
+                                    </span>
                                 )
                             }
-                            <span className={classNames(devotee?.initiated_name? '' : 'font-bold')}>
+                            <span className={classNames(devotee?.initiated_name ? '' : 'font-bold')}>
                                 {
                                     (devotee?.initiated_name ? 'aka. ' : '')
                                 }
                                 <span className="capitalize">
                                     {
-                                        (devotee?.name || '') + ('    ') + (devotee?.gender && !devotee?.initiated_name ? devotee.spiritual_levels[`title_${devotee?.gender}`] : '' )
+                                        (devotee?.name || '') + ('    ') + (devotee?.gender && !devotee?.initiated_name ? devotee.spiritual_levels[`title_${devotee?.gender}`] : '')
                                     }
                                 </span>
                             </span>
-                            <span className="flex text-sm">{`+${devotee?.phone?.slice(0,2)}-${devotee?.phone?.slice(2)}` || ''}</span>
+                            <span className="flex text-sm">{`+${devotee?.phone?.slice(0, 2)}-${devotee?.phone?.slice(2)}` || ''}</span>
                         </div>
                     </button>
                 )
