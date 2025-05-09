@@ -18,7 +18,6 @@ import DonationsDashboard from './DonationsDashboard';
 type dialogueModalContentType = {
     header: string,
     content: ReactElement,
-    width?: string,
     footer?: ReactElement
 };
 
@@ -30,8 +29,7 @@ export default function TopNavBar() {
             header: firstTime? 'Keep your profile up to date':'Edit Profile',
             content: (
                 devotee?.id? <Devotee devoteeId={devotee?.id} /> : <></>
-            ),
-            width: '99vw'
+            )
         }
     }
 
@@ -94,40 +92,34 @@ export default function TopNavBar() {
 
     const ReferralsModalContent = {
         header: 'Referrals',
-        content: (<Referrals />),
-        width: '90vw'
+        content: (<Referrals />)
     }
 
     const AddNewDevoteeModalContent = {
         header: 'Add New Devotee' + underConstructionPlaceholder,
-        content: (<p>Add New Devotee Component Form</p>),
-        width: '50vw'
+        content: (<p>Add New Devotee Component Form</p>)
     }
 
     const ViewDevoteeDetailsModalContent = {
         header: 'View Devotee Details' + underConstructionPlaceholder,
-        content: (<p>View Devotee Component Form</p>),
-        width: '50vw'
+        content: (<p>View Devotee Component Form</p>)
     }
 
     const ViewDevoteesDataModalContent = {
         header: 'All Devotees' + underConstructionPlaceholder,
-        content: (<p>View All Devotees Component Form</p>),
-        width: '50vw'
+        content: (<p>View All Devotees Component Form</p>)
     }
 
     const ViewDonationsDataModalContent = {
         header: 'Donations' + underConstructionPlaceholder,
-        content: (<DonationsDashboard />),
-        width: '50vw'
+        content: (<DonationsDashboard />)
     }
 
     const settingsModalContent = {
         header: 'Settings' + underConstructionPlaceholder,
         content: (
             <p>Settings Component Modal</p>
-        ),
-        width: '50vw'
+        )
     }
 
     const topRightMenuItems: MenuItem[] = [
@@ -209,8 +201,9 @@ export default function TopNavBar() {
             <Menubar className="component-transparent" model={topMenuItems} end={end} />
             {inProgress ? <ProgressBar mode="indeterminate" style={{ height: '2px' }}></ProgressBar> : ''}
 
-            <Dialog className="navbar-dialogue" header={dialogueModalContent ? dialogueModalContent.header : ''}
-                visible={!!dialogueModalContent} style={{ width: dialogueModalContent?.width || '90vw' }}
+            <Dialog
+                header={dialogueModalContent ? dialogueModalContent.header : ''}
+                visible={!!dialogueModalContent}
                 onHide={hideDialogueModal} footer={dialogueModalContent?.footer || ''}>
                 <span className="mb-5">
                     {dialogueModalContent?.content || ''}
