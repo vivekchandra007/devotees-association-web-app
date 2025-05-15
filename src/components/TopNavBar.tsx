@@ -11,9 +11,10 @@ import Image from 'next/image';
 import { Menu } from 'primereact/menu';
 import { classNames } from 'primereact/utils';
 import { SYSTEM_ROLES } from '@/data/constants';
-import Devotee from './Devotee';
 import Referrals from './Referrals';
 import DonationsDashboard from './DonationsDashboard';
+import { InputText } from 'primereact/inputtext';
+import { useRouter } from "next/navigation";
 
 type dialogueModalContentType = {
     header: string,
@@ -22,20 +23,14 @@ type dialogueModalContentType = {
 };
 
 export default function TopNavBar() {
+    const router = useRouter();
     const { devotee, systemRole, logout } = useAuth();
     const [inProgress] = useState<boolean>(false);
-    const userProfileModalContent = (firstTime: boolean) => {
-        return {
-            header: firstTime ? 'Keep your profile up to date' : 'Edit Profile',
-            content: (
-                devotee?.id ? <Devotee devoteeId={devotee?.id} /> : <></>
-            )
-        }
-    }
 
     const underConstructionPlaceholder = ' (under construction, not yet live)';
 
-    const [dialogueModalContent, setDialogueModalContent] = useState<dialogueModalContentType | null>(userProfileModalContent(true));
+    const [dialogueModalContent, setDialogueModalContent] = useState<dialogueModalContentType | null>();
+    const [devoteeName, setDevoteeName] = useState<string>('');
     const userProfileActionsPanel = useRef<Menu>(null);
 
     const topMenuItems: MenuItem[] = [
@@ -56,13 +51,13 @@ export default function TopNavBar() {
             command: () => { setDialogueModalContent(ViewDevoteeDetailsModalContent) }
         },
         {
-            label: "Devotees Dashboard",
+            label: "Devotees",
             visible: systemRole === SYSTEM_ROLES.admin, 
             icon: 'pi pi-fw pi-user-edit',
             command: () => { setDialogueModalContent(ViewDevoteesDataModalContent) }
         },
         {
-            label: 'Donations Dashboard',
+            label: 'Donations',
             visible: systemRole === SYSTEM_ROLES.admin,
             icon: 'pi pi-fw pi-user',
             command: () => { setDialogueModalContent(ViewDonationsDataModalContent) }
@@ -73,6 +68,33 @@ export default function TopNavBar() {
             command: () => { setDialogueModalContent(ReferralsModalContent) }
         },
     ];
+
+    const userProfileModalContent = (firstTime: boolean, self?: boolean) => {
+        if (firstTime && !devotee?.name && self) {
+            return {
+                header: '',
+                content: (
+                    <div className="p-inputgroup mt-2 sm:mt-7">
+                        <span className="p-inputgroup-addon">
+                            <i className="pi pi-user"></i>
+                        </span>
+                        <span className="p-float-label">
+                            <InputText id="name" required maxLength={100}
+                                value={devoteeName}
+                                onChange={(e) => {
+                                    setDevoteeName(e.target.value);
+                                }}
+                                className={classNames({ 'p-invalid': !!devoteeName })} />
+                            <label className="capitalize"
+                                htmlFor="name">Name</label>
+                        </span>
+                    </div>
+                )
+            }
+        } else {
+            router.push('/devotee');
+        }
+    }
 
     const ReferralsModalContent = {
         header: 'Referrals',

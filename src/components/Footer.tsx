@@ -85,7 +85,7 @@ export default function Footer() {
                         ईश्वर: परम: कृष्ण: सच्चिदानंद विग्रह: ।<br/>
                         अनादिरादिर्गोविंद: सर्वकारणकारणम् ।।
                     </span>
-                    <p className="copyright left">All glories to Guru and Gauranga</p>
+                    <p className="copyright left">All glories to Shri Guru and Gauranga</p>
                     <p className="copyright left">Developed with प्रेम❤️🙏भक्ति by {packageInfo.author}</p>
                     <p className="copyright right">
                         Copyright © 2025 &nbsp;

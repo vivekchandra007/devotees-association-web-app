@@ -1,0 +1,12 @@
+:root {
+  --primary-color: #d97706;       /* Saffron */
+  --primary-color-text: #ffffff;
+
+  --surface-ground: #fffaf0;      /* Light cream */
+  --surface-card: #ffffff;
+  --surface-border: #e5e7eb;
+  --text-color: #1f2937;          /* Charcoal */
+
+  --highlight-bg: #fef3c7;
+  --highlight-text-color: #92400e;
+}
