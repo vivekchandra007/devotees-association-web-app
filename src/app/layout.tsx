@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, Geist_Mono, Bonheur_Royale } from "next/font/google";
 import Image from "next/image";
 import "@/styles/globals.css";
 // import 'primereact/resources/themes/lara-light-purple/theme.css'
@@ -21,6 +21,13 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const bonheurRoyale = Bonheur_Royale({
+  subsets: ['latin'],
+  weight: '400', // Bonheur Royale has only one weight
+  variable: '--font-bonheur',
+  display: 'swap',
+})
+
 export const metadata: Metadata = {
   title: "Devotees' Association",
   description: "Devotees' Association",
@@ -32,7 +39,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={bonheurRoyale.variable}>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
