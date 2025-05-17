@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { PrimeReactProvider } from 'primereact/api';
 import { Geist, Geist_Mono, Bonheur_Royale, Bilbo_Swash_Caps } from "next/font/google";
 import Image from "next/image";
 import "@/styles/globals.css";
@@ -52,10 +51,8 @@ export default function RootLayout({
       >
         <Suspense>
           <AuthProvider>
-            <PrimeReactProvider value={{ ripple: true }}>
-              <TopNavBar />
-              {children}
-            </PrimeReactProvider>
+            <TopNavBar />
+            {children}
           </AuthProvider>
         </Suspense>
         <Footer />
