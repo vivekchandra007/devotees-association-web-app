@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
+import { PrimeReactProvider } from 'primereact/api';
 import { Geist, Geist_Mono, Bonheur_Royale, Bilbo_Swash_Caps } from "next/font/google";
 import Image from "next/image";
 import "@/styles/globals.css";
 // import 'primereact/resources/themes/lara-light-purple/theme.css'
-import 'primereact/resources/themes/saga-blue/theme.css'
+import 'primereact/resources/themes/saga-blue/theme.css';
 import 'primereact/resources/primereact.min.css';
 import 'primeicons/primeicons.css';
 import Footer from "@/components/Footer";
@@ -51,8 +52,10 @@ export default function RootLayout({
       >
         <Suspense>
           <AuthProvider>
-            <TopNavBar />
-            {children}
+            <PrimeReactProvider value={{ ripple: true }}>
+              <TopNavBar />
+              {children}
+            </PrimeReactProvider>
           </AuthProvider>
         </Suspense>
         <Footer />
