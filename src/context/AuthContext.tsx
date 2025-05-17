@@ -76,7 +76,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     await axios.post('/api/auth/logout'); // NOTE: use raw axios, not the wrapped one
     setDevotee(null);
     const queryParams = searchParams.toString();
-    router.push(`/login${queryParams ? `?${queryParams}` : ''}`)
+    const guestMode = !!searchParams.get('guest');
+    if(!guestMode) {
+      router.push(`/login${queryParams ? `?${queryParams}` : ''}`)
+    }
   };
 
   useEffect(() => {

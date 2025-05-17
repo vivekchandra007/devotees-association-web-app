@@ -24,7 +24,7 @@ type dialogueModalContentType = {
 
 export default function TopNavBar() {
     const router = useRouter();
-    const { devotee, systemRole, logout } = useAuth();
+    const { devotee, isAuthenticated, systemRole, logout } = useAuth();
     const [inProgress] = useState<boolean>(false);
 
     const underConstructionPlaceholder = ' (under construction, not yet live)';
@@ -195,6 +195,10 @@ export default function TopNavBar() {
 
     const hideDialogueModal = () => {
         setDialogueModalContent(null);
+    }
+
+    if (!isAuthenticated) {
+        return null;
     }
 
     return (

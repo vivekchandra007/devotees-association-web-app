@@ -24,7 +24,6 @@ import { ProgressBar } from "primereact/progressbar";
 import { devotees } from "@prisma/client";
 import { convertDateObjectIntoDateString } from "@/lib/conversions";
 import FullPageSpinner from "@/components/FullPageSpinner";
-import TopNavBar from "@/components/TopNavBar";
 import ProfileCompletionMeter from "@/components/ProfileCompletionMeter";
 
 export default function Devotee() {
@@ -151,7 +150,6 @@ export default function Devotee() {
 
     return (
         <>
-            <TopNavBar />
             <div className="grid md:items-center bg-white">
                 {!isAuthenticated && devotee && <FullPageSpinner message="Hare Krishna! Fetching details..." />}
                 <form onSubmit={formik.handleSubmit} className="text-sm md:text-base m-2">

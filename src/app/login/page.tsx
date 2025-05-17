@@ -9,6 +9,7 @@ import axios from "axios";
 import { useRouter, useSearchParams } from "next/navigation";
 import FullPageSpinner from "@/components/FullPageSpinner";
 import { useAuth } from "@/hooks/useAuth";
+import Link from "next/link";
 
 declare global {
     interface Window {
@@ -21,8 +22,9 @@ export default function LoginPage() {
     const router = useRouter();
     const [authInProgress, setAuthInProgress] = useState<boolean>(false);
     const searchParams = useSearchParams();
-    const referralCode:string | null = searchParams.get('ref');
-    const source:string | null = searchParams.get('source');
+    const referralCode: string | null = searchParams.get('ref');
+    const source: string | null = searchParams.get('source');
+    const guestMode: string | null = searchParams.get('guest');
 
     const getVerifiedNumber = async (verifiedPhoneAccessToken: string) => {
         setAuthInProgress(true);
@@ -39,7 +41,7 @@ export default function LoginPage() {
                         Authorization: `Bearer ${verifiedPhoneAccessToken}`,
                     }
                 }
-            ); 
+            );
             if (response.status === 200) {
                 // call the login hook from useAuth(), which will store access token in localStorae and again call fetchMe() hook with complete devotee details
                 login(response.data.accessToken);
@@ -54,20 +56,17 @@ export default function LoginPage() {
     };
 
     const header = (
-        <div className="max-h-[240px] max-w-[240px] m-auto">
-            <Image
-                className="rounded-full border-2 border-yellow-500"
-                src="/app-image.jpg"
-                alt="Devotees' Association"
-                width={240}
-                height={240}
-                priority
-            />
-        </div>
+        <Image
+            src="/app-image.jpg"
+            alt="Devotees' Association"
+            width={240}
+            height={240}
+            priority
+        />
     );
 
     const title = (
-        <span className="text-3xl font-light text-indigo-900">
+        <span className="font-bilbo text-5xl text-text">
             <span className="text-orange-500">Dev</span>otees&apos;&nbsp;
             <span className="text-orange-500">Association</span>
             <Divider align="center">
@@ -83,11 +82,13 @@ export default function LoginPage() {
             Hare Krishna 🙏🏼
             <br />
             As mentioned in&nbsp;
-            <a className="hover:underline text-indigo-950" href="https://vedabase.io/en/library/cc/adi/3/91/" target="_blank" rel="noopener noreferrer">
+            <a className="hover:underline text-text" href="https://vedabase.io/en/library/cc/adi/3/91/" target="_blank" rel="noopener noreferrer">
                 Śrī Caitanya-Caritāmṛta Ādi 3.91 &nbsp;<i className="pi pi-external-link"></i>
             </a>
             <br />
             The devotees of Lord Viṣṇu are godly <span className="text-orange-600">(dev)</span>
+            <br />
+            and Association of Devotees is one of the most important activity in Bhakti.
             <br />
             So, come and get associated with us, <span className="text-orange-600">dev</span>
         </span>
@@ -152,9 +153,9 @@ export default function LoginPage() {
     });
 
     return (
-        <div className="grid md:items-center pt-4 justify-items-center min-h-screen">
-            {authInProgress && <FullPageSpinner message="Hare Krishna! OTP verifed. Redirecting you to Home Page" />}
-            <div className="">
+        <div className="grid md:items-center m-auto justify-items-center min-h-screen">
+            {authInProgress && <FullPageSpinner message="Hare Krishna! OTP verifed. Redirecting to Home Page" />}
+            <div>
                 <Card title={title}
                     subTitle={subTitle} footer={footer} header={header}
                     className="shadow-2xl w-93 md:w-110 text-center component-transparent">
@@ -162,6 +163,11 @@ export default function LoginPage() {
                         <Button id="btn-sign-in" label="Login with your Mobile Number" severity="danger" raised
                             icon="pi pi-mobile" loading={authInProgress}
                             onClick={() => initSendOTP(configuration)} />
+                        <br />
+                        {
+                            !guestMode && 
+                            <Link href="/?guest=true" className="text-sm block mt-2 underline">explore logged out</Link>
+                        }
                     </div>
                 </Card>
             </div>

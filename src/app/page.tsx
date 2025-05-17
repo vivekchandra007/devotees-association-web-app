@@ -1,9 +1,8 @@
 "use client";
 
 import { useAuth } from '@/hooks/useAuth';
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import FullPageSpinner from '@/components/FullPageSpinner';
-import TopNavBar from '@/components/TopNavBar';
 import { Button } from 'primereact/button';
 import ProfileCompletionMeter from '@/components/ProfileCompletionMeter';
 import { Card } from 'primereact/card';
@@ -12,33 +11,21 @@ import { Divider } from 'primereact/divider';
 
 export default function Home() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const guestMode: boolean | null = !!searchParams.get('guest');
   const { devotee, isAuthenticated } = useAuth();
 
-  if (!isAuthenticated) return <FullPageSpinner message="Hare Krishna! Fetching your details..." />;
-
-  const header = (
-    <div className="max-h-[60px] max-w-[60px] m-auto hidden md:block">
-      <Image
-        className="rounded-full mt-2 border-2 border-yellow-500"
-        src="/app-image.jpg"
-        alt="Devotees' Association"
-        width={60}
-        height={60}
-        priority
-      />
-    </div>
-  );
-
   const title = (
-    <small>
-      Hare Krishna! <br />{devotee?.name}{devotee?.gender ? `, ${devotee.spiritual_levels[`title_${devotee?.gender}`]}` : ''} 🙏🏻
+    <small className="text-text">
+      || हरे कृष्ण ||
+      <br />
+      {devotee?.initiated_name || devotee?.name}{devotee?.gender ? `, ${devotee.spiritual_levels[`title_${devotee?.gender}`]}` : ''} 🙏🏻
     </small>
   );
 
   const subTitle = (
-    <small className="text-xs md:text-base">
-      Congratulations! <br />
-      you are getting your own temple in Baner
+    <small className="text-text">
+      Congratulations! Thanks to your devotion, Baner is about to get a new beautiful temple
     </small>
   );
 
@@ -58,24 +45,25 @@ export default function Home() {
     </div>
   );
 
+  if (!guestMode && !isAuthenticated) return <FullPageSpinner message="Hare Krishna! Fetching your details..." />;
+
   return (
     <>
       <Image
         className="absolute -z-1 top-0 left-0 w-full h-full object-cover"
-        src="/app-image.jpg"
+        src="/background.jpg"
         alt="Devotees' Association background image"
         sizes="100v"
         fill
         priority
       />
-      <TopNavBar />
       <div className="grid md:pt-1 justify-items-center min-h-screen">
         <Card title={title}
-          subTitle={subTitle} footer={footer} header={header}
-          className="shadow-2xl w-93 md:w-110 text-center component-transparent">
+          subTitle={subTitle} footer={footer}
+          className="shadow-2xl w-full md:w-110 text-center component-transparent text-text">
           <div>
-            <div>
-              <strong className="font-bonheur md:text-2xl">Shri Shri <span className="text-5xl text-[#e07338]">Radha Krishna</span>&nbsp;Temple</strong>
+            <div className="text-text">
+              <strong className="font-bilbo md:text-2xl">Shri Shri <span className="text-5xl text-special">Radha Krishna</span>&nbsp;Temple</strong>
             </div>
             <Image
               className="m-auto"
@@ -86,27 +74,48 @@ export default function Home() {
               priority
             />
             <br />
-            <small className="block">So, now it&apos;s your turn. Take following steps:</small><br />
-            <Button id="btn-sign-in" label="Step 1: Don't miss this Opportunity. Contribute towards building it." severity="warning" raised size="small"
+            <small className="text-text">
+              So, now it&apos;s your turn.
+              <br />
+              Let&apos;s build it brick by brick, step by step
+            </small>
+            <br /><br />
+            <Button label="Step 1: Don't miss this once in a Lifetime Opportunity to build a temple for Shri Shri Radha Krishna. Contribute!" severity="warning" raised size="small"
               icon="pi pi-indian-rupee"
               onClick={() => window.open("https://iskconpunebcec.com/#/newtemple")} />
             <br /><br />
-            <Button id="btn-sign-in" label="Step 2: Come, join our Whatsapp group for latest updates and spiritual association" severity="success" raised size="small"
+            <Button label="Step 2: Come, join our Whatsapp group for latest updates and spiritual association" severity="success" raised size="small"
               icon="pi pi-whatsapp"
               onClick={() => alert('Link to a Whatsapp group')} />
             <br /><br />
-            <Button id="btn-sign-in" severity="info" raised className="w-full" size="small"
-              icon="pi pi-mobile"
-              onClick={() => router.push('/devotee')}>
-                <div className="grid grid-cols-12 items-center">
-                  <span className="col-span-8">Step 13: Keep your profile upto date</span>
-                  <ProfileCompletionMeter devotee={devotee} className="col-span-4" />
-                </div>
-            </Button>
-            <br /><br />
-            <Button id="btn-sign-in" label="Step 4: Let&apos;s Spread the word. Refer Others and become a spiritual catalyst in their life." severity="secondary" raised size="small"
-              icon="pi pi-fw pi-share-alt"
-              onClick={() => router.push('/referral')} />
+            {
+              guestMode ?
+                (
+                  <>
+                    <Button label="Step 3: Create Profile, Get Gifts on your special occassions, Track Your Donations and Associate with Devotees. All at one place"
+                      severity="danger" size="small" raised
+                      icon="pi pi-crown"
+                      onClick={() => router.push(`/login${searchParams ? `?${searchParams}` : ''}`)} />
+                    <br />
+                  </>
+                ) :
+                (
+                  <>
+                    <Button severity="info" raised className="w-full" size="small"
+                      icon="pi pi-mobile"
+                      onClick={() => router.push('/devotee')}>
+                      <div className="grid grid-cols-12 items-center">
+                        <span className="col-span-8">Step 13: Keep your profile upto date</span>
+                        <ProfileCompletionMeter devotee={devotee} className="col-span-4" />
+                      </div>
+                    </Button>
+                    <br /><br />
+                    <Button label="Step 4: Let&apos;s Spread the word. Refer Others and become a spiritual catalyst in their life." severity="secondary" raised size="small"
+                      icon="pi pi-fw pi-share-alt"
+                      onClick={() => router.push('/referral')} />
+                  </>
+                )
+            }
           </div>
           <Divider align="center">
           </Divider>
