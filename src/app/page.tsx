@@ -95,10 +95,13 @@ export default function Home() {
               icon="pi pi-whatsapp"
               onClick={() => alert('Link to a Whatsapp group')} />
             <br /><br />
-            <Button id="btn-sign-in" label="Step 3: Keep your profile upto date" severity="info" raised className="w-full" size="small"
+            <Button id="btn-sign-in" severity="info" raised className="w-full" size="small"
               icon="pi pi-mobile"
               onClick={() => router.push('/devotee')}>
-              <ProfileCompletionMeter devotee={devotee} className="pl-7" />
+                <div className="grid grid-cols-12 items-center">
+                  <span className="col-span-8">Step 13: Keep your profile upto date</span>
+                  <ProfileCompletionMeter devotee={devotee} className="col-span-4" />
+                </div>
             </Button>
             <br /><br />
             <Button id="btn-sign-in" label="Step 4: Let&apos;s Spread the word. Refer Others and become a spiritual catalyst in their life." severity="secondary" raised size="small"

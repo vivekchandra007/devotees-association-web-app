@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { PrimeReactProvider } from 'primereact/api';
 import { Geist, Geist_Mono, Bonheur_Royale } from "next/font/google";
 import Image from "next/image";
 import "@/styles/globals.css";
@@ -13,7 +14,7 @@ import { Suspense } from "react";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
-  subsets: ["latin"], 
+  subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
@@ -44,7 +45,11 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Suspense>
-          <AuthProvider>{children}</AuthProvider>
+          <AuthProvider>
+            <PrimeReactProvider value={{ ripple: true }}>
+              {children}
+            </PrimeReactProvider>
+          </AuthProvider>
         </Suspense>
         <Footer />
         <Image
