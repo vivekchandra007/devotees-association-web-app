@@ -24,7 +24,7 @@ module.exports = {
         text: '#1e1b4b',       // indigo-950
         special: '#e07338',
         card: '#ffffff',
-        border: '#e5e7eb'
+        border: '#e5e7eb',
       },
       backgroundColor: {
         testgreen: '#00ff00',
