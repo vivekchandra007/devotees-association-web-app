@@ -8,12 +8,16 @@ import ProfileCompletionMeter from '@/components/ProfileCompletionMeter';
 import { Card } from 'primereact/card';
 import Image from "next/image";
 import { Divider } from 'primereact/divider';
+import Referrals from '@/components/Referrals';
+import { Dialog } from 'primereact/dialog';
+import { useState } from 'react';
 
 export default function Home() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const guestMode: boolean | null = !!searchParams.get('guest');
   const { devotee, isAuthenticated } = useAuth();
+   const [showReferralModal, setShowReferralModal] = useState<boolean>(false);
 
   const title = (
     <small className="text-text">
@@ -112,7 +116,7 @@ export default function Home() {
                     <br /><br />
                     <Button label="Step 4: Let&apos;s Spread the word. Refer Others and become a spiritual catalyst in their life." severity="secondary" raised size="small"
                       icon="pi pi-fw pi-share-alt"
-                      onClick={() => router.push('/referral')} />
+                      onClick={() => setShowReferralModal(true)} />
                   </>
                 )
             }
@@ -120,6 +124,14 @@ export default function Home() {
           <Divider align="center">
           </Divider>
         </Card>
+        <Dialog
+            header="Referrals"
+            visible={showReferralModal}
+            onHide={() => setShowReferralModal(false)}>
+            <span className="mb-5">
+                <Referrals />
+            </span>
+        </Dialog>
       </div>
     </>
   );

@@ -26,7 +26,7 @@ import { convertDateObjectIntoDateString } from "@/lib/conversions";
 import FullPageSpinner from "@/components/FullPageSpinner";
 import ProfileCompletionMeter from "@/components/ProfileCompletionMeter";
 
-export default function Devotee() {
+export default function DevoteePage() {
     // const searchParams = useSearchParams();
     const toast = useRef<Toast>(null);
     const { devotee, isAuthenticated } = useAuth();
