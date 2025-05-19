@@ -39,6 +39,7 @@ export default function Home() {
 
   async function saveDevoteeName() {
     if (devotee && devoteeName) {
+      setSavingName(true);
       await api.post('/devotee', {
         id: devotee.id,
         name: devoteeName
