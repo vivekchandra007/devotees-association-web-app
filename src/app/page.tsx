@@ -117,7 +117,7 @@ export default function Home() {
             Congratulations! Thanks to your devotion, we all are now getting a new beautiful temple in Baner, Pune
           </small>
           <div className="text-text">
-            <strong className="font-bilbo md:text-2xl">Shri Shri <span className="text-5xl text-special">Radha Krishna</span>&nbsp;Temple</strong>
+            <strong className="font-bilbo md:text-4xl">Shri Shri <span className="text-7xl text-special">Radha Krishna</span>&nbsp;Temple</strong>
           </div>
           <Image
             className="m-auto"
