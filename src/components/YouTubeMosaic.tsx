@@ -29,7 +29,7 @@ export default function YouTubeMosaic() {
   return (
     <>
       <small><strong>Note:</strong>&nbsp;Click or Hover over on any thumbnail to take Holy Dip in this Sāgar of videos, which will inspire you to the soul.</small>
-      <div className="grid grid-cols-12 gap-1 p-2 component-transparent w-full">
+      <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-12 gap-1 p-2 component-transparent w-full">
         {videos.map((video, idx) => {
           return (
             <div key={idx} className="cursor-pointer" onClick={() => setSelectedVideo(video)} onMouseEnter={(e) => handleHover(e, video)}>
