@@ -40,6 +40,7 @@ export default function YouTubeMosaic() {
                 height="128"
                 className="transition hover:scale-105"
               />
+              <small className="block w-[111px] truncate overflow-hidden whitespace-nowrap">{video.title}</small>
             </div>
           );
         })}
@@ -61,11 +62,12 @@ export default function YouTubeMosaic() {
         <Dialog
           visible={!!selectedVideo}
           style={{ width: '90vw', maxWidth: '800px' }}
-          header="Now Playing"
+          header={`Now Playing: ${selectedVideo?.title}`}
           modal
           dismissableMask
           onHide={() => setSelectedVideo(null)}
         >
+          <small>{selectedVideo?.description}</small>
           {selectedVideo && (
             <iframe
               width="100%"
