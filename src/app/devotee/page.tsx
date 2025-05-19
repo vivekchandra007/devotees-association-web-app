@@ -17,7 +17,7 @@ import { SKILLS } from "@/data/skills";
 import { CITIES } from "@/data/cities";
 import ALL_CITIES from "@/data/states.json";
 import { AREAS } from "@/data/areas";
-import api from "@/lib/axios";
+import api from "@/lib/axios";              // our Custom Axios
 import { Toast } from "primereact/toast";
 import { MessageSeverity } from "primereact/api";
 import { ProgressBar } from "primereact/progressbar";
@@ -151,7 +151,7 @@ export default function DevoteePage() {
     return (
         <div className="bg-white">
             {!isAuthenticated && devotee && <FullPageSpinner message="Hare Krishna! Fetching details..." />}
-            
+
             {formik.isSubmitting && <FullPageSpinner message="Saving Changes" />}
 
             <form onSubmit={formik.handleSubmit} className="text-sm md:text-base m-2">

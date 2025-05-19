@@ -11,6 +11,8 @@ import { Divider } from 'primereact/divider';
 import Referrals from '@/components/Referrals';
 import { Dialog } from 'primereact/dialog';
 import { useState } from 'react';
+import { InputText } from 'primereact/inputtext';
+import api from "@/lib/axios";              // our Custom Axios Wrapper
 
 export default function Home() {
   const router = useRouter();
@@ -18,6 +20,8 @@ export default function Home() {
   const guestMode: boolean | null = !!searchParams.get('guest');
   const { devotee, isAuthenticated } = useAuth();
   const [showReferralModal, setShowReferralModal] = useState<boolean>(false);
+  const [devoteeName, setDevoteeName] = useState<string>('');
+  const [savingName, setSavingName] = useState<boolean>(false);
 
   const title = (
     <small className="text-text">
@@ -32,6 +36,16 @@ export default function Home() {
       Congratulations! Thanks to your devotion, we all are now getting a new beautiful temple in Baner, Pune
     </small>
   );
+
+  async function saveDevoteeName() {
+    if (devotee && devoteeName) {
+      await api.post('/devotee', {
+        id: devotee.id,
+        name: devoteeName
+      }); // automatically sends token
+      window.location.reload();
+    }
+  }
 
   if (!guestMode && !isAuthenticated) return <FullPageSpinner message="Hare Krishna! Fetching your details..." />;
 
@@ -114,6 +128,51 @@ export default function Home() {
         <span className="mb-5">
           <Referrals />
         </span>
+      </Dialog>
+      <Dialog
+        header="What should we call you?" keepInViewport
+        closeIcon="pi pi-crown"
+        visible={!guestMode && !!devotee && !devotee.name}
+        footer={
+          (
+            <div className="grid grid-cols-12 items-center">
+              <div className="col-span-8 md:col-span-10 p-4">
+                <small>
+                  <strong>Note:</strong>&nbsp;Just tell us your name, so that you can start using this app. Rest of the details, you can always fill later, through Profile menu on top, at your own ease.
+                </small>
+              </div>
+              <div className="col-span-4 md:col-span-2 mr-1">
+                <Button
+                  className="float-right"
+                  size="small"
+                  type="button"
+                  onClick={() => saveDevoteeName()}
+                  label={savingName ? "Saving..." : "Save"}
+                  icon="pi pi-save"
+                  loading={savingName}
+                  disabled={savingName || !devoteeName}
+                  raised
+                />
+              </div>
+            </div>
+          )
+        }
+        onHide={() => setShowReferralModal(false)}>
+        <div className="p-inputgroup mt-2 sm:mt-7">
+          <span className="p-inputgroup-addon">
+            <i className="pi pi-user"></i>
+          </span>
+          <span className="p-float-label">
+            <InputText id="name" required maxLength={100}
+              value={devoteeName}
+              onChange={(e) => {
+                setDevoteeName(e.target.value);
+              }}
+            />
+            <label className="capitalize"
+              htmlFor="name">{'Name'}</label>
+          </span>
+        </div>
       </Dialog>
     </>
   );
