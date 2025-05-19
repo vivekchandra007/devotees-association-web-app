@@ -3,7 +3,7 @@
 import { MenuItem } from 'primereact/menuitem';
 import { Dialog } from 'primereact/dialog';
 import { Avatar } from 'primereact/avatar';
-import { ReactElement, useRef, useState } from 'react';
+import { ReactElement, useEffect, useRef, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth'; // your auth hook
 import Image from 'next/image';
 import { Menu } from 'primereact/menu';
@@ -12,6 +12,8 @@ import Referrals from './Referrals';
 import { useRouter } from "next/navigation";
 import { Toolbar } from 'primereact/toolbar';
 import { Button } from 'primereact/button';
+import { ProgressBar } from 'primereact/progressbar';
+import { usePathname, useSearchParams } from 'next/navigation';
 
 type dialogueModalContentType = {
     header: string,
@@ -21,7 +23,12 @@ type dialogueModalContentType = {
 
 export default function TopNavBar() {
     const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
+    
     const { devotee, isAuthenticated, logout } = useAuth();
+
+    const [ isNavigating, setIsNavigating ] = useState<boolean>(false);
 
     const underConstructionPlaceholder = ' (under construction, not yet live)';
 
@@ -60,7 +67,7 @@ export default function TopNavBar() {
         {
             label: 'Edit My Profile',
             icon: 'pi pi-fw pi-user-edit',
-            command: () => router.push('/devotee')
+            command: () => navigateToPage('devotee')
         },
         {
             label: 'Referrals',
@@ -107,9 +114,17 @@ export default function TopNavBar() {
         setDialogueModalContent(null);
     }
 
-    if (!isAuthenticated) {
-        return null;
+    function navigateToPage(page: string) {
+        if (pathname !== `/${page}`) {
+            setIsNavigating(true);
+            router.push(`/${page}`);
+        }
     }
+
+    useEffect(() => {
+        // Do something on route change
+        setIsNavigating(false);
+    }, [pathname, searchParams]);
 
     const startContent = (
         <span className="flex flex-col items-center space-y-1">
@@ -121,7 +136,7 @@ export default function TopNavBar() {
                 aria-label="Home"
                 size="large"
                 style={{ padding: '8px' }}
-                onClick={() => router.push('/')}
+                onClick={() => navigateToPage('')}
             >
                 <Image src="/logo-dark.png" alt="Home" height="32" width="32" className="invert-100" priority />
             </Button>
@@ -139,7 +154,7 @@ export default function TopNavBar() {
                     severity="contrast"
                     aria-label="Edit Profile"
                     size="large"
-                    onClick={() => router.push('/devotee')}
+                    onClick={() => navigateToPage('devotee')}
                 />
                 <span className="text-xs mt-1">Profile</span>
             </span>
@@ -152,7 +167,7 @@ export default function TopNavBar() {
                     severity="contrast"
                     aria-label="Donations"
                     size="large"
-                    onClick={() => router.push('/donations')}
+                    onClick={() => navigateToPage('donations')}
                 />
                 <span className="text-xs mt-1">Donations</span>
             </span>
@@ -195,11 +210,19 @@ export default function TopNavBar() {
         </div>
     );
 
+    if (!isAuthenticated) {
+        return null;
+    }
+
     return (
         <div>
-            <Toolbar start={startContent} center={centerContent} end={endContent} className="shadow-2 component-transparent" style={{ padding: '8px' }} />
+            <Toolbar start={startContent} center={centerContent} end={endContent} className="component-transparent" style={{ padding: '8px', border: 'none ', boxShadow: 'rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px' }} />
+            {
+                isNavigating &&
+                <ProgressBar mode="indeterminate" style={{ height: '4px', background: '#f1c40f' }}></ProgressBar>
+            }
             <Dialog
-                header={dialogueModalContent ? dialogueModalContent.header : ''}
+                header={dialogueModalContent ? dialogueModalContent.header : ''} keepInViewport
                 visible={!!dialogueModalContent}
                 onHide={hideDialogueModal} footer={dialogueModalContent?.footer || ''}>
                 <span className="mb-5">

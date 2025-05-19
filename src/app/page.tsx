@@ -29,7 +29,7 @@ export default function Home() {
 
   const subTitle = (
     <small className="text-text">
-      Congratulations! Thanks to your devotion, Baner is about to get a new beautiful temple
+      Congratulations! Thanks to your devotion, we all are now getting a new beautiful temple in Baner, Pune
     </small>
   );
 
@@ -108,7 +108,7 @@ export default function Home() {
         </Divider>
       </Card>
       <Dialog
-        header="Referrals"
+        header="Referrals" keepInViewport
         visible={showReferralModal}
         onHide={() => setShowReferralModal(false)}>
         <span className="mb-5">

@@ -55,7 +55,7 @@ export default function Referrals() {
             </div>
 
             <Dialog
-                header="Share via QR Code"
+                header="Share via QR Code" keepInViewport
                 visible={showQR}
                 onHide={() => setShowQR(false)}
                 modal
