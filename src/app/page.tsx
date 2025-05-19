@@ -19,6 +19,7 @@ export default function Home() {
   const searchParams = useSearchParams();
   const guestMode: boolean | null = !!searchParams.get('guest');
   const { devotee, isAuthenticated } = useAuth();
+  const [showWelcomeCard, setShowWelcomeCard] = useState<boolean>(true);
   const [showReferralModal, setShowReferralModal] = useState<boolean>(false);
   const [devoteeName, setDevoteeName] = useState<string>('');
   const [savingName, setSavingName] = useState<boolean>(false);
@@ -59,68 +60,86 @@ export default function Home() {
         fill
         priority
       />
-      <Card title={title}
-        subTitle={subTitle}
-        className="shadow-2xl w-full md:w-110 text-center component-transparent text-text size-fit m-auto">
-        <div>
-          <div className="text-text">
-            <strong className="font-bilbo md:text-2xl">Shri Shri <span className="text-5xl text-special">Radha Krishna</span>&nbsp;Temple</strong>
-          </div>
-          <Image
-            className="m-auto"
-            src="/chant-and-be-happy.png"
-            alt="Devotees' Association"
-            width={200}
-            height={214}
-            priority
-          />
-          <br />
-          <small className="text-text">
-            So, now it&apos;s your turn.
+      {
+        showWelcomeCard &&
+        <Card title={title}
+          subTitle={subTitle}
+          className="shadow-2xl w-full md:w-110 text-center component-transparent text-text size-fit m-auto">
+          <div>
+            <div className="text-text">
+              <strong className="font-bilbo md:text-2xl">Shri Shri <span className="text-5xl text-special">Radha Krishna</span>&nbsp;Temple</strong>
+            </div>
+            <Image
+              className="m-auto"
+              src="/chant-and-be-happy.png"
+              alt="Devotees' Association"
+              width={200}
+              height={214}
+              priority
+            />
             <br />
-            Let&apos;s build it brick by brick, step by step
-          </small>
-          <br /><br />
-          <Button label="Step 1: Don't miss this once in a Lifetime Opportunity to build a temple for Shri Shri Radha Krishna. Contribute!" severity="warning" raised size="small"
-            icon="pi pi-indian-rupee"
-            onClick={() => window.open("https://iskconpunebcec.com/#/newtemple")} />
-          <br /><br />
-          <Button label="Step 2: Come, join our Whatsapp group for latest updates and spiritual association" severity="success" raised size="small"
-            icon="pi pi-whatsapp"
-            onClick={() => alert('Link to a Whatsapp group')} />
-          <br /><br />
-          {
-            guestMode ?
-              (
-                <>
-                  <Button label="Step 3: Create Profile, Get Gifts on your special occassions, Track Your Donations and Associate with Devotees. All at one place"
-                    severity="danger" size="small" raised
-                    icon="pi pi-crown"
-                    onClick={() => router.push(`/login${searchParams ? `?${searchParams}` : ''}`)} />
-                  <br />
-                </>
-              ) :
-              (
-                <>
-                  <Button severity="info" raised className="w-full" size="small"
-                    icon="pi pi-mobile"
-                    onClick={() => router.push('/devotee')}>
-                    <div className="grid grid-cols-12 items-center">
-                      <span className="col-span-8">Step 13: Keep your profile upto date</span>
-                      <ProfileCompletionMeter devotee={devotee} className="col-span-4" />
-                    </div>
-                  </Button>
-                  <br /><br />
-                  <Button label="Step 4: Let&apos;s Spread the word. Refer Others and become a spiritual catalyst in their life." severity="secondary" raised size="small"
-                    icon="pi pi-fw pi-share-alt"
-                    onClick={() => setShowReferralModal(true)} />
-                </>
-              )
-          }
-        </div>
-        <Divider align="center">
-        </Divider>
-      </Card>
+            <small className="text-text">
+              So, now it&apos;s your turn.
+              <br />
+              Let&apos;s build it brick by brick, step by step
+            </small>
+            <br /><br />
+            <Button label="Step 1: Don't miss this once in a Lifetime Opportunity to build a temple for Shri Shri Radha Krishna. Contribute!" severity="warning" raised size="small"
+              icon="pi pi-indian-rupee"
+              onClick={() => window.open("https://iskconpunebcec.com/#/newtemple")} />
+            <br /><br />
+            <Button label="Step 2: Come, join our Whatsapp group for latest updates and spiritual association" severity="success" raised size="small"
+              icon="pi pi-whatsapp"
+              onClick={() => alert('Link to a Whatsapp group')} />
+            <br /><br />
+            {
+              guestMode ?
+                (
+                  <>
+                    <Button label="Step 3: Create Profile, Get Gifts on your special occassions, Track Your Donations and Associate with Devotees. All at one place"
+                      severity="danger" size="small" raised
+                      icon="pi pi-crown"
+                      onClick={() => router.push(`/login${searchParams ? `?${searchParams}` : ''}`)} />
+                    <br />
+                  </>
+                ) :
+                (
+                  <>
+                    <Button severity="info" raised className="w-full" size="small"
+                      icon="pi pi-mobile"
+                      onClick={() => router.push('/devotee')}>
+                      <div className="grid grid-cols-12 items-center">
+                        <span className="col-span-8">Step 13: Keep your profile upto date</span>
+                        <ProfileCompletionMeter devotee={devotee} className="col-span-4" />
+                      </div>
+                    </Button>
+                    <br /><br />
+                    <Button label="Step 4: Let&apos;s Spread the word. Refer Others and become a spiritual catalyst in their life." severity="secondary" raised size="small"
+                      icon="pi pi-fw pi-share-alt"
+                      onClick={() => setShowReferralModal(true)} />
+                  </>
+                )
+            }
+            <br /><br />
+            <span className="flex flex-col items-center space-y-1">
+                <Button
+                    icon="pi pi-times-circle"
+                    rounded
+                    text
+                    raised
+                    severity="contrast"
+                    aria-label="Close"
+                    size="large"
+                    onClick={() => {
+                      setShowWelcomeCard(false);
+                      window.scrollTo(0,0);
+                    }}
+                />
+                <span className="text-xs mt-1">Close</span>
+            </span>
+          </div>
+        </Card>
+      }
       <Dialog
         header="Referrals" keepInViewport
         visible={showReferralModal}
