@@ -21,7 +21,8 @@ export default function Home() {
   const guestMode: boolean | null = !!searchParams.get('guest');
   const { devotee, isAuthenticated } = useAuth();
   const LOCAL_STORAGE_STEPS_COMPLETED = "stepsCompleted";
-  const [showWelcomeCard, setShowWelcomeCard] = useState<boolean>(!Boolean(localStorage.getItem(LOCAL_STORAGE_STEPS_COMPLETED)));
+  const stepsCompletedFromLocalStorage = typeof window !== 'undefined'? Boolean(localStorage.getItem(LOCAL_STORAGE_STEPS_COMPLETED)): false
+  const [showWelcomeCard, setShowWelcomeCard] = useState<boolean>(!stepsCompletedFromLocalStorage);
   const [showReferralModal, setShowReferralModal] = useState<boolean>(false);
   const [stepsCompleted, setStepsCompleted] = useState<boolean>(false);
   const [devoteeName, setDevoteeName] = useState<string>('');

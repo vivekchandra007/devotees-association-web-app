@@ -1,7 +1,10 @@
+"use client";
+
 import React, { useState, useRef } from 'react';
 import videos from '@/data/videos.json';
 import { OverlayPanel } from 'primereact/overlaypanel';
 import { Dialog } from 'primereact/dialog';
+import Image from 'next/image';
 
 type YouTubeVideo = {
   id: string;
@@ -18,7 +21,7 @@ export default function YouTubeMosaic() {
   const overlayRef = useRef<OverlayPanel>(null);
   const [hoverVideo, setHoverVideo] = useState<YouTubeVideo | null>(null);
 
-  const handleHover = (event: any, video: YouTubeVideo) => {
+  const handleHover = (event: React.SyntheticEvent, video: YouTubeVideo) => {
     setHoverVideo(video);
     overlayRef.current?.show(event, event.currentTarget);
   };
@@ -30,11 +33,11 @@ export default function YouTubeMosaic() {
         {videos.map((video, idx) => {
           return (
             <div key={idx} className="cursor-pointer" onClick={() => setSelectedVideo(video)} onMouseEnter={(e) => handleHover(e, video)}>
-              <img
+              <Image
                 src={video.thumbnail}
-                alt="Thumbnail"
-                width="128px"
-                height="128px"
+                alt={`Video#${video.videoId}`}
+                width="128"
+                height="128"
                 className="transition hover:scale-105"
               />
             </div>
