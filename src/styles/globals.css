@@ -50,6 +50,20 @@ body {
   border-radius: 0;
 }
 
+.p-tabview-nav-link {
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: saturate(210%) blur(9px);
+}
+.p-tabview-nav {
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: saturate(210%) blur(9px);
+}
+
+.p-tabview-panels {
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: saturate(210%) blur(9px);
+}
+
 .p-divider .p-divider-content {
   background: transparent;
 }
