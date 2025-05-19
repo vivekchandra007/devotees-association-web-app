@@ -788,7 +788,7 @@ export default function Devotee({ devoteeId }: DevoteeProps) {
                     <br />
                     <Fieldset legend={<span>Memberships<i className="pi pi-id-card pl-2"></i></span>} toggleable collapsed >
                         Temple: &nbsp;
-                        <a href="https://iskconpunebcec.com/#/Home" target="_blank" rel="noopener noreferrer" className="underline">
+                        <a href="https://iskconpunebcec.com/#/Home" target="_blank" rel="noopener noreferrer" className="underline hover:text-hover">
                             ISKCON BCEC
                         </a>
                         {/* <div className="grid">

@@ -49,8 +49,12 @@ export default function RootLayout({
         <Suspense>
           <AuthProvider>
             <PrimeReactProvider value={{ ripple: true }}>
-              <TopNavBar />
-              {children}
+              <div className="sticky z-10 top-0">
+                <TopNavBar />
+              </div>
+              <div className="grid items-center m-auto justify-items-center min-h-screen">
+                {children}
+              </div>
             </PrimeReactProvider>
           </AuthProvider>
         </Suspense>

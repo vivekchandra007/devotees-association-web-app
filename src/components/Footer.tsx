@@ -12,12 +12,12 @@ export default function Footer() {
                                 <Image src="/logo-dark.png" alt="logo" width={128} height={128} priority/>
                             </div>
                             <br/>
-                            <a className="footer-dark-special-text hover:underline" href="https://vedabase.io/en/library/cc/adi/3/91/" target="_blank" rel="noopener noreferrer">
+                            <a className="footer-dark-special-text hover:underline hover:text-hover" href="https://vedabase.io/en/library/cc/adi/3/91/" target="_blank" rel="noopener noreferrer">
                                 द्वौ भूत​-सर्गौ लोके ऽस्मिन् <br />
                                 दैव आसुर एव च​  ।<br/>
                                 विष्णु-भक्तः स्मृतो दैव​ <br />
                                 आसुरस् तद्-विपर्ययः ।।<br/>
-                                <span className="underline text-sm">(Śrī Caitanya-Caritāmṛta Ādi 3.91)</span>
+                                <span className="underline hover:text-hover text-sm">(Śrī Caitanya-Caritāmṛta Ādi 3.91)</span>
                             </a>
                             <br/><br/>
                             <h3>{packageInfo.displayName} v{packageInfo.version}</h3>
@@ -32,27 +32,27 @@ export default function Footer() {
                             <h3>Pune Temples&apos; Official Links</h3>
                             <ul>
                                 <li>
-                                    <a className="underline" href="http://iskconvishalnagar.com" target="_blank" rel="noopener noreferrer">
+                                    <a className="underline hover:text-hover" href="http://iskconvishalnagar.com" target="_blank" rel="noopener noreferrer">
                                         ISKCON (BCEC), formerly known as ISKCON Vishal Nagar
                                     </a>
                                 </li>
                                 <li>
                                     <a href="https://iskconpunebcec.com/#/newtemple" target="_blank" rel="noopener noreferrer">
-                                    <p className="pi pi-star-fill text-amber-200"/>&nbsp;&nbsp;<span className="underline">ISKCON (Baner) New Temple</span>&nbsp;&nbsp;<p className="pi pi-star-fill text-amber-200"/>
+                                    <p className="pi pi-star-fill text-amber-200"/>&nbsp;&nbsp;<span className="underline hover:text-hover">ISKCON (Baner) New Temple</span>&nbsp;&nbsp;<p className="pi pi-star-fill text-amber-200"/>
                                     </a>
                                 </li>
                                 <li>
-                                    <a className="underline" href="https://iskconpunecamp.com" target="_blank" rel="noopener noreferrer">
+                                    <a className="underline hover:text-hover" href="https://iskconpunecamp.com" target="_blank" rel="noopener noreferrer">
                                         ISKCON (Camp)
                                     </a>
                                 </li>
                                 <li>
-                                    <a className="underline" href="https://www.iskconpune.com" target="_blank" rel="noopener noreferrer">
+                                    <a className="underline hover:text-hover" href="https://www.iskconpune.com" target="_blank" rel="noopener noreferrer">
                                         ISKCON (NVCC)
                                     </a>
                                 </li>
                                 <li>
-                                    <a className="underline" href="https://iskconravet.com" target="_blank" rel="noopener noreferrer">
+                                    <a className="underline hover:text-hover" href="https://iskconravet.com" target="_blank" rel="noopener noreferrer">
                                         ISKCON (Ravet)
                                     </a>
                                 </li>
@@ -85,11 +85,18 @@ export default function Footer() {
                         ईश्वर: परम: कृष्ण: सच्चिदानंद विग्रह: ।<br/>
                         अनादिरादिर्गोविंद: सर्वकारणकारणम् ।।
                     </span>
+                    <Image
+                        src="/signature-prabhupada.png"
+                        alt="Devotees' Association"
+                        width={400}
+                        height={214}
+                        className="invert-70 m-auto mt-6"
+                    />
                     <p className="copyright left">All glories to Shri Guru and Gauranga</p>
                     <p className="copyright left">Developed with प्रेम❤️🙏भक्ति by {packageInfo.author}</p>
                     <p className="copyright right">
                         Copyright © 2025 &nbsp;
-                        <a className="underline" href="https://shri-krishna.in/" target="_blank" rel="noopener noreferrer">
+                        <a className="underline hover:text-hover" href="https://shri-krishna.in/" target="_blank" rel="noopener noreferrer">
                             Shri-Krishna.in
                         </a>
                         &nbsp;- All Rights Reserved.

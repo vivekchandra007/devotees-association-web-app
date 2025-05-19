@@ -19,9 +19,11 @@ module.exports = {
         secondary: '#2563eb',  // ISKCON blue
         accent: '#16a34a',     // vrindavan green
         text: '#1e1b4b',       // indigo-950
+        general: '#1a202c',    // gray-900
         special: '#e07338',
         card: '#ffffff',
         border: '#e5e7eb',
+        hover: '#f97316',      // orange-500
       },
       backgroundColor: {
         testgreen: '#00ff00',
