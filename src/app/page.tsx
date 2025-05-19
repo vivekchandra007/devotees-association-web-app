@@ -7,7 +7,6 @@ import { Button } from 'primereact/button';
 import ProfileCompletionMeter from '@/components/ProfileCompletionMeter';
 import { Card } from 'primereact/card';
 import Image from "next/image";
-import { Divider } from 'primereact/divider';
 import Referrals from '@/components/Referrals';
 import { Dialog } from 'primereact/dialog';
 import { useState } from 'react';
