@@ -39,11 +39,11 @@ export default function Home() {
   );
 
   const footer = (
-    <div className="grid grid-cols-12 items-center">
-      <div className="col-span-8">
-        <small className="float-left">
+    <div className="grid grid-cols-12 items-center mt-5">
+      <div className="col-span-8 text-left">
+        <small>
           <Checkbox onChange={e => setStepsCompleted(e.checked!)} checked={stepsCompleted}></Checkbox>
-          &nbsp;&nbsp;&nbsp;I have completed all the above {steps} steps. Please don&apos;t show this message again.
+          &nbsp;&nbsp;&nbsp;I have completed all the above {steps} steps. Don&apos;t show this message again.
         </small>
       </div>
       <div className="col-span-4">
@@ -98,10 +98,12 @@ export default function Home() {
             <strong className="text-general">Bhakti Sāgar</strong>
             <hr />
             <small className="text-general">
-              Take <strong className="text-hover">Holy Dip</strong> in this Sāgar of Bhakti videos, which will <strong className="text-hover">inspire</strong> you to the <strong className="text-hover">soul</strong>. Touch, 3D Touch, Click or Hover on any thumbnail to play.
+              Take <strong className="text-hover">Holy Dip</strong> in this Sāgar of Bhakti videos, which will <strong className="text-hover">inspire</strong> you to the <strong className="text-hover">soul</strong>. Touch, 3D Touch, Click or Hover on any thumbnail to play. Press Escape, Click x button or just Click outside the video to close player.
             </small>
           </div>
-          <YouTubeMosaic />
+          <div className="min-h-screen">
+            <YouTubeMosaic />
+          </div>
         </TabPanel>
         <TabPanel header="" leftIcon="pi pi-sun mr-2">
           <div className='p-3'>

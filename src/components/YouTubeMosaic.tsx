@@ -1,12 +1,14 @@
 "use client";
 
-import React, { useState, useRef } from 'react';
-import videos from '@/data/videos.json';
+import React, { useState, useRef, useEffect } from 'react';
+import videosData from '@/data/videos.json';
 import { OverlayPanel } from 'primereact/overlaypanel';
 import { Dialog } from 'primereact/dialog';
 import Image from 'next/image';
+import { Button } from 'primereact/button';
+import { InputText } from 'primereact/inputtext';
 
-type YouTubeVideo = {
+type VideoItem = {
   id: string;
   videoId: string,
   kind?: string;
@@ -17,73 +19,178 @@ type YouTubeVideo = {
 };
 
 export default function YouTubeMosaic() {
-  const [selectedVideo, setSelectedVideo] = useState<YouTubeVideo | null>(null);
+  const [videos, setVideos] = useState<VideoItem[]>([]);
+  const [filteredVideos, setFilteredVideos] = useState<VideoItem[]>([]);
+  const [selectedVideo, setSelectedVideo] = useState<VideoItem | null>(null);
+  const [spotlightVideo, setSpotlightVideo] = useState<VideoItem | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
   const overlayRef = useRef<OverlayPanel>(null);
-  const [hoverVideo, setHoverVideo] = useState<YouTubeVideo | null>(null);
 
-  const handleHover = (event: React.SyntheticEvent, video: YouTubeVideo) => {
+  const [hoverVideo, setHoverVideo] = useState<VideoItem | null>(null);
+
+  const handleHover = (event: React.SyntheticEvent, video: VideoItem) => {
     setHoverVideo(video);
     overlayRef.current?.show(event, event.currentTarget);
   };
 
+  useEffect(() => {
+    const data = videosData as VideoItem[];
+    setVideos(data);
+    setFilteredVideos(data);
+    const random = data[Math.floor(Math.random() * data.length)];
+    setSpotlightVideo(random);
+  }, []);
+
+  useEffect(() => {
+    const filtered = videos.filter((v) =>
+      v.title.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredVideos(filtered);
+  }, [searchQuery, videos]);
+
   return (
-    <>
-      <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-12 gap-1 p-2 component-transparent w-full">
-        {videos.map((video, idx) => {
-          return (
-            <div key={idx} className="cursor-pointer" onClick={() => setSelectedVideo(video)} onMouseEnter={(e) => handleHover(e, video)}>
-              <Image
-                src={video.thumbnail}
-                alt={`Video#${video.videoId}`}
-                width="128"
-                height="128"
-                className="transition hover:scale-105"
-              />
-              <small className="block w-[111px] truncate overflow-hidden whitespace-nowrap">{video.title}</small>
-            </div>
-          );
-        })}
-
-        <OverlayPanel
-          ref={overlayRef} showCloseIcon>
-          {hoverVideo && (
-            <div className="max-w-[320px] max-h-[300px]">
-              <strong>{hoverVideo?.title}</strong>
-              <iframe
-              width="320"
-              height="180"
-              src={`https://www.youtube.com/embed/${hoverVideo.videoId}?autoplay=1&mute=1`}
-              title="Preview"
-              frameBorder="0"
-              allow="autoplay; encrypted-media"
-              allowFullScreen
+    <div className="p-2">
+      {/* Spotlight Section */}
+      {spotlightVideo && (
+        <div className="mb-6 p-4 bg-primary/10 border border-primary rounded-xl shadow-md">
+          <h2 className="text-lg font-semibold mb-2 text-primary">🎯 Spotlight Video, especially for You</h2>
+          <div className="flex flex-col md:flex-row items-center gap-4">
+            <iframe
+              src={`https://www.youtube.com/embed/${spotlightVideo.videoId}?autoplay=1&mute=1&controls=0`}
+              width="300"
+              height="170"
+              allow="autoplay"
+              className="rounded-lg"
             />
+            <div>
+              <h3 title={spotlightVideo.title} className="text-lg font-bold line-clamp-2 overflow-hidden text-ellipsis">
+                {spotlightVideo.title}
+              </h3>
+              <small title={spotlightVideo.description} className="line-clamp-2 overflow-hidden text-ellipsis">
+                {spotlightVideo.description}
+              </small>
+              <br />
+              <Button
+                label="Play Now"
+                icon="pi pi-play"
+                onClick={() => setSelectedVideo(spotlightVideo)}
+                className="mt-2"
+                severity="danger"
+              />
             </div>
-          )}
-        </OverlayPanel>
+          </div>
+        </div>
+      )}
 
+      {/* Search */}
+      <div className="mb-4 relative w-full md:w-1/2">
+        <InputText
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search videos..."
+          className="w-full pr-10"
+        />
+        {searchQuery && (
+          <Button
+            onClick={() => setSearchQuery('')}
+            icon="pi pi-times-circle"
+            rounded
+            text
+            severity="contrast"
+            tooltip="Clear Search"
+            className="flex float-right bottom-[48px] text-gray-400 hover:text-gray-600"
+            aria-label="Clear search"
+          />
+        )}
+      </div>
+
+      {/* Shorts Strip */}
+      <div className="overflow-x-auto whitespace-nowrap flex gap-2 mb-6">
+        {videos.filter(v => v.type === 'short' || v.kind?.includes("short") || v.title.includes("shorts") || v.description?.includes("shorts")).map((short) => (
+          <Image
+            key={short.id}
+            src={short.thumbnail}
+            alt={short.title}
+            width={120}
+            height={90}
+            className="rounded-lg cursor-pointer"
+            onClick={() => setSelectedVideo(short)}
+          />
+        ))}
+      </div>
+
+      {/* Mosaic Grid */}
+
+      { filteredVideos.length === 0 &&
+        <small>
+          <span className="p-error">No videos found with above Search Query.</span>
+          <br />
+          Try <strong>Ashtami</strong>, <strong>Chaturdashi</strong>, <strong>Poornima</strong>, etc"
+        </small>
+      }
+      <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-12 gap-1 p-2 w-full">
+        {filteredVideos.map((video) => (
+          <div
+            key={video.id}
+            className="relative cursor-pointer"
+            onMouseEnter={(e) => {
+              overlayRef.current?.show(e, e.currentTarget);
+              handleHover(e, video);
+            }}
+            onClick={() => setSelectedVideo(video)}
+          >
+            <Image
+              src={video.thumbnail}
+              alt={video.title}
+              width={100}
+              height={60}
+              className="rounded"
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* On Hover Overlay Player */}
+
+      {
+        hoverVideo &&
+        <OverlayPanel ref={overlayRef} showCloseIcon>
+          <div className="max-w-[300px] max-h-[200px]">
+            <iframe
+              src={`https://www.youtube.com/embed/${hoverVideo.videoId}?autoplay=1&mute=1`}
+              width="300"
+              height="170"
+              allow="autoplay"
+            />
+            <span className="text-sm mt-2 font-semibold">{hoverVideo.title}</span>
+          </div>
+        </OverlayPanel>
+      }
+
+      {/* Dialog Player */}
+
+      {
+        selectedVideo &&
         <Dialog
           visible={!!selectedVideo}
           style={{ width: '90vw', maxWidth: '800px' }}
-          header={`Now Playing: ${selectedVideo?.title}`}
-          modal
-          dismissableMask
           onHide={() => setSelectedVideo(null)}
+          header={selectedVideo?.title}
+          dismissableMask
+          className="w-[90vw] max-w-3xl"
         >
-          <small>{selectedVideo?.description}</small>
           {selectedVideo && (
             <iframe
               width="100%"
               height="400"
               src={`https://www.youtube.com/embed/${selectedVideo.videoId}?autoplay=1`}
-              title="YouTube video player"
-              frameBorder="0"
               allow="autoplay; encrypted-media"
+              frameBorder="0"
               allowFullScreen
             />
           )}
         </Dialog>
-      </div>
-    </>
+      }
+    </div>
   );
 }
