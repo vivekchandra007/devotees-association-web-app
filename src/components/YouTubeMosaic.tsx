@@ -28,7 +28,6 @@ export default function YouTubeMosaic() {
 
   return (
     <>
-      <small><strong>Note:</strong>&nbsp;Click or Hover over on any thumbnail to take Holy Dip in this Sāgar of videos, which will inspire you to the soul.</small>
       <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-12 gap-1 p-2 component-transparent w-full">
         {videos.map((video, idx) => {
           return (
@@ -45,9 +44,12 @@ export default function YouTubeMosaic() {
           );
         })}
 
-        <OverlayPanel ref={overlayRef}>
+        <OverlayPanel
+          ref={overlayRef} showCloseIcon>
           {hoverVideo && (
-            <iframe
+            <div className="max-w-[320px] max-h-[300px]">
+              <strong>{hoverVideo?.title}</strong>
+              <iframe
               width="320"
               height="180"
               src={`https://www.youtube.com/embed/${hoverVideo.videoId}?autoplay=1&mute=1`}
@@ -56,6 +58,7 @@ export default function YouTubeMosaic() {
               allow="autoplay; encrypted-media"
               allowFullScreen
             />
+            </div>
           )}
         </OverlayPanel>
 

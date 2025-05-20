@@ -21,12 +21,14 @@ export default function Home() {
   const guestMode: boolean | null = !!searchParams.get('guest');
   const { devotee, isAuthenticated } = useAuth();
   const LOCAL_STORAGE_STEPS_COMPLETED = "stepsCompleted";
-  const stepsCompletedFromLocalStorage = typeof window !== 'undefined'? Boolean(localStorage.getItem(LOCAL_STORAGE_STEPS_COMPLETED)): false
+  const stepsCompletedFromLocalStorage = typeof window !== 'undefined' ? Boolean(localStorage.getItem(LOCAL_STORAGE_STEPS_COMPLETED)) : false
   const [showWelcomeCard, setShowWelcomeCard] = useState<boolean>(!stepsCompletedFromLocalStorage);
   const [showReferralModal, setShowReferralModal] = useState<boolean>(false);
   const [stepsCompleted, setStepsCompleted] = useState<boolean>(false);
   const [devoteeName, setDevoteeName] = useState<string>('');
   const [savingName, setSavingName] = useState<boolean>(false);
+
+  const steps: number = guestMode ? 3 : 4;
 
   const title = (
     <small className="text-text">
@@ -41,7 +43,7 @@ export default function Home() {
       <div className="col-span-8">
         <small className="float-left">
           <Checkbox onChange={e => setStepsCompleted(e.checked!)} checked={stepsCompleted}></Checkbox>
-          &nbsp;&nbsp;&nbsp;I have completed all the above steps. Please don&apos;t show this message again.
+          &nbsp;&nbsp;&nbsp;I have completed all the above {steps} steps. Please don&apos;t show this message again.
         </small>
       </div>
       <div className="col-span-4">
@@ -58,7 +60,7 @@ export default function Home() {
     </div>
   );
 
-  function hideWelcomeMessage(stepsCompleted?:boolean) {
+  function hideWelcomeMessage(stepsCompleted?: boolean) {
     setShowWelcomeCard(false);
     if (stepsCompleted) {
       localStorage.setItem(LOCAL_STORAGE_STEPS_COMPLETED, "true")
@@ -81,28 +83,59 @@ export default function Home() {
 
   return (
     <>
-      <Image
+      {/* <Image
         className="absolute -z-1 top-0 left-0 w-full h-full object-cover"
         src="/background.jpg"
         alt="Devotees' Association background image"
         sizes="100v"
         fill
         priority
-      />
+      /> */}
 
       <TabView className="w-full">
-        <TabPanel header="Bhakti Sāgar">
-            <YouTubeMosaic />
+        <TabPanel header="" leftIcon="pi pi-youtube mr-2">
+          <div className='p-3'>
+            <strong className="text-general">Bhakti Sāgar</strong>
+            <hr />
+            <small className="text-general">
+              Take <strong className="text-hover">Holy Dip</strong> in this Sāgar of Bhakti videos, which will <strong className="text-hover">inspire</strong> you to the <strong className="text-hover">soul</strong>. Touch, 3D Touch, Click or Hover on any thumbnail to play.
+            </small>
+          </div>
+          <YouTubeMosaic />
         </TabPanel>
-        <TabPanel header="Gyān Sāgar">
-            <p className="m-0 min-h-screen text-text">
-                A consolidated place for all Knowledge that matters, from <strong>Discovering Your Self</strong> to stories of Bhakts from Grantharāj&nbsp;<strong>Shrimad Bhagwatam</strong>.
-            </p>
+        <TabPanel header="" leftIcon="pi pi-sun mr-2">
+          <div className='p-3'>
+            <strong className="text-general">I'm feeling lucky</strong>
+            <hr />
+            <small className="text-general">
+              Let&apos;s see what lesson from <strong className="text-hover">Shrimad Bhagwad Gitā</strong> brings hidden inspiration for today.
+            </small>
+            <div className="min-h-screen">
+            </div>
+          </div>
         </TabPanel>
-        <TabPanel header="Events">
-            <p className="m-0 min-h-screen text-text">
-                A place for all upcoming events.
-            </p>
+        <TabPanel header="" leftIcon="pi pi-book mr-2">
+          <div className='p-3'>
+            <strong className="text-general">Gyān Sāgar</strong>
+            <hr />
+            <small className="text-general">
+              A consolidated place for all Knowledge that matters, from <strong className="text-hover">Discovering Your Self</strong> to stories of Bhakts from Grantharāj&nbsp;<strong className="text-hover">Shrimad Bhagwatam</strong>.
+            </small>
+            <div className="min-h-screen">
+            </div>
+          </div>
+        </TabPanel>
+        <TabPanel header="" leftIcon="pi pi-bolt mr-2">
+          <div className='p-3'>
+            <strong className="text-general">Events</strong>
+            <hr />
+            <small className="text-general">
+              Look out for upcoming events to physically and personally connect with fellow&nbsp;
+              <strong className="text-hover">Dev</strong>otees
+            </small>
+            <div className="min-h-screen">
+            </div>
+          </div>
         </TabPanel>
       </TabView>
 
@@ -110,7 +143,7 @@ export default function Home() {
         header={title} keepInViewport
         visible={showWelcomeCard}
         footer={footer}
-        onHide={() => hideWelcomeMessage() }
+        onHide={() => hideWelcomeMessage()}
         className="shadow-2xl w-full md:w-110 text-center component-transparent text-text size-fit m-auto">
         <div>
           <small className="block text-text mb-4">
@@ -159,7 +192,7 @@ export default function Home() {
                     icon="pi pi-mobile"
                     onClick={() => router.push('/devotee')}>
                     <div className="grid grid-cols-12 items-center">
-                      <span className="col-span-8">Step 13: Keep your profile upto date</span>
+                      <span className="col-span-8">Step 3: Keep your profile upto date</span>
                       <ProfileCompletionMeter devotee={devotee} className="col-span-4" />
                     </div>
                   </Button>

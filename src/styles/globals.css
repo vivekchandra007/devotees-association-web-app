@@ -53,6 +53,7 @@ body {
 .p-tabview-nav-link {
   background-color: rgba(255, 255, 255, 0.7);
   backdrop-filter: saturate(210%) blur(9px);
+  border-radius: 0;
 }
 .p-tabview-nav {
   background-color: rgba(255, 255, 255, 0.7);
@@ -60,8 +61,17 @@ body {
 }
 
 .p-tabview-panels {
-  background-color: rgba(255, 255, 255, 0.7);
-  backdrop-filter: saturate(210%) blur(9px);
+  background-color: rgba(255, 255, 255, 0.9);
+  backdrop-filter: saturate(210%) blur(11px);
+  padding: 0;
+}
+
+.p-unselectable-text {
+  width: 33.33%;
+}
+
+.p-tabview-nav-link {
+  justify-content: center;
 }
 
 .p-divider .p-divider-content {
