@@ -107,7 +107,7 @@ export default function Home() {
         </TabPanel>
         <TabPanel header="" leftIcon="pi pi-sun mr-2">
           <div className='p-3'>
-            <strong className="text-general">I'm feeling lucky</strong>
+            <strong className="text-general">I&apos;m feeling lucky</strong>
             <hr />
             <small className="text-general">
               Let&apos;s see what lesson from <strong className="text-hover">Shrimad Bhagwad Gitā</strong> brings hidden inspiration for today.

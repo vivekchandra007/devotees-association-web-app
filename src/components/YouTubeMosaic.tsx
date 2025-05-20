@@ -125,7 +125,7 @@ export default function YouTubeMosaic() {
         <small>
           <span className="p-error">No videos found with above Search Query.</span>
           <br />
-          Try <strong>Ashtami</strong>, <strong>Chaturdashi</strong>, <strong>Poornima</strong>, etc"
+          Try <strong>Ashtami</strong>, <strong>Chaturdashi</strong>, <strong>Poornima</strong>, etc.
         </small>
       }
       <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-12 gap-1 p-2 w-full">
