@@ -52,7 +52,9 @@ export default function YouTubeMosaic() {
     <div className="p-2">
       {/* Spotlight Section */}
       {spotlightVideo && (
-        <div className="mb-6 p-4 bg-primary/10 border border-primary rounded-xl shadow-md">
+        <div
+          className="mb-6 p-4 bg-primary/10 border border-primary rounded-xl shadow-md cursor-pointer"
+          onClick={() => setSelectedVideo(spotlightVideo)}>
           <h2 className="text-lg font-semibold mb-2 text-primary">🎯 Spotlight Video, especially for You</h2>
           <div className="flex flex-col md:flex-row items-center gap-4">
             <iframe
@@ -121,7 +123,7 @@ export default function YouTubeMosaic() {
 
       {/* Mosaic Grid */}
 
-      { filteredVideos.length === 0 &&
+      {filteredVideos.length === 0 &&
         <small>
           <span className="p-error">No videos found with above Search Query.</span>
           <br />

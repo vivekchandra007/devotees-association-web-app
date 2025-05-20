@@ -110,7 +110,7 @@ export default function Home() {
             <strong className="text-general">I&apos;m feeling lucky</strong>
             <hr />
             <small className="text-general">
-              Let&apos;s see what lesson from <strong className="text-hover">Shrimad Bhagwad Gitā</strong> brings hidden inspiration for today.
+              Let&apos;s see what lesson from <strong className="text-hover">Shrimad Bhagwad Gitā</strong> brings a hidden inspiration for you, today.
             </small>
             <div className="min-h-screen">
             </div>
