@@ -198,7 +198,7 @@ export default function Home() {
         visible={showWelcomeDialogue}
         footer={guestMode ? guestModeFooter : (typeof window !== 'undefined' && !Boolean(localStorage.getItem(LOCAL_STORAGE_STEPS_COMPLETED)) && footer)}
         onHide={() => hideWelcomeMessage()}
-        className="shadow-2xl w-full md:w-[75vw] lg:w-[45vw] text-center component-transparent text-text size-fit m-auto">
+        className="shadow-2xl w-full md:w-[75vw] lg:w-[45vw] text-center text-text size-fit m-auto">
         <div>
           <small className="block text-text mb-4">
             Congratulations! Thanks to your devotion, we all are now getting a new beautiful temple in Baner, Pune

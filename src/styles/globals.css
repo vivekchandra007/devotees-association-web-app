@@ -8,7 +8,8 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #1e1b4b;;
+  --foreground: #1e1b4b;
+  ;
 }
 
 @theme inline {
@@ -31,14 +32,14 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/** Text Gradient Example */ 
+/** Text Gradient Example */
 .text-gradient {
-  color: #592E2F; 
-  background-image: radial-gradient(circle, #592E2F , #894939 , #C87A4B , #F0B268 , #FADAA0 ); 
-  background-clip: text; 
-  -webkit-background-clip: text; 
-  -webkit-text-fill-color: transparent; 
- }
+  color: #592E2F;
+  background-image: radial-gradient(circle, #592E2F, #894939, #C87A4B, #F0B268, #FADAA0);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
 
 .justify-content-space-between {
   justify-content: space-between;
@@ -55,6 +56,7 @@ body {
   backdrop-filter: saturate(210%) blur(9px);
   border-radius: 0;
 }
+
 .p-tabview-nav {
   background-color: rgba(255, 255, 255, 0.7);
   backdrop-filter: saturate(210%) blur(9px);
@@ -64,6 +66,21 @@ body {
   background-color: rgba(255, 255, 255, 0.9);
   backdrop-filter: saturate(210%) blur(11px);
   padding: 0;
+}
+
+.p-dialog .p-dialog-header {
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: saturate(210%) blur(9px);
+}
+
+.p-dialog .p-dialog-content {
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: saturate(210%) blur(9px);
+}
+
+.p-dialog .p-dialog-footer {
+  background-color: rgba(255, 255, 255, 0.7);
+  backdrop-filter: saturate(210%) blur(9px);
 }
 
 .p-unselectable-text {
@@ -90,50 +107,53 @@ body {
 }
 
 .footer-dark {
-  padding:50px 0;
-  color:#f0f9ff;
-  background-color:#282d32;
+  padding: 50px 0;
+  color: #f0f9ff;
+  background-color: #282d32;
   text-align: center;
 
   .footer-dark-special-text {
-      color: #fd79a8;
+    color: #fd79a8;
   }
 
   .item.text {
-      margin-bottom:36px;
-      p {
-          opacity:0.6;
-          margin-bottom:0;
-      }
+    margin-bottom: 36px;
+
+    p {
+      opacity: 0.6;
+      margin-bottom: 0;
+    }
   }
 
   a {
-      color: #61dafb;
+    color: #61dafb;
   }
 
   ul {
-      padding:0;
-      list-style:none;
-      line-height:1.6;
-      margin-bottom:0;
-      a {
-          color:inherit;
-          opacity:0.6;
-          &:hover {
-              opacity:0.8;
-          }
+    padding: 0;
+    list-style: none;
+    line-height: 1.6;
+    margin-bottom: 0;
+
+    a {
+      color: inherit;
+      opacity: 0.6;
+
+      &:hover {
+        opacity: 0.8;
       }
+    }
   }
 
   .copyright {
-      text-align: center;
-      padding-top:24px;
-      opacity:0.3;
-      margin-bottom:0;
+    text-align: center;
+    padding-top: 24px;
+    opacity: 0.3;
+    margin-bottom: 0;
   }
 
   .mapouter {
-      margin: 12px 12px 0 12px;
-      filter: invert(90%);
+    margin: 12px 12px 0 12px;
+    filter: invert(90%);
   }
 }
