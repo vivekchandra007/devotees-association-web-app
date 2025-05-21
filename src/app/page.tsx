@@ -96,7 +96,7 @@ export default function Home() {
   function showRepetitiveWelcomeMessageInGuestMode() {
     if (typeof window !== 'undefined') {
       const stepsDone = !!Boolean(localStorage.getItem(LOCAL_STORAGE_STEPS_COMPLETED));
-      if (!stepsDone) {
+      if (guestMode || !stepsDone) {
         const repetiionTime = guestMode ? (1000 * 60 * 4) : (1000 * 60 * 21)        // 2 minutes in guestMode and 21 minutes in logged in mode
         // insist user to complete steps by showing welcome dialogue
         setShowWelcomeDialogue(true);
@@ -110,9 +110,14 @@ export default function Home() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const stepsDone = !!Boolean(localStorage.getItem(LOCAL_STORAGE_STEPS_COMPLETED));
-      setStepsCompleted(stepsDone);
-      setShowWelcomeDialogue(!stepsDone);
-      if (!stepsDone) {
+      if (!guestMode) {
+        setStepsCompleted(stepsDone);
+        setShowWelcomeDialogue(!stepsDone);
+        if (!stepsDone) {
+          showRepetitiveWelcomeMessageInGuestMode();
+        }
+      } else {
+        // in case of Guest Mode, always show the repetitive welcome message at coded intervals
         showRepetitiveWelcomeMessageInGuestMode();
       }
     }
