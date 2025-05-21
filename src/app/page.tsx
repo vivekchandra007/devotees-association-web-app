@@ -186,7 +186,7 @@ export default function Home() {
       <Dialog
         header={title} keepInViewport closeOnEscape={!guestMode}
         visible={showWelcomeDialogue}
-        footer={!guestMode ? footer : guestModeFooter}
+        footer={guestMode ? guestModeFooter : (typeof window !== 'undefined' && !Boolean(localStorage.getItem(LOCAL_STORAGE_STEPS_COMPLETED)) && footer )}
         onHide={() => hideWelcomeMessage()}
         className="shadow-2xl w-full md:w-[75vw] lg:w-[45vw] text-center component-transparent text-text size-fit m-auto">
         <div>
