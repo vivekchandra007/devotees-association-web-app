@@ -123,7 +123,7 @@ export default function Home() {
         showRepetitiveWelcomeMessageInGuestMode();
       }
     }
-  });
+  }, [guestMode]);
 
   if (!guestMode && !isAuthenticated) return <FullPageSpinner message="Hare Krishna! Fetching your details..." />;
 
