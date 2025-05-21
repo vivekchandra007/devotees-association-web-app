@@ -144,8 +144,8 @@ export default function Home() {
           </i>
         </Button>
       </span>
-      <TabView className="w-full">
-        <TabPanel header="" leftIcon="pi pi-youtube mr-2">
+      <TabView className="w-full home-page-tabs">
+        <TabPanel header="Bhakti" leftIcon="pi pi-youtube mr-2">
           <div className='p-3'>
             <strong className="text-general">Bhakti Sāgar</strong>
             <hr />
@@ -157,7 +157,7 @@ export default function Home() {
             <YouTubeMosaic />
           </div>
         </TabPanel>
-        <TabPanel header="" leftIcon="pi pi-sun mr-2">
+        <TabPanel header="Kripā" leftIcon="pi pi-sun mr-2">
           <div className='p-3'>
             <strong className="text-general">I&apos;m feeling lucky</strong>
             <hr />
@@ -168,7 +168,7 @@ export default function Home() {
             </div>
           </div>
         </TabPanel>
-        <TabPanel header="" leftIcon="pi pi-book mr-2">
+        <TabPanel header="Gyān" leftIcon="pi pi-book mr-2">
           <div className='p-3'>
             <strong className="text-general">Gyān Sāgar</strong>
             <hr />
@@ -179,7 +179,7 @@ export default function Home() {
             </div>
           </div>
         </TabPanel>
-        <TabPanel header="" leftIcon="pi pi-bolt mr-2">
+        <TabPanel header="Sevā" leftIcon="pi pi-bolt mr-2">
           <div className='p-3'>
             <strong className="text-general">Events</strong>
             <hr />
