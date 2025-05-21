@@ -47,7 +47,7 @@ export default function Home() {
 
   const footer = (
     <div className="grid grid-cols-12 items-center mt-5">
-      <div className="col-span-8 text-left">
+      <div className="col-span-6 text-left">
         <small onClick={() => setStepsCompleted(!stepsCompleted)} className="cursor-pointer">
           <Checkbox
             checked={stepsCompleted}>
@@ -55,15 +55,14 @@ export default function Home() {
           &nbsp;&nbsp;&nbsp;I have completed all the above {steps} steps.
         </small>
       </div>
-      <div className="col-span-4">
+      <div className="col-span-6">
         {
           stepsCompleted &&
           <Button
             size="small"
             onClick={() => hideWelcomeMessage(true)}
             label="Don&apos;t show this message again."
-            severity="contrast"
-            icon="pi pi-times-circle"
+            severity="danger"
             raised
           />
         }
