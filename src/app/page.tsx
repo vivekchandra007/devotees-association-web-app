@@ -14,6 +14,7 @@ import api from "@/lib/axios";              // our Custom Axios Wrapper
 import YouTubeMosaic from '@/components/YouTubeMosaic';
 import { Checkbox } from 'primereact/checkbox';
 import { TabView, TabPanel } from 'primereact/tabview';
+import { classNames } from 'primereact/utils';
 
 export default function Home() {
   const router = useRouter();
@@ -46,8 +47,8 @@ export default function Home() {
   )
 
   const footer = (
-    <div className="grid grid-cols-12 items-center mt-5">
-      <div className="col-span-6 text-left">
+    <div className={classNames('grid items-center mt-5', stepsCompleted ? "grid-cols-12" : "")}>
+      <div className={classNames('text-left', stepsCompleted ? "col-span-6" : "")}>
         <small onClick={() => setStepsCompleted(!stepsCompleted)} className="cursor-pointer">
           <Checkbox
             checked={stepsCompleted}>
@@ -55,9 +56,9 @@ export default function Home() {
           &nbsp;&nbsp;&nbsp;I have completed all the above {steps} steps.
         </small>
       </div>
-      <div className="col-span-6">
-        {
-          stepsCompleted &&
+      {
+        stepsCompleted &&
+        <div className="col-span-6">
           <Button
             size="small"
             onClick={() => hideWelcomeMessage(true)}
@@ -65,8 +66,8 @@ export default function Home() {
             severity="danger"
             raised
           />
-        }
-      </div>
+        </div>
+      }
     </div>
   );
 
@@ -96,7 +97,7 @@ export default function Home() {
     if (typeof window !== 'undefined') {
       const stepsDone = !!Boolean(localStorage.getItem(LOCAL_STORAGE_STEPS_COMPLETED));
       if (!stepsDone) {
-        const repetiionTime = guestMode? (1000 * 60 * 2) : (1000 * 60 * 21)        // 2 minutes in guestMode and 21 minutes in logged in mode
+        const repetiionTime = guestMode ? (1000 * 60 * 4) : (1000 * 60 * 21)        // 2 minutes in guestMode and 21 minutes in logged in mode
         // insist user to complete steps by showing welcome dialogue
         setShowWelcomeDialogue(true);
         setTimeout(() => {
@@ -121,6 +122,18 @@ export default function Home() {
 
   return (
     <>
+      <span className="flex flex-col items-center space-y-1 absolute top-[17vh] md:top-[13.5vh] right-0 md:right-2 z-10">
+        <Button
+          icon="pi pi-bell"
+          rounded
+          className="hover:animate-pulse"
+          severity="secondary"
+          aria-label="Steps"
+          size="small"
+          title="Open Welcome Page again to checkout mandatory Steps."
+          onClick={() => setShowWelcomeDialogue(true)}
+        />
+      </span>
       <TabView className="w-full">
         <TabPanel header="" leftIcon="pi pi-youtube mr-2">
           <div className='p-3'>
@@ -175,7 +188,7 @@ export default function Home() {
         visible={showWelcomeDialogue}
         footer={!guestMode ? footer : guestModeFooter}
         onHide={() => hideWelcomeMessage()}
-        className="shadow-2xl w-full md:w-[75vw] lg:w-[50vw] text-center component-transparent text-text size-fit m-auto">
+        className="shadow-2xl w-full md:w-[75vw] lg:w-[45vw] text-center component-transparent text-text size-fit m-auto">
         <div>
           <small className="block text-text mb-4">
             Congratulations! Thanks to your devotion, we all are now getting a new beautiful temple in Baner, Pune
@@ -200,10 +213,12 @@ export default function Home() {
           <br /><br />
           <Button label="Step 1: Don't miss this once in a Lifetime Opportunity to build a temple for Shri Shri Radha Krishna. Contribute!" severity="warning" raised size="small"
             icon="pi pi-indian-rupee"
+            className="w-full"
             onClick={() => window.open("https://iskconpunebcec.com/#/newtemple")} />
           <br /><br />
           <Button label="Step 2: Come, join our Whatsapp group for latest updates and spiritual association" severity="success" raised size="small"
             icon="pi pi-whatsapp"
+            className="w-full"
             onClick={() => alert('Link to a Whatsapp group')} />
           <br /><br />
           {
@@ -213,16 +228,18 @@ export default function Home() {
                   <Button label="Step 3: Create Profile, Get Gifts on your special occassions, Track Your Donations and Associate with Devotees. All at one place"
                     severity="danger" size="small" raised
                     icon="pi pi-crown"
+                    className="w-full"
                     onClick={() => router.push(`/login${searchParams ? `?${searchParams}` : ''}`)} />
                   <br />
                 </>
               ) :
               (
                 <>
-                  <Button severity="info" raised className="w-full" size="small"
+                  <Button severity="info" raised
+                    className="w-full" size="small"
                     icon="pi pi-mobile"
                     onClick={() => router.push('/devotee')}>
-                    <div className="grid grid-cols-12 items-center">
+                    <div className="grid grid-cols-12 items-center w-full">
                       <span className="col-span-8">Step 3: Keep your profile upto date</span>
                       <ProfileCompletionMeter devotee={devotee} className="col-span-4" />
                     </div>
@@ -230,6 +247,7 @@ export default function Home() {
                   <br /><br />
                   <Button label="Step 4: Let&apos;s Spread the word. Refer Others and become a spiritual catalyst in their life." severity="secondary" raised size="small"
                     icon="pi pi-fw pi-share-alt"
+                    className="w-full"
                     onClick={() => setShowReferralModal(true)} />
                 </>
               )
