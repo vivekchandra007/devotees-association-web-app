@@ -69,18 +69,18 @@ body {
 }
 
 .p-dialog .p-dialog-header {
-  background-color: rgba(255, 255, 255, 0.7);
-  backdrop-filter: saturate(210%) blur(9px);
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: saturate(210%) blur(11px);
 }
 
 .p-dialog .p-dialog-content {
-  background-color: rgba(255, 255, 255, 0.7);
-  backdrop-filter: saturate(210%) blur(9px);
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: saturate(210%) blur(11px);
 }
 
 .p-dialog .p-dialog-footer {
-  background-color: rgba(255, 255, 255, 0.7);
-  backdrop-filter: saturate(210%) blur(9px);
+  background-color: rgba(255, 255, 255, 0.9);
+  backdrop-filter: saturate(210%) blur(11px);
 }
 
 .p-unselectable-text {

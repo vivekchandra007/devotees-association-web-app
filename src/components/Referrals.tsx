@@ -65,7 +65,7 @@ export default function Referrals() {
                 </div>
             </Dialog>
 
-            <small>Note: You can share the above QR code or link with anyone, over any platform and if they login using this link, they will be linked to you and appear in below list. 
+            <small className="text-general">Note: You can share the above QR code or link with anyone, over any platform and if they login using this link, they will be linked to you and appear in below list. 
                 <br />So, let&apos;s spread the word{devotee?.gender ? `, ${devotee.spiritual_levels[`title_${devotee?.gender}`]}` : '' } 🙏🏻
             </small>
 
