@@ -16,6 +16,7 @@ import { Checkbox } from 'primereact/checkbox';
 import { TabView, TabPanel } from 'primereact/tabview';
 import { classNames } from 'primereact/utils';
 import { Badge } from 'primereact/badge';
+import Kripa from '@/components/kripa';
 
 export default function Home() {
   const router = useRouter();
@@ -122,13 +123,13 @@ export default function Home() {
         showRepetitiveWelcomeMessageInGuestMode();
       }
     }
-  }, []);
+  });
 
   if (!guestMode && !isAuthenticated) return <FullPageSpinner message="Hare Krishna! Fetching your details..." />;
 
   return (
     <>
-      <span className={classNames("absolute right-0 md:right-2 z-10", guestMode? 'top-[7vh] md:top-[8.8vh]' : 'top-[17vh] md:top-[13.5vh]')}>
+      <span className={classNames("absolute right-0 md:right-2 z-1", guestMode? 'top-[7vh] md:top-[8.8vh]' : 'top-[17vh] md:top-[13.5vh]')}>
         <Button
           rounded
           raised
@@ -162,9 +163,10 @@ export default function Home() {
             <strong className="text-general">I&apos;m feeling Kripā</strong>
             <hr />
             <small className="text-general">
-              Once you get inspired, Kripā will start showing. Let&apos;s see what lesson from <strong className="text-hover">Shrimad Bhagwad Gitā</strong> brings a hidden inspiration for you, today.
+              Once you get inspired, Kripā will start showing. Let&apos;s see what <strong className="text-hover">Shloka</strong> from <strong className="text-hover">Shrimad Bhagwad Gita</strong> brings a hidden inspiration for you, today.
             </small>
             <div className="min-h-screen">
+              <Kripa />
             </div>
           </div>
         </TabPanel>
