@@ -83,8 +83,8 @@ body {
   backdrop-filter: saturate(210%) blur(11px);
 }
 
-.p-unselectable-text {
-  width: 33.33%;
+.p-tabview-nav .p-unselectable-text {
+  width: 25%;
 }
 
 .p-tabview-nav-link {
