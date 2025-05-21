@@ -15,6 +15,7 @@ import YouTubeMosaic from '@/components/YouTubeMosaic';
 import { Checkbox } from 'primereact/checkbox';
 import { TabView, TabPanel } from 'primereact/tabview';
 import { classNames } from 'primereact/utils';
+import { Badge } from 'primereact/badge';
 
 export default function Home() {
   const router = useRouter();
@@ -127,17 +128,21 @@ export default function Home() {
 
   return (
     <>
-      <span className="flex flex-col items-center space-y-1 absolute top-[17vh] md:top-[13.5vh] right-0 md:right-2 z-10">
+      <span className={classNames("absolute right-0 md:right-2 z-10", guestMode? 'top-[7vh] md:top-[8.8vh]' : 'top-[17vh] md:top-[13.5vh]')}>
         <Button
-          icon="pi pi-bell"
           rounded
+          raised
           className="hover:animate-pulse"
           severity="secondary"
           aria-label="Steps"
           size="small"
           title="Open Welcome Page again to checkout mandatory Steps."
           onClick={() => setShowWelcomeDialogue(true)}
-        />
+        >
+          <i className="pi pi-bell cursor-pointer text-white p-overlay-badge">
+          <Badge severity="danger" className="scale-50"></Badge>
+          </i>
+        </Button>
       </span>
       <TabView className="w-full">
         <TabPanel header="" leftIcon="pi pi-youtube mr-2">
@@ -191,7 +196,7 @@ export default function Home() {
       <Dialog
         header={title} keepInViewport closeOnEscape={!guestMode}
         visible={showWelcomeDialogue}
-        footer={guestMode ? guestModeFooter : (typeof window !== 'undefined' && !Boolean(localStorage.getItem(LOCAL_STORAGE_STEPS_COMPLETED)) && footer )}
+        footer={guestMode ? guestModeFooter : (typeof window !== 'undefined' && !Boolean(localStorage.getItem(LOCAL_STORAGE_STEPS_COMPLETED)) && footer)}
         onHide={() => hideWelcomeMessage()}
         className="shadow-2xl w-full md:w-[75vw] lg:w-[45vw] text-center component-transparent text-text size-fit m-auto">
         <div>
