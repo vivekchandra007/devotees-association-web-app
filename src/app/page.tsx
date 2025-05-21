@@ -145,12 +145,12 @@ export default function Home() {
         </Button>
       </span>
       <TabView className="w-full home-page-tabs">
-        <TabPanel header="Bhakti" leftIcon="pi pi-youtube mr-2">
+        <TabPanel header="Prernā" leftIcon="pi pi-youtube mr-2">
           <div className='p-3'>
-            <strong className="text-general">Bhakti Sāgar</strong>
+            <strong className="text-general">Prernā Sāgar</strong>
             <hr />
             <small className="text-general">
-              Take <strong className="text-hover">Holy Dip</strong> in this Sāgar of Bhakti videos, which will <strong className="text-hover">inspire</strong> you to the <strong className="text-hover">soul</strong>. Touch, 3D Touch, Click or Hover on any thumbnail to play. Press Escape, Click x button or just Click outside the video to close player.
+              Start your spiritual journey by taking <strong className="text-hover">Holy Dip</strong> in this Sāgar of <strong className="text-hover">Bhakti</strong> videos, which will <strong className="text-hover">inspire</strong> you to the <strong className="text-hover">soul</strong>. Touch, 3D Touch, Click or Hover on any thumbnail to play. Press Escape, Click x button or just Click outside the video to close player.
             </small>
           </div>
           <div className="min-h-screen">
@@ -159,10 +159,10 @@ export default function Home() {
         </TabPanel>
         <TabPanel header="Kripā" leftIcon="pi pi-sun mr-2">
           <div className='p-3'>
-            <strong className="text-general">I&apos;m feeling lucky</strong>
+            <strong className="text-general">I&apos;m feeling Kripā</strong>
             <hr />
             <small className="text-general">
-              Let&apos;s see what lesson from <strong className="text-hover">Shrimad Bhagwad Gitā</strong> brings a hidden inspiration for you, today.
+              Once you get inspired, Kripā will start showing. Let&apos;s see what lesson from <strong className="text-hover">Shrimad Bhagwad Gitā</strong> brings a hidden inspiration for you, today.
             </small>
             <div className="min-h-screen">
             </div>
@@ -170,22 +170,22 @@ export default function Home() {
         </TabPanel>
         <TabPanel header="Gyān" leftIcon="pi pi-book mr-2">
           <div className='p-3'>
-            <strong className="text-general">Gyān Sāgar</strong>
+            <strong className="text-general">Gyān Sāgar (Athāto Brahma Jigyāsā)</strong>
             <hr />
             <small className="text-general">
-              A consolidated place for all Knowledge that matters, from <strong className="text-hover">Discovering Your Self</strong> to stories of Bhakts from Grantharāj&nbsp;<strong className="text-hover">Shrimad Bhagwatam</strong>.
+              Once you Kripā in your life, start with the ultimate question - <strong className="text-hover">Who YOU are?</strong>. A consolidated place for all Knowledge that matters, from <strong className="text-hover">Discovering Your Self</strong> to stories of Bhakts from Grantharāj&nbsp;<strong className="text-hover">Shrimad Bhāgwatam</strong>.
             </small>
             <div className="min-h-screen">
             </div>
           </div>
         </TabPanel>
-        <TabPanel header="Sevā" leftIcon="pi pi-bolt mr-2">
+        <TabPanel header="Bhakti" leftIcon="pi pi-bolt mr-2">
           <div className='p-3'>
             <strong className="text-general">Events</strong>
             <hr />
             <small className="text-general">
-              Look out for upcoming events to physically and personally connect with fellow&nbsp;
-              <strong className="text-hover">Dev</strong>otees
+              Finally, it&apos;s time to do practical - <strong className="text-hover">Bhakti</strong>. Visit temple to take divine darshan of <strong className="text-hover">The Lord</strong> or look out for upcoming events to physically and personally connect with fellow&nbsp;
+              <strong className="text-hover">Dev</strong>otees.
             </small>
             <div className="min-h-screen">
             </div>
