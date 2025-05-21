@@ -8,7 +8,7 @@ import ProfileCompletionMeter from '@/components/ProfileCompletionMeter';
 import Image from "next/image";
 import Referrals from '@/components/Referrals';
 import { Dialog } from 'primereact/dialog';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { InputText } from 'primereact/inputtext';
 import api from "@/lib/axios";              // our Custom Axios Wrapper
 import YouTubeMosaic from '@/components/YouTubeMosaic';
@@ -21,8 +21,7 @@ export default function Home() {
   const guestMode: boolean | null = !!searchParams.get('guest');
   const { devotee, isAuthenticated } = useAuth();
   const LOCAL_STORAGE_STEPS_COMPLETED = "stepsCompleted";
-  const stepsCompletedFromLocalStorage = typeof window !== 'undefined' ? Boolean(localStorage.getItem(LOCAL_STORAGE_STEPS_COMPLETED)) : false
-  const [showWelcomeCard, setShowWelcomeCard] = useState<boolean>(!stepsCompletedFromLocalStorage);
+  const [showWelcomeDialogue, setShowWelcomeDialogue] = useState<boolean>(true);
   const [showReferralModal, setShowReferralModal] = useState<boolean>(false);
   const [stepsCompleted, setStepsCompleted] = useState<boolean>(false);
   const [devoteeName, setDevoteeName] = useState<string>('');
@@ -38,33 +37,48 @@ export default function Home() {
     </small>
   );
 
+  const guestModeFooter = (
+    <div className="w-full text-left">
+      <small>
+        <strong>Note: We recommed you complete all the above steps at earliest, especially Step 3 to register and create profile, to enjoy seamless and blissfull experience.</strong>
+      </small>
+    </div>
+  )
+
   const footer = (
     <div className="grid grid-cols-12 items-center mt-5">
       <div className="col-span-8 text-left">
-        <small>
-          <Checkbox onChange={e => setStepsCompleted(e.checked!)} checked={stepsCompleted}></Checkbox>
-          &nbsp;&nbsp;&nbsp;I have completed all the above {steps} steps. Don&apos;t show this message again.
+        <small onClick={() => setStepsCompleted(!stepsCompleted)} className="cursor-pointer">
+          <Checkbox
+            checked={stepsCompleted}>
+          </Checkbox>
+          &nbsp;&nbsp;&nbsp;I have completed all the above {steps} steps.
         </small>
       </div>
       <div className="col-span-4">
-        <Button
-          size="small"
-          onClick={() => hideWelcomeMessage(true)}
-          label="Close"
-          severity="contrast"
-          disabled={!stepsCompleted}
-          icon="pi pi-times-circle"
-          raised
-        />
+        {
+          stepsCompleted &&
+          <Button
+            size="small"
+            onClick={() => hideWelcomeMessage(true)}
+            label="Don&apos;t show this message again."
+            severity="contrast"
+            icon="pi pi-times-circle"
+            raised
+          />
+        }
       </div>
     </div>
   );
 
   function hideWelcomeMessage(stepsCompleted?: boolean) {
-    setShowWelcomeCard(false);
+    setShowWelcomeDialogue(false);
     if (stepsCompleted) {
-      localStorage.setItem(LOCAL_STORAGE_STEPS_COMPLETED, "true")
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(LOCAL_STORAGE_STEPS_COMPLETED, "true");
+      }
     }
+    console.log("In hide, stepsCompleted: " + stepsCompleted);
     window.scrollTo(0, 0);
   }
 
@@ -79,19 +93,35 @@ export default function Home() {
     }
   }
 
+  function showRepetitiveWelcomeMessageInGuestMode() {
+    if (typeof window !== 'undefined') {
+      const stepsDone = !!Boolean(localStorage.getItem(LOCAL_STORAGE_STEPS_COMPLETED));
+      if (!stepsDone) {
+        const repetiionTime = guestMode? (1000 * 60 * 2) : (1000 * 60 * 21)        // 2 minutes in guestMode and 21 minutes in logged in mode
+        // insist user to complete steps by showing welcome dialogue
+        setShowWelcomeDialogue(true);
+        setTimeout(() => {
+          showRepetitiveWelcomeMessageInGuestMode();
+        }, repetiionTime);
+      }
+    }
+  }
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stepsDone = !!Boolean(localStorage.getItem(LOCAL_STORAGE_STEPS_COMPLETED));
+      setStepsCompleted(stepsDone);
+      setShowWelcomeDialogue(!stepsDone);
+      if (!stepsDone) {
+        showRepetitiveWelcomeMessageInGuestMode();
+      }
+    }
+  }, []);
+
   if (!guestMode && !isAuthenticated) return <FullPageSpinner message="Hare Krishna! Fetching your details..." />;
 
   return (
     <>
-      {/* <Image
-        className="absolute -z-1 top-0 left-0 w-full h-full object-cover"
-        src="/background.jpg"
-        alt="Devotees' Association background image"
-        sizes="100v"
-        fill
-        priority
-      /> */}
-
       <TabView className="w-full">
         <TabPanel header="" leftIcon="pi pi-youtube mr-2">
           <div className='p-3'>
@@ -142,11 +172,11 @@ export default function Home() {
       </TabView>
 
       <Dialog
-        header={title} keepInViewport
-        visible={showWelcomeCard}
-        footer={footer}
+        header={title} keepInViewport closeOnEscape={!guestMode}
+        visible={showWelcomeDialogue}
+        footer={!guestMode ? footer : guestModeFooter}
         onHide={() => hideWelcomeMessage()}
-        className="shadow-2xl w-full md:w-110 text-center component-transparent text-text size-fit m-auto">
+        className="shadow-2xl w-full md:w-[75vw] lg:w-[50vw] text-center component-transparent text-text size-fit m-auto">
         <div>
           <small className="block text-text mb-4">
             Congratulations! Thanks to your devotion, we all are now getting a new beautiful temple in Baner, Pune
@@ -205,23 +235,6 @@ export default function Home() {
                 </>
               )
           }
-          {/* <br /><br />
-          <span className="flex flex-col items-center space-y-1">
-            <Button
-              icon="pi pi-times-circle"
-              rounded
-              text
-              raised
-              severity="contrast"
-              aria-label="Close"
-              size="large"
-              onClick={() => {
-                setShowWelcomeCard(false);
-                window.scrollTo(0, 0);
-              }}
-            />
-            <span className="text-xs mt-1">Close</span>
-          </span> */}
         </div>
       </Dialog>
       <Dialog
