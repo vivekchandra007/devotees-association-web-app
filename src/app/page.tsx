@@ -21,8 +21,8 @@ import Kripa from '@/components/kripa';
 export default function Home() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const guestMode: boolean | null = !!searchParams.get('guest');
   const { devotee, isAuthenticated } = useAuth();
+  const guestMode: boolean | null = !devotee;
   const LOCAL_STORAGE_STEPS_COMPLETED = "stepsCompleted";
   const [showWelcomeDialogue, setShowWelcomeDialogue] = useState<boolean>(true);
   const [showReferralModal, setShowReferralModal] = useState<boolean>(false);
@@ -141,7 +141,7 @@ export default function Home() {
           onClick={() => setShowWelcomeDialogue(true)}
         >
           <i className="pi pi-bell cursor-pointer text-white p-overlay-badge">
-          <Badge severity="danger" className="scale-50"></Badge>
+            <Badge severity="danger" className="scale-50"></Badge>
           </i>
         </Button>
       </span>
@@ -223,44 +223,86 @@ export default function Home() {
             Let&apos;s build it brick by brick, step by step
           </small>
           <br /><br />
-          <Button label="Step 1: Don't miss this once in a Lifetime Opportunity to build a temple for Shri Shri Radha Krishna. Contribute!" severity="warning" raised size="small"
-            icon="pi pi-indian-rupee"
-            className="w-full"
-            onClick={() => window.open("https://iskconpunebcec.com/#/newtemple")} />
-          <br /><br />
-          <Button label="Step 2: Come, join our Whatsapp group for latest updates and spiritual association" severity="success" raised size="small"
-            icon="pi pi-whatsapp"
-            className="w-full"
-            onClick={() => alert('Link to a Whatsapp group')} />
-          <br /><br />
+          <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-gray-400 pl-2">
+            <div className="col-span-8 md:col-span-10 text-left">
+              <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
+              <small className="text-text"><strong className="text-hover">Step 1:</strong> Don't miss this once in a Lifetime Opportunity to build a temple for Shri Shri Radha Krishna. Please Contribute!</small>
+            </div>
+            <div className="col-span-4 md:col-span-2 mr-1">
+              <Button label="" severity="warning" raised size="small" className="float-right"
+                icon="pi pi-indian-rupee"
+                onClick={() => window.open("https://iskconpunebcec.com/#/newtemple")}>
+                  <Badge severity="warning" value="▸" className="scale-150"></Badge>
+              </Button>
+            </div>
+          </div>
+          <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-gray-400 pl-2">
+            <div className="col-span-8 md:col-span-10 text-left">
+              <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
+              <small className="text-text"><strong className="text-hover">Step 2:</strong> Join our Whatsapp group to stay updated with the latest news and events.</small>
+            </div>
+            <div className="col-span-4 md:col-span-2 mr-1">
+              <Button label="" severity="success" raised size="small" className="float-right"
+                icon="pi pi-whatsapp"
+                onClick={() => alert('Link to a Whatsapp group')}>
+                  <Badge severity="success" value="▸" className="scale-150"></Badge>
+              </Button>
+            </div>
+          </div>
           {
             guestMode ?
               (
                 <>
-                  <Button label="Step 3: Create Profile, Get Gifts on your special occassions, Track Your Donations and Associate with Devotees. All at one place"
-                    severity="danger" size="small" raised
-                    icon="pi pi-crown"
-                    className="w-full"
-                    onClick={() => router.push(`/login${searchParams ? `?${searchParams}` : ''}`)} />
-                  <br />
+                  <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-gray-400 pl-2">
+                    <div className="col-span-8 md:col-span-10 text-left">
+                      <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
+                      <small className="text-text"><strong className="text-hover">Step 3:</strong> Create Profile, Get Gifts on your special occassions, Track Your Donations and Associate with Devotees. All at one place.</small>
+                    </div>
+                    <div className="col-span-4 md:col-span-2 mr-1">
+                      <Button label="" severity="danger" raised size="small" className="float-right"
+                        icon="pi pi-crown"
+                        onClick={() => router.push(`/login${searchParams ? `?${searchParams}` : ''}`)} >
+                          <Badge severity="danger" value="▸" className="scale-150"></Badge>
+                      </Button>
+                    </div>
+                  </div>
                 </>
               ) :
               (
                 <>
-                  <Button severity="info" raised
-                    className="w-full" size="small"
-                    icon="pi pi-mobile"
-                    onClick={() => router.push('/devotee')}>
-                    <div className="grid grid-cols-12 items-center w-full">
-                      <span className="col-span-8">Step 3: Keep your profile upto date</span>
-                      <ProfileCompletionMeter devotee={devotee} className="col-span-4" />
+                  <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-gray-400 pl-2">
+                    <div className="col-span-8 md:col-span-10 text-left">
+                      <div className="grid grid-cols-12 items-center">
+                        <div className="col-span-8 md:col-span-7 text-left">
+                          <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
+                          <small className="text-text"><strong className="text-hover">Step 3:</strong> Keep your profile 100% and upto date</small>
+                        </div>
+                        <div className="col-span-4 md:col-span-5">
+                          <ProfileCompletionMeter devotee={devotee} />
+                        </div>
+                      </div>
                     </div>
-                  </Button>
-                  <br /><br />
-                  <Button label="Step 4: Let&apos;s Spread the word. Refer Others and become a spiritual catalyst in their life." severity="secondary" raised size="small"
-                    icon="pi pi-fw pi-share-alt"
-                    className="w-full"
-                    onClick={() => setShowReferralModal(true)} />
+                    <div className="col-span-4 md:col-span-2 mr-1">
+                      <Button label="" severity="info" raised size="small" className="float-right"
+                        icon="pi pi-user-edit"
+                        onClick={() => router.push('/devotee')}>
+                          <Badge severity="info" value="▸" className="scale-150"></Badge>
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-gray-400 pl-2">
+                    <div className="col-span-8 md:col-span-10 text-left">
+                      <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
+                      <small className="text-text"><strong className="text-hover">Step 4:</strong> Let&apos;s Spread the word. Refer Others and become a spiritual catalyst in their life.</small>
+                    </div>
+                    <div className="col-span-4 md:col-span-2 mr-1">
+                      <Button label="" severity="secondary" raised size="small" className="float-right"
+                        icon="pi pi-share-alt"
+                        onClick={() => setShowReferralModal(true)} >
+                          <Badge severity="secondary" value="▸" className="scale-150"></Badge>
+                      </Button>
+                    </div>
+                  </div>
                 </>
               )
           }
