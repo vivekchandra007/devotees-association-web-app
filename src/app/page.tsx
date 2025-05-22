@@ -123,7 +123,7 @@ export default function Home() {
         showRepetitiveWelcomeMessageInGuestMode();
       }
     }
-  }, [guestMode]);
+  }, []);
 
   if (!guestMode && !isAuthenticated) return <FullPageSpinner message="Hare Krishna! Fetching your details..." />;
 
@@ -226,7 +226,7 @@ export default function Home() {
           <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-gray-400 pl-2">
             <div className="col-span-8 md:col-span-10 text-left">
               <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
-              <small className="text-text"><strong className="text-hover">Step 1:</strong> Don't miss this once in a Lifetime Opportunity to build a temple for Shri Shri Radha Krishna. Please Contribute!</small>
+              <small className="text-text"><strong className="text-hover">Step 1:</strong> Don&apos;t miss this once in a Lifetime Opportunity to build a temple for Shri Shri Radha Krishna. Please Contribute!</small>
             </div>
             <div className="col-span-4 md:col-span-2 mr-1">
               <Button label="" severity="warning" raised size="small" className="float-right"
