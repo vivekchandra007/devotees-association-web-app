@@ -223,7 +223,7 @@ export default function Home() {
             Let&apos;s build it brick by brick, step by step
           </small>
           <br /><br />
-          <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-gray-400 pl-2">
+          <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
             <div className="col-span-8 md:col-span-10 text-left">
               <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
               <small className="text-text"><strong className="text-hover">Step 1:</strong> Don&apos;t miss this once in a Lifetime Opportunity to build a temple for Shri Shri Radha Krishna. Please Contribute!</small>
@@ -236,7 +236,7 @@ export default function Home() {
               </Button>
             </div>
           </div>
-          <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-gray-400 pl-2">
+          <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
             <div className="col-span-8 md:col-span-10 text-left">
               <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
               <small className="text-text"><strong className="text-hover">Step 2:</strong> Join our Whatsapp group to stay updated with the latest news and events.</small>
@@ -253,7 +253,7 @@ export default function Home() {
             guestMode ?
               (
                 <>
-                  <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-gray-400 pl-2">
+                  <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
                     <div className="col-span-8 md:col-span-10 text-left">
                       <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
                       <small className="text-text"><strong className="text-hover">Step 3:</strong> Create Profile, Get Gifts on your special occassions, Track Your Donations and Associate with Devotees. All at one place.</small>
@@ -270,7 +270,7 @@ export default function Home() {
               ) :
               (
                 <>
-                  <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-gray-400 pl-2">
+                  <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
                     <div className="col-span-8 md:col-span-10 text-left">
                       <div className="grid grid-cols-12 items-center">
                         <div className="col-span-8 md:col-span-7 text-left">
@@ -290,7 +290,7 @@ export default function Home() {
                       </Button>
                     </div>
                   </div>
-                  <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-gray-400 pl-2">
+                  <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
                     <div className="col-span-8 md:col-span-10 text-left">
                       <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
                       <small className="text-text"><strong className="text-hover">Step 4:</strong> Let&apos;s Spread the word. Refer Others and become a spiritual catalyst in their life.</small>
