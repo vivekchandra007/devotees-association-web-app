@@ -66,42 +66,43 @@ export default function Kripa() {
     }
 
     return (
-        <div className="m-auto mt-7">
+        <>
             {inProgress && <FullPageSpinner message="Take a deep breathe and let Shri Shri Rādhā Krishna manifest in your heart." />}
-
-            {
-                !kripaOfTheDayChapter || !kripaOfTheDayShloka ?
-                    <Button
-                        label="Reveal my Kripā Shloka of the day"
-                        icon="pi pi-sparkles"
-                        onClick={() => revealKripaShlokaOfTheDay()}
-                        className="m-2 w-full"
-                        size="small"
-                        severity="danger"
-                    />
-                    :
-                    <div>
-                        <h2 className="text-center font-semibold m-2 text-text">Your Kripā Shloka of the day to guide you is</h2>
-                        <strong className="text-hover">from Chapter: {kripaOfTheDayChapter}, Shloka: {kripaOfTheDayShloka}</strong>
-                        <br />
-                        <iframe
-                            src={`https://vedabase.io/en/library/bg/${kripaOfTheDayChapter}/${kripaOfTheDayShloka}/`}
-                            width="99%"
-                            height="600"
-                            className="rounded-lg block"
+            <div className="m-auto mt-7">
+                {
+                    !kripaOfTheDayChapter || !kripaOfTheDayShloka ?
+                        <Button
+                            label="Reveal my Kripā Shloka of the day"
+                            icon="pi pi-sparkles"
+                            onClick={() => revealKripaShlokaOfTheDay()}
+                            className="m-2 w-[50vw]"
+                            size="small"
+                            severity="danger"
                         />
-                        <br />
+                        :
                         <div>
-                            <Button
-                                label="Play Now"
-                                icon="pi pi-play"
-                                onClick={() => alert('aa')}
-                                className="m-2"
-                                severity="secondary"
+                            <h2 className="text-center font-semibold m-2 text-text">Your Kripā Shloka of the day to guide you is</h2>
+                            <strong className="text-hover">from Chapter: {kripaOfTheDayChapter}, Shloka: {kripaOfTheDayShloka}</strong>
+                            <br />
+                            <iframe
+                                src={`https://vedabase.io/en/library/bg/${kripaOfTheDayChapter}/${kripaOfTheDayShloka}/`}
+                                width="99%"
+                                height="600"
+                                className="rounded-lg block"
                             />
+                            <br />
+                            <div>
+                                <Button
+                                    label="Play Now"
+                                    icon="pi pi-play"
+                                    onClick={() => alert('aa')}
+                                    className="m-2"
+                                    severity="secondary"
+                                />
+                            </div>
                         </div>
-                    </div>
-            }
-        </div>
+                }
+            </div>
+        </>
     );
 }

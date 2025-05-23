@@ -16,7 +16,7 @@ import { Checkbox } from 'primereact/checkbox';
 import { TabView, TabPanel } from 'primereact/tabview';
 import { classNames } from 'primereact/utils';
 import { Badge } from 'primereact/badge';
-import Kripa from '@/components/kripa';
+import Kripa from '@/components/Kripa';
 
 export default function Home() {
   const router = useRouter();
@@ -203,7 +203,7 @@ export default function Home() {
         className="shadow-2xl w-full md:w-[75vw] lg:w-[45vw] text-center text-text size-fit m-auto">
         <div>
           <small className="block text-text mb-4">
-            Congratulations! Thanks to your devotion, we all are now getting a new beautiful temple in Baner, Pune
+            Congratulations! Thanks to your devotion, we are getting a new beautiful temple in Baner, Pune
           </small>
           <div className="text-text">
             <strong className="font-bilbo md:text-4xl">Shri Shri <span className="text-7xl text-special">Radha Krishna</span>&nbsp;Temple</strong>
@@ -226,7 +226,7 @@ export default function Home() {
           <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
             <div className="col-span-8 md:col-span-10 text-left">
               <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
-              <small className="text-text"><strong className="text-hover">Step 1:</strong> Don&apos;t miss this once in a Lifetime Opportunity to build a temple for Shri Shri Radha Krishna. Please Contribute!</small>
+              <small className="text-text"><strong className="text-hover">Step 1:</strong> A Once-In-A-Lifetime, divine chance to eternally serve Shri Shri Radha Krishna — build their eternal home in your area. Do Not Miss. Donate today.</small>
             </div>
             <div className="col-span-4 md:col-span-2 mr-1">
               <Button label="" severity="warning" raised size="small" className="float-right"
@@ -256,7 +256,7 @@ export default function Home() {
                   <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
                     <div className="col-span-8 md:col-span-10 text-left">
                       <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
-                      <small className="text-text"><strong className="text-hover">Step 3:</strong> Create Profile, Get Gifts on your special occassions, Track Your Donations and Associate with Devotees. All at one place.</small>
+                      <small className="text-text"><strong className="text-hover">Step 3:</strong> Create Profile, Get Gifts on your special occassions, Track your Donations, Offer online Prayers and Associate with Devotees. All at one place.</small>
                     </div>
                     <div className="col-span-4 md:col-span-2 mr-1">
                       <Button label="" severity="danger" raised size="small" className="float-right"
