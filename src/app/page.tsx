@@ -16,7 +16,7 @@ import { Checkbox } from 'primereact/checkbox';
 import { TabView, TabPanel } from 'primereact/tabview';
 import { classNames } from 'primereact/utils';
 import { Badge } from 'primereact/badge';
-import Kripa from '@/components/Kripa';
+import Kripa from '@/components/kripa';
 
 export default function Home() {
   const router = useRouter();
