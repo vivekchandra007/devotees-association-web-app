@@ -14,6 +14,7 @@ import { Toolbar } from 'primereact/toolbar';
 import { Button } from 'primereact/button';
 import { ProgressBar } from 'primereact/progressbar';
 import { usePathname, useSearchParams } from 'next/navigation';
+import { SYSTEM_ROLES } from '@/data/constants';
 
 type dialogueModalContentType = {
     header: string,
@@ -26,7 +27,7 @@ export default function TopNavBar() {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     
-    const { devotee, isAuthenticated, logout } = useAuth();
+    const { devotee, isAuthenticated, systemRole, logout } = useAuth();
 
     const [ isNavigating, setIsNavigating ] = useState<boolean>(false);
 
@@ -65,7 +66,7 @@ export default function TopNavBar() {
             }
         },
         {
-            label: 'Edit My Profile',
+            label: 'Profile',
             icon: 'pi pi-fw pi-user-edit',
             command: () => navigateToPage('devotee')
         },
@@ -156,21 +157,42 @@ export default function TopNavBar() {
                     size="large"
                     onClick={() => navigateToPage('devotee')}
                 />
-                <span className="text-xs mt-1">Profile</span>
+                <span className="text-xs mt-1">My Profile</span>
             </span>
-            <span className="flex flex-col items-center space-y-1">
-                <Button
-                    icon="pi pi-indian-rupee"
-                    rounded
-                    text
-                    raised
-                    severity="contrast"
-                    aria-label="Donations"
-                    size="large"
-                    onClick={() => navigateToPage('donations')}
-                />
-                <span className="text-xs mt-1">Donations</span>
-            </span>
+            {
+                systemRole === SYSTEM_ROLES.member ?
+                (
+                    <span className="flex flex-col items-center space-y-1">
+                        <Button
+                            icon="pi pi-indian-rupee"
+                            rounded
+                            text
+                            raised
+                            severity="contrast"
+                            aria-label="Donations"
+                            size="large"
+                            onClick={() => navigateToPage('donations')}
+                        />
+                        <span className="text-xs mt-1">Donations</span>
+                    </span>
+                )
+                :
+                (
+                    <span className="flex flex-col items-center space-y-1">
+                        <Button
+                            icon="pi pi-users"
+                            rounded
+                            text
+                            raised
+                            severity="contrast"
+                            aria-label="Devotees"
+                            size="large"
+                            onClick={() => navigateToPage('devotees')}
+                        />
+                        <span className="text-xs mt-1">Devotees</span>
+                    </span>
+                )
+            }
             <span className="flex flex-col items-center space-y-1">
                 <Button
                     icon="pi pi-share-alt"

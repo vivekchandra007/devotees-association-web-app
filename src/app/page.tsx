@@ -10,7 +10,7 @@ import Referrals from '@/components/Referrals';
 import { Dialog } from 'primereact/dialog';
 import { useEffect, useState } from 'react';
 import { InputText } from 'primereact/inputtext';
-import api from "@/lib/axios";              // our Custom Axios Wrapper
+import api from "@/lib/axios";              // our Custom Axios Wrapper which automatically adds access token in header
 import YouTubeMosaic from '@/components/YouTubeMosaic';
 import { Checkbox } from 'primereact/checkbox';
 import { TabView, TabPanel } from 'primereact/tabview';

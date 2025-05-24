@@ -7,6 +7,7 @@ import Footer from "@/components/Footer";
 import { AuthProvider } from "@/context/AuthContext";
 import { Suspense } from "react";
 import TopNavBar from "@/components/TopNavBar";
+import { ScrollTop } from "primereact/scrolltop";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -55,6 +56,7 @@ export default function RootLayout({
               <div className="grid items-center m-auto justify-items-center min-h-screen">
                 {children}
               </div>
+              <ScrollTop />
             </PrimeReactProvider>
           </AuthProvider>
         </Suspense>

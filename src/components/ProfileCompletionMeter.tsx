@@ -4,6 +4,7 @@ import { ProgressBar } from 'primereact/progressbar'
 import { Tooltip } from 'primereact/tooltip'
 import { useMemo } from 'react'
 import _ from 'lodash'
+import React from 'react'
 
 type Props = {
   devotee?: object | null
@@ -58,10 +59,21 @@ export default function ProfileCompletionMeter({ devotee, className }: Props) {
     return { percentage, missing }
   }, [devotee])
 
+  const valueTemplate = (percentage: string) => {
+    return (
+      <React.Fragment>
+        <small>
+          <strong>{percentage}%</strong>
+        </small>
+      </React.Fragment>
+    );
+  };
+
   return (
     <div className={`w-full space-y-2 ${className || ''}`}>
       <ProgressBar
         value={percentage}
+        displayValueTemplate={valueTemplate}
         showValue
         data-pr-tooltip={`Missing: ${missing.join(', ') || 'None'}`}
         data-pr-position="top"

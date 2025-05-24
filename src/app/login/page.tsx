@@ -96,7 +96,7 @@ export default function LoginPage() {
     const footer = (
         <div>
             <small>
-                <hr className="text-gray-100 mb-2"/>
+                <hr className="text-gray-100 mb-2" />
                 <span className="flex justify-content-space-between text-hover">
                     <a href="https://iskconpunebcec.com/#/Home" target="_blank" rel="noopener noreferrer" className="underline hover:text-hover">
                         ISKCON BCEC
@@ -154,22 +154,20 @@ export default function LoginPage() {
     return (
         <>
             {authInProgress && <FullPageSpinner message="Hare Krishna! OTP verifed. Redirecting to Home Page" />}
-            <div>
-                <Card title={title}
-                    subTitle={subTitle} footer={footer} header={header}
-                    className="shadow-2xl w-93 md:w-110 text-center component-transparent">
-                    <div>
-                        <Button id="btn-sign-in" label="Login with your Mobile Number" severity="danger" raised
-                            icon="pi pi-mobile" loading={authInProgress}
-                            onClick={() => initSendOTP(configuration)} />
-                        <br />
-                        {
-                            !guestMode && 
-                            <Link href="/?guest=true" className="text-sm block mt-2 underline">explore logged out</Link>
-                        }
-                    </div>
-                </Card>
-            </div>
+            <Card title={title}
+                subTitle={subTitle} footer={footer} header={header}
+                className="shadow-2xl w-93 md:w-110 text-center component-transparent">
+                <div>
+                    <Button id="btn-sign-in" label="Login with your Mobile Number" severity="danger" raised
+                        icon="pi pi-mobile" loading={authInProgress}
+                        onClick={() => initSendOTP(configuration)} />
+                    <br />
+                    {
+                        !guestMode &&
+                        <Link href="/?guest=true" className="text-sm block mt-2 underline">explore logged out</Link>
+                    }
+                </div>
+            </Card>
         </>
     );
 }

@@ -17,7 +17,7 @@ import { SKILLS } from "@/data/skills";
 import { CITIES } from "@/data/cities";
 import ALL_CITIES from "@/data/states.json";
 import { AREAS } from "@/data/areas";
-import api from "@/lib/axios";              // our Custom Axios
+import api from "@/lib/axios";              // our Custom Axios Wrapper which automatically adds access token in header
 import { Toast } from "primereact/toast";
 import { MessageSeverity } from "primereact/api";
 import { ProgressBar } from "primereact/progressbar";
