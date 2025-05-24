@@ -75,7 +75,7 @@ export default function DevoteesPage() {
                             value={searchQuery}
                             onChange={(e) => {
                                 setSearchQuery(e.target.value);
-                                _.debounce(() => handleSearch(searchQuery), 2000)();
+                                _.debounce(() => handleSearch(e.target.value), 1000)();
                             }}
                         />
                         <label
