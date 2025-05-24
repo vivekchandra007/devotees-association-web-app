@@ -130,11 +130,11 @@ export default function YouTubeMosaic() {
           Try <strong>Ashtami</strong>, <strong>Chaturdashi</strong>, <strong>Poornima</strong>, etc.
         </small>
       }
-      <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-12 gap-1 p-2 w-full">
+      <div className="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-12 gap-1 w-full">
         {filteredVideos.map((video) => (
           <div
             key={video.id}
-            className="relative cursor-pointer"
+            className="relative cursor-pointer hover:scale-200 hover:z-2 transition"
             onMouseEnter={(e) => {
               overlayRef.current?.show(e, e.currentTarget);
               handleHover(e, video);
@@ -157,7 +157,18 @@ export default function YouTubeMosaic() {
       {
         hoverVideo &&
         <OverlayPanel ref={overlayRef} showCloseIcon>
-          <div className="max-w-[300px] max-h-[200px]">
+          <div className="max-w-[300px] max-h-[300px]">
+            <div className="grid grid-cols-12 mb-1">
+              <span className="col-span-6 text-sm">Quick Preview</span>
+              <div className="col-span-6 text-right">
+                <Button
+                  text label="Expand"
+                  icon="pi pi-window-maximize" severity="secondary" aria-label="Expand"
+                  size="small" iconPos="right" className="paddingless-button hover:underline"
+                  onClick={() => setSelectedVideo(hoverVideo)}
+                />
+              </div>
+            </div>
             <iframe
               src={`https://www.youtube.com/embed/${hoverVideo.videoId}?autoplay=1&mute=1`}
               width="300"

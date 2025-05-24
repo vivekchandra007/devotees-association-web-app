@@ -45,6 +45,10 @@ body {
   justify-content: space-between;
 }
 
+.paddingless-button.p-button {
+  padding: 0;
+}
+
 .component-transparent {
   background-color: rgba(255, 255, 255, 0.7);
   backdrop-filter: saturate(210%) blur(9px);

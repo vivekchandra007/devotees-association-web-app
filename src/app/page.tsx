@@ -163,7 +163,7 @@ export default function Home() {
             <strong className="text-general">I&apos;m feeling Kripā</strong>
             <hr />
             <small className="text-general">
-              Once you get inspired, Kripā will start showing. Let&apos;s see what <strong className="text-hover">Shloka</strong> from <strong className="text-hover">Shrimad Bhagwad Gita</strong> brings a hidden inspiration for you, today.
+              Once you get inspired, <strong className="text-hover">Kripā</strong> (divine blessing) will start showing. Let&apos;s see what <strong className="text-hover">Shloka</strong> from <strong className="text-hover">Shrimad Bhagwad Gita</strong> brings a hidden inspiration for you, today.
             </small>
             <div className="min-h-screen">
               <Kripa />
@@ -181,12 +181,12 @@ export default function Home() {
             </div>
           </div>
         </TabPanel>
-        <TabPanel header="Bhakti" leftIcon="pi pi-bolt mr-2">
+        <TabPanel header="Bhakti" leftIcon="pi pi-heart-fill mr-2">
           <div className='p-3'>
             <strong className="text-general">Events</strong>
             <hr />
             <small className="text-general">
-              Finally, it&apos;s time to do practical - <strong className="text-hover">Bhakti</strong>. Visit temple to take divine darshan of <strong className="text-hover">The Lord</strong> or look out for upcoming events to physically and personally connect with fellow&nbsp;
+              Finally, it&apos;s time to do practical - <strong className="text-hover">Prema Bhakti</strong>. Visit temple to take divine darshan of <strong className="text-hover">The Lord</strong> or look out for upcoming events to physically and personally connect with fellow&nbsp;
               <strong className="text-hover">Dev</strong>otees.
             </small>
             <div className="min-h-screen">
@@ -226,7 +226,7 @@ export default function Home() {
           <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
             <div className="col-span-8 md:col-span-10 text-left">
               <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
-              <small className="text-text"><strong className="text-hover">Step 1:</strong> A Once-In-A-Lifetime, divine chance to eternally serve Shri Shri Radha Krishna — build their eternal home in your area. Do Not Miss. Donate today.</small>
+              <small className="text-text"><strong className="text-hover">Step 1:</strong> A Once-In-A-Lifetime, divine chance to dearly serve Shri Shri Radha Krishna — build their eternal home in your area. Do Not Miss. Donate today.</small>
             </div>
             <div className="col-span-4 md:col-span-2 mr-1">
               <Button label="" severity="warning" raised size="small" className="float-right"

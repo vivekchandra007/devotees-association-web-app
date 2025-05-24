@@ -20,7 +20,7 @@ export default function FullPageSpinner({ message = 'Loading...' }: { message?: 
     }
   }, 1000);
   return (
-    <div className="fixed p-2 inset-0 z-50 flex flex-col items-center justify-center bg-black/85 backdrop-blur-sm text-white">
+    <div className="fixed inset-0 z-50 flex flex-col items-center pt-[20vh] bg-black/85 backdrop-blur-sm text-white">
       <div className="relative inline-block">
         {/* Spinner ring */}
         <div className="absolute inset-0 rounded-full border-2 border-t-yellow-500 border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
@@ -41,7 +41,6 @@ export default function FullPageSpinner({ message = 'Loading...' }: { message?: 
         <br />
         <span className="font-bilbo text-3xl">{messageMantra}</span>
       </p>
-
     </div>
   );
 }
