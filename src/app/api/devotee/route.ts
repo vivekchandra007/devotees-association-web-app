@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'; // adjust to your prisma client
 import { verifyAccessToken } from '@/lib/auth'; // your JWT verification function
 import { devoteeSchema } from '@/schema/devoteeFormSchema';
 import { convertDateStringIntoDateObject } from '@/lib/conversions';
+import { SYSTEM_ROLES } from '@/data/constants';
 
 export async function POST(req: NextRequest) {
   try {
@@ -25,10 +26,23 @@ export async function POST(req: NextRequest) {
     }
 
     if (parsed.data.id !== payload) {
-      // TODO: either it be devotee himself or a role_id > 1 i.e. a leader or admin who can make changes to some devotee's data
-      return NextResponse.json({ error: 'Forbidden: Mismatched devotee ID' }, { status: 403 });
+      // If it is not devotee himself then a role_id > 2 i.e. a leader or admin who can make changes to some devotee's data
+      const loggedIndevotee = await prisma.devotees.findUnique({
+        where: { id: payload },
+        select: {
+          name: true,
+          role_id: true,
+          system_roles: {
+            select: {
+              name: true,
+            },
+          }
+        },
+      });
+      if (![SYSTEM_ROLES.admin, SYSTEM_ROLES.leader].includes(loggedIndevotee?.system_roles.name!)) {
+        return NextResponse.json({ error: 'Forbidden: You do not have privileges to update details of this devotee.' }, { status: 403 });
+      }
     }
-
     const updatedDevotee = await prisma.devotees.update({
       where: { id: parsed.data.id },
       data: {
@@ -46,16 +60,16 @@ export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     if (!searchParams || searchParams.size === 0) {
-        return Response.json({ error: 'Query Params are missing in api request' }, { status: 400 });
+      return Response.json({ error: 'Query Params are missing in api request' }, { status: 400 });
     }
-    
+
     // Get the search term from query parameters
     const devoteeId = Number.parseInt(searchParams.get('devoteeId')!);
     if (!devoteeId) {
-        return Response.json({ error: 'id of the devotee is required' }, { status: 400 });
+      return Response.json({ error: 'id of the devotee is required' }, { status: 400 });
     }
 
-    const devotee = await prisma.devotees.findUnique({ 
+    const devotee = await prisma.devotees.findUnique({
       where: { id: devoteeId },
       include: {
         system_roles: {
@@ -70,9 +84,9 @@ export async function GET(req: NextRequest) {
             title_other: true
           }
         }
-      }, 
+      },
     });
-    
+
     if (!devotee) throw new Error();
 
     return NextResponse.json({ devotee });

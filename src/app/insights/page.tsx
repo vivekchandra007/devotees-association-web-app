@@ -4,9 +4,19 @@ import { useAuth } from "@/hooks/useAuth";
 import FullPageSpinner from "@/components/FullPageSpinner";
 import { TabView, TabPanel } from "primereact/tabview";
 import SearchDevotee from "@/components/SearchDevotee";
+import { useEffect } from "react";
+import { SYSTEM_ROLES } from "@/data/constants";
+import { useRouter } from "next/navigation";
 
 export default function DevoteesPage() {
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, systemRole } = useAuth();
+    const router = useRouter();
+
+    useEffect(() => {
+        if (systemRole === SYSTEM_ROLES.member) {
+            router.push('/');
+        }
+    },[isAuthenticated, systemRole]);
 
     return (
         <div className="h-full w-full component-transparent">

@@ -25,12 +25,14 @@ import { devotees } from "@prisma/client";
 import { convertDateObjectIntoDateString, convertDateStringIntoDateObject } from "@/lib/conversions";
 import FullPageSpinner from "@/components/FullPageSpinner";
 import ProfileCompletionMeter from "@/components/ProfileCompletionMeter";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
+import { SYSTEM_ROLES } from "@/data/constants";
 
 export default function DevoteePage() {
     const searchParams = useSearchParams();
+    const router = useRouter();
     const toast = useRef<Toast>(null);
-    const { devotee, isAuthenticated } = useAuth();
+    const { devotee, isAuthenticated, systemRole } = useAuth();
     const otherDevoteeId = Number.parseInt(searchParams.get('devoteeId')!);
 
     const [readOnly, setReadOnly] = useState<boolean>();
@@ -67,7 +69,8 @@ export default function DevoteePage() {
                     }
                 }
                 editedValues = convertDateObjectIntoDateString(editedValues!);
-                await api.post('/devotee', editedValues); // automatically sends token
+
+                await api.post(otherDevoteeId? `/devotee?devoteeId=${otherDevoteeId}`:'/devotee', editedValues); // automatically sends token
                 toast.current?.show({
                     severity: MessageSeverity.SUCCESS,
                     summary: `Profile`,
@@ -153,31 +156,35 @@ export default function DevoteePage() {
             setInitialValues(devotee);
             setReadOnly(false);
         } else if (otherDevoteeId) {
-            const fetchDevotee = async () => {
-                try {
-                    setInProgress(true);
-                    const res = await api.get(`/devotee?devoteeId=${otherDevoteeId}`); // automatically sends token 
-                    if (res && res.status === 200 && res.data?.devotee) {
-                        const parsedOtherDevotee = convertDateStringIntoDateObject(res.data.devotee);
-                        setOtherDevotee(parsedOtherDevotee);
-                        setInitialValues(parsedOtherDevotee);
-                    } else {
-                        throw new Error();
+            if (systemRole !== SYSTEM_ROLES.member) {
+                const fetchDevotee = async () => {
+                    try {
+                        setInProgress(true);
+                        const res = await api.get(`/devotee?devoteeId=${otherDevoteeId}`); // automatically sends token 
+                        if (res && res.status === 200 && res.data?.devotee) {
+                            const parsedOtherDevotee = convertDateStringIntoDateObject(res.data.devotee);
+                            setOtherDevotee(parsedOtherDevotee);
+                            setInitialValues(parsedOtherDevotee);
+                        } else {
+                            throw new Error();
+                        }
+                        setInProgress(true);
+                    } catch {
+                        toast.current?.show({
+                            severity: MessageSeverity.ERROR,
+                            summary: `Devotee Details`,
+                            detail: 'Could not retrieve devotee details. Try refreshing page or go to Home page and try again after some time',
+                            life: 10000
+                        });
+                    } finally {
+                        setInProgress(false);
                     }
-                    setInProgress(true);
-                } catch {
-                    toast.current?.show({
-                        severity: MessageSeverity.ERROR,
-                        summary: `Devotee Details`,
-                        detail: 'Could not retrieve devotee details. Try refreshing page or go to Home page and try again after some time',
-                        life: 10000
-                    });
-                } finally {
-                    setInProgress(false);
                 }
+                setReadOnly(true);
+                fetchDevotee();
+            } else {
+                router.push('/');
             }
-            setReadOnly(true);
-            fetchDevotee();
         }
     }, [devotee, otherDevoteeId])
 
@@ -206,23 +213,38 @@ export default function DevoteePage() {
                                 )
                                 :
                                 (
-                                    <ProfileCompletionMeter devotee={otherDevoteeId? otherDevotee:devotee} />
+                                    <ProfileCompletionMeter devotee={otherDevoteeId ? otherDevotee : devotee} />
                                 )
                         }
                     </div>
                     {
-                        !readOnly &&
                         <div className="col-span-4 md:col-span-2 mr-1 mt-4">
-                            <Button
-                                className="float-right"
-                                size="small"
-                                type="submit"
-                                label={formik.isSubmitting ? "Saving..." : "Save"}
-                                icon="pi pi-save"
-                                loading={formik.isSubmitting}
-                                disabled={!formik.dirty || formContainsError}
-                                raised
-                            />
+                            {
+                                readOnly ?
+                                    [SYSTEM_ROLES.admin, SYSTEM_ROLES.leader].includes(systemRole!) &&
+                                    <Button
+                                        className="float-right"
+                                        size="small"
+                                        type="button"
+                                        label="Edit"
+                                        icon="pi pi-user-edit"
+                                        raised
+                                        severity="danger"
+                                        title={`As an ${systemRole} you can edit details on behalf of ${otherDevotee?.name}`}
+                                        onClick={() => setReadOnly(false)}
+                                    />
+                                    :
+                                    <Button
+                                        className="float-right"
+                                        size="small"
+                                        type="submit"
+                                        label={formik.isSubmitting ? "Saving..." : "Save"}
+                                        icon="pi pi-save"
+                                        loading={formik.isSubmitting}
+                                        disabled={!formik.dirty || formContainsError}
+                                        raised
+                                    />
+                            }
                         </div>
                     }
                 </div>

@@ -121,8 +121,7 @@ export default function SearchDevotee() {
                                             }
                                             <p><strong>Role:</strong> {devoteeDetails?.system_roles?.name}</p>
                                             {
-                                                // only leaders and admins can view full details of a devotee
-                                                systemRole !== SYSTEM_ROLES.volunteer &&
+                                                // volunteers, leaders and admins can view full details of a devotee
                                                 <Button
                                                     label="View Details"
                                                     onClick={() => router.push(`/devotee?devoteeId=${devoteeDetails?.id}`)}
