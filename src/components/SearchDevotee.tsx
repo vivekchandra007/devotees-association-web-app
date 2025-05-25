@@ -71,11 +71,11 @@ export default function SearchDevotee() {
                     <hr />
             }
             <small className="text-general">
-                {devotee?.name} At your role level, you have the privileges to <strong className="text-hover">search</strong> a devotee, registered within this portal, to <strong className="text-hover">help</strong> them or even <strong className="text-hover">refer</strong> them to this portal, if they are not already registered.
+                {devotee?.name}, at your role level, you have the privileges to <strong className="text-hover">search</strong> a devotee registered within this portal. It may be to <strong className="text-hover">help</strong> them or even <strong className="text-hover">refer</strong> them to this portal, if they are not already registered.
             </small>
             <div className="min-h-screen">
-                <form onSubmit={handleSearch} className="p-inputgroup text-sm mt-7">
-                    <span className="p-float-label w-full">
+                <form onSubmit={handleSearch} className="p-inputgroup text-sm mt-7 w-full">
+                    <span className="p-float-label">
                         <InputText id="search-input" required maxLength={50}
                             value={searchQuery}
                             onChange={(e) => {
@@ -84,7 +84,7 @@ export default function SearchDevotee() {
                             }}
                         />
                         <label
-                            htmlFor="search-input">Type query and press enter or click 🔍 on right
+                            htmlFor="search-input">Type query and press enter or click 🔍 
                         </label>
                     </span>
                     <Button
