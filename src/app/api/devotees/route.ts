@@ -39,6 +39,7 @@ export async function GET(req: NextRequest) {
                 name: true,
                 email: true,
                 phone: true,
+                status: true,
                 role_id: true,
                 system_roles: {
                     select: {

@@ -125,10 +125,12 @@ export default function Home() {
     }
   }, []);
 
-  if (!guestMode && !isAuthenticated) return <FullPageSpinner message="Hare Krishna! Fetching your details..." />;
-
   return (
     <>
+      {
+        !guestMode && !isAuthenticated && 
+        <FullPageSpinner message="Hare Krishna! Fetching your details..." />
+      }
       <span className={classNames("absolute right-0 md:right-2 z-1", guestMode? 'top-[7vh] md:top-[8.8vh]' : 'top-[17vh] md:top-[13.5vh]')}>
         <Button
           rounded
