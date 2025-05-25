@@ -16,7 +16,7 @@ export default function DevoteesPage() {
         if (systemRole === SYSTEM_ROLES.member) {
             router.push('/');
         }
-    },[isAuthenticated, systemRole]);
+    },[systemRole, router]);
 
     return (
         <div className="h-full w-full component-transparent">

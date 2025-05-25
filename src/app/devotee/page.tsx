@@ -186,7 +186,7 @@ export default function DevoteePage() {
                 router.push('/');
             }
         }
-    }, [devotee, otherDevoteeId])
+    }, [devotee, otherDevoteeId, router, systemRole])
 
     return (
         <div className="bg-white">

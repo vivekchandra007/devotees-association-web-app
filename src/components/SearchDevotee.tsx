@@ -1,6 +1,5 @@
 "use client";
 
-import { SYSTEM_ROLES } from "@/data/constants";
 import { useAuth } from "@/hooks/useAuth";
 import api from "@/lib/axios";      // our Custom Axios Wrapper which automatically adds access token in header
 import { useRouter } from 'next/navigation';
@@ -13,7 +12,7 @@ import { ProgressBar } from "primereact/progressbar";
 import { useRef, useState } from "react";
 
 export default function SearchDevotee() {
-    const { devotee, systemRole } = useAuth();
+    const { devotee } = useAuth();
     const [searchInProgress, setSearchInProgress] = useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [searchResult, setSearchResult] = useState<object | null>(null);

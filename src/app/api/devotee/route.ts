@@ -3,7 +3,6 @@ import { prisma } from '@/lib/prisma'; // adjust to your prisma client
 import { verifyAccessToken } from '@/lib/auth'; // your JWT verification function
 import { devoteeSchema } from '@/schema/devoteeFormSchema';
 import { convertDateStringIntoDateObject } from '@/lib/conversions';
-import { SYSTEM_ROLES } from '@/data/constants';
 
 export async function POST(req: NextRequest) {
   try {
@@ -32,14 +31,9 @@ export async function POST(req: NextRequest) {
         select: {
           name: true,
           role_id: true,
-          system_roles: {
-            select: {
-              name: true,
-            },
-          }
         },
       });
-      if (![SYSTEM_ROLES.admin, SYSTEM_ROLES.leader].includes(loggedIndevotee?.system_roles.name!)) {
+      if (!loggedIndevotee?.role_id || loggedIndevotee?.role_id <= 2) {
         return NextResponse.json({ error: 'Forbidden: You do not have privileges to update details of this devotee.' }, { status: 403 });
       }
     }
