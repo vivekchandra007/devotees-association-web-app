@@ -25,14 +25,17 @@ import { devotees } from "@prisma/client";
 import { convertDateObjectIntoDateString } from "@/lib/conversions";
 import FullPageSpinner from "@/components/FullPageSpinner";
 import ProfileCompletionMeter from "@/components/ProfileCompletionMeter";
+import { useSearchParams } from "next/navigation";
 
 export default function DevoteePage() {
-    // const searchParams = useSearchParams();
+    const searchParams = useSearchParams();
     const toast = useRef<Toast>(null);
     const { devotee, isAuthenticated } = useAuth();
-    // const devoteeId = Number.parseInt(searchParams.get('devoteeId')!);
-    // const self:boolean = devotee?.id === devoteeId;
+    const devoteeId = Number.parseInt(searchParams.get('devoteeId')!);
+    const self: boolean = devotee?.id === devoteeId;
 
+
+    const [readOnly] = useState<boolean>(!self);
     const [initialValues, setInitialValues] = useState<typeof devotee>();
     const [filteredSkills, setFilteredSkills] = useState<string[] | null[]>();
     const [filteredCities, setFilteredCities] = useState<string[] | null[]>();
@@ -175,18 +178,21 @@ export default function DevoteePage() {
                                 )
                         }
                     </div>
-                    <div className="col-span-4 md:col-span-2 mr-1 mt-4">
-                        <Button
-                            className="float-right"
-                            size="small"
-                            type="submit"
-                            label={formik.isSubmitting ? "Saving..." : "Save"}
-                            icon="pi pi-save"
-                            loading={formik.isSubmitting}
-                            disabled={!formik.dirty || formContainsError}
-                            raised
-                        />
-                    </div>
+                    {
+                        !readOnly &&
+                        <div className="col-span-4 md:col-span-2 mr-1 mt-4">
+                            <Button
+                                className="float-right"
+                                size="small"
+                                type="submit"
+                                label={formik.isSubmitting ? "Saving..." : "Save"}
+                                icon="pi pi-save"
+                                loading={formik.isSubmitting}
+                                disabled={!formik.dirty || formContainsError}
+                                raised
+                            />
+                        </div>
+                    }
                 </div>
                 <div className="w-full h-auto">
                     <Fieldset legend={<span>Personal Details<i className="pi pi-user-edit pl-2"></i></span>} toggleable>
@@ -212,7 +218,7 @@ export default function DevoteePage() {
                                     <i className="pi pi-at"></i>
                                 </span>
                                 <span className="p-float-label">
-                                    <InputText id="email" maxLength={255}
+                                    <InputText id="email" maxLength={255} disabled={readOnly}
                                         value={formik.values?.email}
                                         onChange={(e) => {
                                             formik.setFieldValue("email", e.target.value);
@@ -232,7 +238,7 @@ export default function DevoteePage() {
                                     <i className="pi pi-user"></i>
                                 </span>
                                 <span className="p-float-label">
-                                    <InputText id="name" required maxLength={100}
+                                    <InputText id="name" required maxLength={100} disabled={readOnly}
                                         value={formik.values?.name}
                                         onChange={(e) => {
                                             formik.setFieldValue("name", e.target.value);
@@ -247,7 +253,7 @@ export default function DevoteePage() {
                                     <i className="pi pi-sun"></i>
                                 </span>
                                 <span className="p-float-label">
-                                    <InputText id="initiated_name" maxLength={90}
+                                    <InputText id="initiated_name" maxLength={90} disabled={readOnly}
                                         value={formik.values?.initiated_name}
                                         onChange={(e) => {
                                             formik.setFieldValue("initiated_name", e.target.value);
@@ -263,7 +269,7 @@ export default function DevoteePage() {
                                 </span>
                                 <span className="p-float-label">
                                     <Calendar
-                                        inputId="dob"
+                                        inputId="dob" disabled={readOnly}
                                         name="dob"
                                         dateFormat="dd/mm/yy" maxDate={new Date()}
                                         value={formik.values?.dob}
@@ -279,7 +285,7 @@ export default function DevoteePage() {
                                     <i className="pi pi-heart"></i>
                                 </span>
                                 <span className="p-float-label">
-                                    <Dropdown id="gender" showClear
+                                    <Dropdown id="gender" showClear disabled={readOnly}
                                         value={formik.values?.gender}
                                         options={[
                                             { name: 'Female', code: 'female' },
@@ -299,7 +305,7 @@ export default function DevoteePage() {
                                     <i className="pi pi-heart-fill"></i>
                                 </span>
                                 <span className="p-float-label">
-                                    <Dropdown id="marital_status" showClear
+                                    <Dropdown id="marital_status" showClear disabled={readOnly}
                                         value={formik.values?.marital_status}
                                         options={[
                                             { name: 'Yes', code: true },
@@ -318,7 +324,7 @@ export default function DevoteePage() {
                                     <i className="pi pi-language"></i>
                                 </span>
                                 <span className="p-float-label">
-                                    <Dropdown id="language_preference" showClear
+                                    <Dropdown id="language_preference" showClear disabled={readOnly}
                                         value={formik.values?.language_preference}
                                         options={[
                                             { name: 'Hindi', code: 'hindi' },
@@ -343,7 +349,7 @@ export default function DevoteePage() {
                                     <i className="pi pi-briefcase"></i>
                                 </span>
                                 <span className="p-float-label">
-                                    <Dropdown id="occupation" showClear
+                                    <Dropdown id="occupation" showClear disabled={readOnly}
                                         value={formik.values?.occupation}
                                         options={[
                                             { name: 'Service', code: 'Service' },
@@ -364,7 +370,7 @@ export default function DevoteePage() {
                                     <i className="pi pi-user"></i>
                                 </span>
                                 <span className="p-float-label">
-                                    <InputText id="occupation_position" maxLength={100}
+                                    <InputText id="occupation_position" maxLength={100} disabled={readOnly}
                                         value={formik.values?.occupation_position}
                                         onChange={(e) => {
                                             formik.setFieldValue("occupation_position", e.target.value);
@@ -380,7 +386,7 @@ export default function DevoteePage() {
                         <div className="p-inputgroup ml-0.5">
                             <Checkbox
                                 id="tax_80g_required"
-                                name="tax_80g_required"
+                                name="tax_80g_required" disabled={readOnly}
                                 checked={formik.values?.tax_80g_required ? true : false}
                                 onChange={(e) => {
                                     formik.setFieldValue("tax_80g_required", e.checked);
@@ -393,7 +399,7 @@ export default function DevoteePage() {
                                 <i className="pi pi-id-card"></i>
                             </span>
                             <span className="p-float-label">
-                                <InputText id="tax_pan" maxLength={10} keyfilter={/^[a-zA-Z0-9]*$/} disabled={!formik.values?.tax_80g_required}
+                                <InputText id="tax_pan" maxLength={10} keyfilter={/^[a-zA-Z0-9]*$/} disabled={readOnly || !formik.values?.tax_80g_required}
                                     value={formik.values?.tax_pan} className="uppercase"
                                     onChange={(e) => {
                                         formik.setFieldValue("tax_pan", e.target.value);
@@ -411,7 +417,7 @@ export default function DevoteePage() {
                                     <i className="pi pi-home"></i>
                                 </span>
                                 <span className="p-float-label">
-                                    <InputText id="address_line1" maxLength={255}
+                                    <InputText id="address_line1" maxLength={255} disabled={readOnly}
                                         value={formik.values?.address_line1}
                                         onChange={(e) => {
                                             formik.setFieldValue("address_line1", e.target.value);
@@ -424,7 +430,7 @@ export default function DevoteePage() {
                                     <i className="pi pi-building"></i>
                                 </span>
                                 <span className="p-float-label">
-                                    <InputText id="address_society" maxLength={255}
+                                    <InputText id="address_society" maxLength={255} disabled={readOnly}
                                         value={formik.values?.address_society}
                                         onChange={(e) => {
                                             formik.setFieldValue("address_society", e.target.value);
@@ -437,7 +443,7 @@ export default function DevoteePage() {
                                     <i className="pi pi-truck"></i>
                                 </span>
                                 <span className="p-float-label">
-                                    <InputText id="address_line2" maxLength={255}
+                                    <InputText id="address_line2" maxLength={255} disabled={readOnly}
                                         value={formik.values?.address_line2}
                                         onChange={(e) => {
                                             formik.setFieldValue("address_line2", e.target.value);
@@ -450,7 +456,7 @@ export default function DevoteePage() {
                                     <i className="pi pi-th-large"></i>
                                 </span>
                                 <span className="p-float-label">
-                                    <AutoComplete id="address_city" forceSelection
+                                    <AutoComplete id="address_city" forceSelection disabled={readOnly}
                                         value={formik.values?.address_city}
                                         suggestions={filteredCities as null[]}
                                         completeMethod={citiesSearch}
@@ -466,8 +472,8 @@ export default function DevoteePage() {
                                     <i className="pi pi-map-marker"></i>
                                 </span>
                                 <span className="p-float-label">
-                                    <AutoComplete id="address_area" disabled={!formik.values?.address_city}
-                                        value={formik.values?.address_area}
+                                    <AutoComplete id="address_area" disabled={readOnly || !formik.values?.address_city}
+                                        value={formik.values?.address_area} 
                                         suggestions={filteredAreas as null[]}
                                         completeMethod={areasSearch}
                                         onChange={(e) => formik.setFieldValue("address_area", e.value)} />
@@ -480,7 +486,7 @@ export default function DevoteePage() {
                                 </span>
                                 <span className="p-float-label">
                                     <InputText id="address_pincode" maxLength={6} keyfilter="int"
-                                        value={formik.values?.address_pincode}
+                                        value={formik.values?.address_pincode} disabled={readOnly}
                                         onChange={(e) => {
                                             formik.setFieldValue("address_pincode", e.target.value);
                                         }} />
@@ -502,7 +508,7 @@ export default function DevoteePage() {
                                     <i className="pi pi-flag"></i>
                                 </span>
                                 <span className="p-float-label">
-                                    <Dropdown id="address_country" showClear
+                                    <Dropdown id="address_country" showClear disabled={readOnly}
                                         value={formik.values?.address_country}
                                         options={[
                                             { name: 'India', code: 'India' },
@@ -522,7 +528,7 @@ export default function DevoteePage() {
                                     <i className="pi pi-map"></i>
                                 </span>
                                 <span className="p-float-label">
-                                    <InputText id="address_gmap_url" maxLength={1000}
+                                    <InputText id="address_gmap_url" maxLength={1000} disabled={readOnly}
                                         value={formik.values?.address_gmap_url}
                                         onChange={(e) => {
                                             formik.setFieldValue("address_gmap_url", e.target.value);
@@ -540,7 +546,7 @@ export default function DevoteePage() {
                                     <i className="pi pi-user"></i>
                                 </span>
                                 <span className="p-float-label">
-                                    <InputText id="spouse_name" maxLength={100}
+                                    <InputText id="spouse_name" maxLength={100} disabled={readOnly}
                                         value={formik.values?.spouse_name}
                                         onChange={(e) => {
                                             formik.setFieldValue("spouse_name", e.target.value);
@@ -554,7 +560,7 @@ export default function DevoteePage() {
                                 </span>
                                 <span className="p-float-label">
                                     <Calendar
-                                        inputId="spouse_dob"
+                                        inputId="spouse_dob" disabled={readOnly}
                                         name="spouse_dob"
                                         dateFormat="dd/mm/yy" maxDate={new Date()}
                                         value={formik.values?.spouse_dob}
@@ -571,7 +577,7 @@ export default function DevoteePage() {
                                 </span>
                                 <span className="p-float-label">
                                     <Calendar
-                                        inputId="spouse_marriage_anniversary"
+                                        inputId="spouse_marriage_anniversary" disabled={readOnly}
                                         name="spouse_marriage_anniversary"
                                         dateFormat="dd/mm/yy" maxDate={new Date()}
                                         value={formik.values?.spouse_marriage_anniversary}
@@ -587,7 +593,7 @@ export default function DevoteePage() {
                                     <i className="pi pi-user"></i>
                                 </span>
                                 <span className="p-float-label">
-                                    <InputText id="parents_father_name" maxLength={100}
+                                    <InputText id="parents_father_name" maxLength={100} disabled={readOnly}
                                         value={formik.values?.parents_father_name}
                                         onChange={(e) => {
                                             formik.setFieldValue("parents_father_name", e.target.value);
@@ -601,7 +607,7 @@ export default function DevoteePage() {
                                 </span>
                                 <span className="p-float-label">
                                     <Calendar
-                                        inputId="parents_father_dob"
+                                        inputId="parents_father_dob" disabled={readOnly}
                                         name="parents_father_dob"
                                         dateFormat="dd/mm/yy" maxDate={new Date()}
                                         value={formik.values?.parents_father_dob}
@@ -617,7 +623,7 @@ export default function DevoteePage() {
                                     <i className="pi pi-user"></i>
                                 </span>
                                 <span className="p-float-label">
-                                    <InputText id="parents_mother_name" maxLength={100}
+                                    <InputText id="parents_mother_name" maxLength={100} disabled={readOnly}
                                         value={formik.values?.parents_mother_name}
                                         onChange={(e) => {
                                             formik.setFieldValue("parents_mother_name", e.target.value);
@@ -631,7 +637,7 @@ export default function DevoteePage() {
                                 </span>
                                 <span className="p-float-label">
                                     <Calendar
-                                        inputId="parents_mother_dob"
+                                        inputId="parents_mother_dob" disabled={readOnly}
                                         name="parents_mother_dob"
                                         dateFormat="dd/mm/yy" maxDate={new Date()}
                                         value={formik.values?.parents_mother_dob}
@@ -648,7 +654,7 @@ export default function DevoteePage() {
                                 </span>
                                 <span className="p-float-label">
                                     <Calendar
-                                        inputId="parents_marriage_anniversary"
+                                        inputId="parents_marriage_anniversary" disabled={readOnly}
                                         name="parents_marriage_anniversary"
                                         dateFormat="dd/mm/yy" maxDate={new Date()}
                                         value={formik.values?.parents_marriage_anniversary}
@@ -664,7 +670,7 @@ export default function DevoteePage() {
                                     <i className="pi pi-user"></i>
                                 </span>
                                 <span className="p-float-label">
-                                    <InputText id="children_1_name" maxLength={100}
+                                    <InputText id="children_1_name" maxLength={100} disabled={readOnly}
                                         value={formik.values?.children_1_name}
                                         onChange={(e) => {
                                             formik.setFieldValue("children_1_name", e.target.value);
@@ -678,7 +684,7 @@ export default function DevoteePage() {
                                 </span>
                                 <span className="p-float-label">
                                     <Calendar
-                                        inputId="children_1_dob"
+                                        inputId="children_1_dob" disabled={readOnly}
                                         name="children_1_dob"
                                         dateFormat="dd/mm/yy" maxDate={new Date()}
                                         value={formik.values?.children_1_dob}
@@ -694,7 +700,7 @@ export default function DevoteePage() {
                                     <i className="pi pi-user"></i>
                                 </span>
                                 <span className="p-float-label">
-                                    <InputText id="children_2_name" maxLength={100}
+                                    <InputText id="children_2_name" maxLength={100} disabled={readOnly}
                                         value={formik.values?.children_2_name}
                                         onChange={(e) => {
                                             formik.setFieldValue("children_2_name", e.target.value);
@@ -708,7 +714,7 @@ export default function DevoteePage() {
                                 </span>
                                 <span className="p-float-label">
                                     <Calendar
-                                        inputId="children_2_dob"
+                                        inputId="children_2_dob" disabled={readOnly}
                                         name="children_2_dob"
                                         dateFormat="dd/mm/yy" maxDate={new Date()}
                                         value={formik.values?.children_2_dob}
@@ -724,7 +730,7 @@ export default function DevoteePage() {
                                     <i className="pi pi-user"></i>
                                 </span>
                                 <span className="p-float-label">
-                                    <InputText id="children_3_name" maxLength={100}
+                                    <InputText id="children_3_name" maxLength={100} disabled={readOnly}
                                         value={formik.values?.children_3_name}
                                         onChange={(e) => {
                                             formik.setFieldValue("children_3_name", e.target.value);
@@ -738,7 +744,7 @@ export default function DevoteePage() {
                                 </span>
                                 <span className="p-float-label">
                                     <Calendar
-                                        inputId="children_3_dob"
+                                        inputId="children_3_dob" disabled={readOnly}
                                         name="children_3_dob"
                                         dateFormat="dd/mm/yy" maxDate={new Date()}
                                         value={formik.values?.children_3_dob}
@@ -754,7 +760,7 @@ export default function DevoteePage() {
                                     <i className="pi pi-user"></i>
                                 </span>
                                 <span className="p-float-label">
-                                    <InputText id="children_4_name" maxLength={100}
+                                    <InputText id="children_4_name" maxLength={100} disabled={readOnly}
                                         value={formik.values?.children_4_name}
                                         onChange={(e) => {
                                             formik.setFieldValue("children_4_name", e.target.value);
@@ -768,7 +774,7 @@ export default function DevoteePage() {
                                 </span>
                                 <span className="p-float-label">
                                     <Calendar
-                                        inputId="children_4_dob"
+                                        inputId="children_4_dob" disabled={readOnly}
                                         name="children_4_dob"
                                         dateFormat="dd/mm/yy" maxDate={new Date()}
                                         value={formik.values?.children_4_dob}
@@ -785,7 +791,7 @@ export default function DevoteePage() {
                     <Fieldset legend={<span>Skills (as many as possible)<i className="pi pi-wrench pl-2"></i></span>} toggleable collapsed >
                         <div className="p-inputgroup mt-3">
                             <span className="p-float-label">
-                                <AutoComplete id="skills" multiple
+                                <AutoComplete id="skills" multiple disabled={readOnly}
                                     value={formik.values?.skills}
                                     suggestions={filteredSkills}
                                     completeMethod={skillsSearch}
@@ -813,7 +819,7 @@ export default function DevoteePage() {
                                 <i className="pi pi-mobile"></i>
                             </span>
                             <span className="p-float-label">
-                                <InputText id="phone_whatsapp" maxLength={14} keyfilter="int" disabled={!formik.values?.whatsapp_consent}
+                                <InputText id="phone_whatsapp" maxLength={14} keyfilter="int" disabled={readOnly || !formik.values?.whatsapp_consent}
                                     value=
                                     {
                                         !formik.values?.whatsapp_consent ? '' :

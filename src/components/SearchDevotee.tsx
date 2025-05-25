@@ -1,8 +1,9 @@
-'use client'
+"use client";
 
 import { SYSTEM_ROLES } from "@/data/constants";
 import { useAuth } from "@/hooks/useAuth";
-import api from "@/lib/axios"; // our Custom Axios Wrapper which automatically adds access token in header
+import api from "@/lib/axios";      // our Custom Axios Wrapper which automatically adds access token in header
+import { useRouter } from 'next/navigation';
 import { BlockUI } from "primereact/blockui";
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
@@ -16,6 +17,7 @@ export default function SearchDevotee() {
     const [searchInProgress, setSearchInProgress] = useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [searchResult, setSearchResult] = useState<object | null>(null);
+    const router = useRouter();
 
     const msgs = useRef<Messages>(null);
 
@@ -123,7 +125,7 @@ export default function SearchDevotee() {
                                                 systemRole !== SYSTEM_ROLES.volunteer &&
                                                 <Button
                                                     label="View Details"
-                                                    onClick={() => alert('aa')}
+                                                    onClick={() => router.push(`/devotee?devoteeId=${devoteeDetails?.id}`)}
                                                     size="small"
                                                     severity="warning"
                                                 />
