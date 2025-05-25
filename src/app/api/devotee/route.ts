@@ -41,3 +41,42 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
 }
+
+export async function GET(req: NextRequest) {
+  try {
+    const { searchParams } = new URL(req.url);
+    if (!searchParams || searchParams.size === 0) {
+        return Response.json({ error: 'Query Params are missing in api request' }, { status: 400 });
+    }
+    
+    // Get the search term from query parameters
+    const devoteeId = Number.parseInt(searchParams.get('devoteeId')!);
+    if (!devoteeId) {
+        return Response.json({ error: 'id of the devotee is required' }, { status: 400 });
+    }
+
+    const devotee = await prisma.devotees.findUnique({ 
+      where: { id: devoteeId },
+      include: {
+        system_roles: {
+          select: {
+            name: true,
+          },
+        },
+        spiritual_levels: {
+          select: {
+            title_male: true,
+            title_female: true,
+            title_other: true
+          }
+        }
+      }, 
+    });
+    
+    if (!devotee) throw new Error();
+
+    return NextResponse.json({ devotee });
+  } catch {
+    return NextResponse.json({ error: 'Server error or Invalid query param' }, { status: 500 });;
+  }
+}

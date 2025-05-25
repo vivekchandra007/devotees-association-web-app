@@ -22,7 +22,7 @@ import { Toast } from "primereact/toast";
 import { MessageSeverity } from "primereact/api";
 import { ProgressBar } from "primereact/progressbar";
 import { devotees } from "@prisma/client";
-import { convertDateObjectIntoDateString } from "@/lib/conversions";
+import { convertDateObjectIntoDateString, convertDateStringIntoDateObject } from "@/lib/conversions";
 import FullPageSpinner from "@/components/FullPageSpinner";
 import ProfileCompletionMeter from "@/components/ProfileCompletionMeter";
 import { useSearchParams } from "next/navigation";
@@ -31,11 +31,12 @@ export default function DevoteePage() {
     const searchParams = useSearchParams();
     const toast = useRef<Toast>(null);
     const { devotee, isAuthenticated } = useAuth();
-    const devoteeId = Number.parseInt(searchParams.get('devoteeId')!);
-    const self: boolean = devotee?.id === devoteeId;
+    const otherDevoteeId = Number.parseInt(searchParams.get('devoteeId')!);
 
+    const [readOnly, setReadOnly] = useState<boolean>();
+    const [inProgress, setInProgress] = useState<boolean>(false);
+    const [otherDevotee, setOtherDevotee] = useState<typeof devotee>();
 
-    const [readOnly] = useState<boolean>(!self);
     const [initialValues, setInitialValues] = useState<typeof devotee>();
     const [filteredSkills, setFilteredSkills] = useState<string[] | null[]>();
     const [filteredCities, setFilteredCities] = useState<string[] | null[]>();
@@ -148,12 +149,43 @@ export default function DevoteePage() {
     }
 
     useEffect(() => {
-        setInitialValues(devotee);
-    }, [devotee])
+        if (!otherDevoteeId) {
+            setInitialValues(devotee);
+            setReadOnly(false);
+        } else if (otherDevoteeId) {
+            const fetchDevotee = async () => {
+                try {
+                    setInProgress(true);
+                    const res = await api.get(`/devotee?devoteeId=${otherDevoteeId}`); // automatically sends token 
+                    if (res && res.status === 200 && res.data?.devotee) {
+                        const parsedOtherDevotee = convertDateStringIntoDateObject(res.data.devotee);
+                        setOtherDevotee(parsedOtherDevotee);
+                        setInitialValues(parsedOtherDevotee);
+                    } else {
+                        throw new Error();
+                    }
+                    setInProgress(true);
+                } catch {
+                    toast.current?.show({
+                        severity: MessageSeverity.ERROR,
+                        summary: `Devotee Details`,
+                        detail: 'Could not retrieve devotee details. Try refreshing page or go to Home page and try again after some time',
+                        life: 10000
+                    });
+                } finally {
+                    setInProgress(false);
+                }
+            }
+            setReadOnly(true);
+            fetchDevotee();
+        }
+    }, [devotee, otherDevoteeId])
 
     return (
         <div className="bg-white">
             {!isAuthenticated && devotee && <FullPageSpinner message="Hare Krishna! Fetching details..." />}
+
+            {inProgress && <FullPageSpinner message="Hare Krishna! Fetching details for the devotee..." />}
 
             {formik.isSubmitting && <FullPageSpinner message="Saving Changes" />}
 
@@ -174,7 +206,7 @@ export default function DevoteePage() {
                                 )
                                 :
                                 (
-                                    <ProfileCompletionMeter devotee={devotee} />
+                                    <ProfileCompletionMeter devotee={otherDevoteeId? otherDevotee:devotee} />
                                 )
                         }
                     </div>
@@ -473,7 +505,7 @@ export default function DevoteePage() {
                                 </span>
                                 <span className="p-float-label">
                                     <AutoComplete id="address_area" disabled={readOnly || !formik.values?.address_city}
-                                        value={formik.values?.address_area} 
+                                        value={formik.values?.address_area}
                                         suggestions={filteredAreas as null[]}
                                         completeMethod={areasSearch}
                                         onChange={(e) => formik.setFieldValue("address_area", e.value)} />
@@ -859,37 +891,40 @@ export default function DevoteePage() {
                         </div>
                     </Fieldset>
                 </div>
-                <div className="grid grid-cols-12 items-center pb-4 px-4">
-                    <div className="col-span-8 md:col-span-10 mt-4 ml-1">
-                        {
-                            formContainsError ?
-                                (
-                                    <small className="text-red-700">
-                                        <strong>Form contains errror. Please correct those and then save.</strong>
-                                    </small>
-                                )
-                                :
-                                (
-                                    <small>
-                                        <strong>Note: Phone Number</strong> can only be updated from User&nbsp;
-                                        <i className="pi pi-cog"></i>&nbsp;Settings Page because it needs verification via OTP.
-                                    </small>
-                                )
-                        }
+                {
+                    !readOnly &&
+                    <div className="grid grid-cols-12 items-center pb-4 px-4">
+                        <div className="col-span-8 md:col-span-10 mt-4 ml-1">
+                            {
+                                formContainsError ?
+                                    (
+                                        <small className="text-red-700">
+                                            <strong>Form contains errror. Please correct those and then save.</strong>
+                                        </small>
+                                    )
+                                    :
+                                    (
+                                        <small>
+                                            <strong>Note: Phone Number</strong> can only be updated from User&nbsp;
+                                            <i className="pi pi-cog"></i>&nbsp;Settings Page because it needs verification via OTP.
+                                        </small>
+                                    )
+                            }
+                        </div>
+                        <div className="col-span-4 md:col-span-2 mr-1 mt-4">
+                            <Button
+                                className="float-right"
+                                size="small"
+                                type="submit"
+                                label={formik.isSubmitting ? "Saving..." : "Save"}
+                                icon="pi pi-save"
+                                loading={formik.isSubmitting}
+                                disabled={!formik.dirty || formContainsError}
+                                raised
+                            />
+                        </div>
                     </div>
-                    <div className="col-span-4 md:col-span-2 mr-1 mt-4">
-                        <Button
-                            className="float-right"
-                            size="small"
-                            type="submit"
-                            label={formik.isSubmitting ? "Saving..." : "Save"}
-                            icon="pi pi-save"
-                            loading={formik.isSubmitting}
-                            disabled={!formik.dirty || formContainsError}
-                            raised
-                        />
-                    </div>
-                </div>
+                }
             </form>
             <Toast ref={toast} position="top-center" />
         </div>

@@ -116,7 +116,7 @@ export default function TopNavBar() {
     }
 
     function navigateToPage(page: string) {
-        if (pathname !== `/${page}`) {
+        if (pathname !== `/${page}` || searchParams.size > 0) {
             setIsNavigating(true);
             router.push(`/${page}`);
         }
