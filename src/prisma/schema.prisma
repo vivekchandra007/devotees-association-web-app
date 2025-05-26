@@ -66,6 +66,7 @@ model devotees {
   spiritual_levels             spiritual_levels @relation(fields: [spiritual_level], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_2")
   devotees                     devotees?        @relation("devoteesTodevotees", fields: [counsellor_id], references: [id], map: "fk_counsellor")
   other_devotees               devotees[]       @relation("devoteesTodevotees")
+  donations                    donations[]
 
   @@index([role_id], map: "fk_1")
   @@index([spiritual_level], map: "fk_2")
@@ -92,6 +93,27 @@ model spiritual_levels {
   created_at      DateTime   @default(now()) @db.Timestamp(0)
   updated_at      DateTime   @default(now()) @db.Timestamp(0)
   devotees        devotees[]
+}
+
+model donations {
+  id                      String    @id @db.VarChar(100)
+  donation_receipt_number String    @db.VarChar(100)
+  name                    String?   @db.VarChar(100)
+  phone                   String?   @db.VarChar(21)
+  cost_center             String?   @db.VarChar(100)
+  scheme_name             String?   @db.VarChar(100)
+  payment_mode            String?   @db.VarChar(20)
+  amount                  Int       @db.UnsignedInt
+  instrument_number       String?   @db.VarChar(100)
+  collected_by            String?   @db.VarChar(100)
+  status                  String    @default("Not Verified") @db.VarChar(21)
+  date                    DateTime? @default(dbgenerated("'CURRENT_DATE'")) @db.Date
+  internal_note           String?   @db.Text
+  created_at              DateTime  @default(now()) @db.Timestamp(0)
+  updated_at              DateTime  @default(now()) @db.Timestamp(0)
+  devotees                devotees? @relation(fields: [phone], references: [phone], map: "fk_donations_phone")
+
+  @@index([phone], map: "fk_donations_phone")
 }
 
 enum devotees_status {

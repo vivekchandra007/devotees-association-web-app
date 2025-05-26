@@ -80,7 +80,6 @@ export default function Home() {
         localStorage.setItem(LOCAL_STORAGE_STEPS_COMPLETED, "true");
       }
     }
-    console.log("In hide, stepsCompleted: " + stepsCompleted);
     window.scrollTo(0, 0);
   }
 

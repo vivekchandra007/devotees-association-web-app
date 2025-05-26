@@ -7,6 +7,7 @@ import SearchDevotee from "@/components/SearchDevotee";
 import { useEffect } from "react";
 import { SYSTEM_ROLES } from "@/data/constants";
 import { useRouter } from "next/navigation";
+import DonationsDashboard from "@/components/DonationsDashboard";
 
 export default function DevoteesPage() {
     const { isAuthenticated, systemRole } = useAuth();
@@ -36,7 +37,7 @@ export default function DevoteesPage() {
                             A consolidated place for all the donations data
                         </small>
                         <div className="min-h-screen">
-
+                            <DonationsDashboard />
                         </div>
                     </div>
                 </TabPanel>

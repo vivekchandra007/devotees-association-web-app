@@ -44,3 +44,12 @@ export function convertDateObjectIntoDateString(devoteeDetails: Devotee) {
     }
     return devoteeDetails;
 }
+
+export function parseDateFromStringddmmyyyy(dateStr: string): Date | null {
+  const [day, month, year] = dateStr.split('/').map(Number);
+
+  if (!day || !month || !year) return null;
+
+  // Month is 0-based in JavaScript Date
+  return new Date(year, month - 1, day);
+};
