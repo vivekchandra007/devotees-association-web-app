@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
                         }
                     },
                     {
-                        amount: query ? parseInt(query, 10) : undefined, // Convert query to number if it's a valid number
+                        amount: parseInt(query, 10) || 0, // Convert query to number if it's a valid number
                     }
                 ]
             },
