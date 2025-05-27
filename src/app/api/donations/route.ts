@@ -8,24 +8,46 @@ export async function GET(req: NextRequest) {
     }
 
     // Get the phone number from query parameters
-    const phone = searchParams.get('phone') || '';
-    if (!phone) {
+    const query = searchParams.get('query') || '';
+    if (!query) {
         return getAllDonations();
     }
     try {
         const donations = await prisma.donations.findMany({
             where: {
-                phone: phone
+                OR: [
+                    {
+                        id: {
+                            contains: query,
+                        }
+                    },
+                    {
+                        phone: {
+                            contains: query,
+                        }
+                    },
+                    {
+                        name: {
+                            contains: query,
+                        }
+                    },
+                    {
+                        donation_receipt_number: {
+                            contains: query,
+                        }
+                    },
+                    {
+                        amount: query ? parseInt(query, 10) : undefined, // Convert query to number if it's a valid number
+                    }
+                ]
             },
-            select: {
-                id: true,
-                donation_receipt_number: true,
-                name: true,
-                payment_mode: true,
-                amount: true,
-                collected_by: true,
-                status: true,
-                date: true
+            include: {
+                devotees: {
+                    select: {
+                        id: true,
+                        name: true
+                    },
+                },
             },
             orderBy: {
                 date: 'desc'

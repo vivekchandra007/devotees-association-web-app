@@ -85,7 +85,7 @@ export default function SearchDevotee() {
                             }}
                         />
                         <label
-                            htmlFor="search-input">Type query and press enter or click 🔍 
+                            htmlFor="search-input">Type query and press enter or click 🔍
                         </label>
                     </span>
                     <Button
@@ -96,7 +96,22 @@ export default function SearchDevotee() {
                         type="submit"
                     />
                 </form>
-                <br />
+                {searchQuery && (
+                    <Button
+                        onClick={() => {
+                            setSearchQuery('');
+                            setSearchResult(null);
+                            msgs.current?.clear();
+                        }}
+                        icon="pi pi-times-circle"
+                        rounded
+                        text
+                        severity="contrast"
+                        tooltip="Clear Search"
+                        className="flex float-right bottom-[65px] right-[40px] z-1 text-gray-400 hover:text-gray-600"
+                        aria-label="Clear search"
+                    />
+                )}
                 <small>
                     <strong>Note:</strong>&nbsp;You can search a devotee by their name, phone number or email.
                 </small>
@@ -119,15 +134,23 @@ export default function SearchDevotee() {
                                                 <p><strong>Status:</strong> {devoteeDetails?.status}</p>
                                             }
                                             <p><strong>Role:</strong> {devoteeDetails?.system_roles?.name}</p>
-                                            {
-                                                // volunteers, leaders and admins can view full details of a devotee
+
+                                            {/* volunteers, leaders and admins can view full details of a devotee as well as their donations */}
+                                            <div className="grid grid-cols-2 gap-2 mt-3">
                                                 <Button
-                                                    label="View Details"
+                                                    outlined
+                                                    label="View Profile"
                                                     onClick={() => router.push(`/devotee?devoteeId=${devoteeDetails?.id}`)}
+                                                    size="small"
+                                                />
+                                                <Button
+                                                    outlined
+                                                    label="View Donations"
+                                                    onClick={() => router.push(`/insights?tab=1&devoteeId=${devoteeDetails?.id}`)}
                                                     size="small"
                                                     severity="warning"
                                                 />
-                                            }
+                                            </div>
                                         </Card>
                                     </BlockUI>
                                 ))

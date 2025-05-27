@@ -11,6 +11,12 @@ import { MessageSeverity } from "primereact/api";
 import { Prisma } from '@prisma/client';
 import _ from "lodash";
 import { parseDateFromStringddmmyyyy } from '@/lib/conversions'
+import { ProgressBar } from 'primereact/progressbar'
+import { useAuth } from '@/hooks/useAuth'
+import { SYSTEM_ROLES } from '@/data/constants'
+import { Button } from 'primereact/button'
+import { InputText } from 'primereact/inputtext'
+import { Messages } from 'primereact/messages'
 
 type Donation = Prisma.donationsGetPayload<{
   include: {
@@ -24,8 +30,17 @@ type Donation = Prisma.donationsGetPayload<{
 }>;
 
 export default function DonationsDashboard() {
-  const [donations, setDonations] = useState<Donation[]>([])
+  const { devotee, systemRole } = useAuth();
+  const [inProgress, setInProgress] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [donations, setDonations] = useState<Donation[] | null>([]);
+  const [allDonations, setAllDonations] = useState<Donation[] | null>([]);
   const toast = useRef<Toast>(null);
+  const msgs = useRef<Messages>(null);
+
+  const errorMessage = (
+    <small>No donations found for this devotee. Clear search to view donations from all devotees.</small>
+  );
 
   const handleUpload = async (e: FileUploadFilesEvent) => {
     const file = e.files[0]
@@ -92,8 +107,19 @@ export default function DonationsDashboard() {
   }
 
   const fetchDonations = async () => {
-    const res = await api.get('/donations')
-    setDonations(res.data)
+    try {
+      setInProgress(true);
+      // Fetch all donations
+      const res = await api.get('/donations')
+      setDonations(res.data);
+      setAllDonations(res.data);
+    } catch {
+      msgs.current?.clear();
+      msgs.current?.show({ id: '1', sticky: true, severity: 'error', summary: 'Error fetching donations. Please try again.', closable: true });
+      setDonations(null); // Reset donations to null if there's an error
+    } finally {
+      setInProgress(false);
+    }
   }
 
   const nameWithLink = (rowData: Donation) => {
@@ -104,34 +130,141 @@ export default function DonationsDashboard() {
     );
   };
 
+  async function handleSearch(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    // This function will be called when the search button is clicked
+    if (!searchQuery.trim()) {
+      setDonations(allDonations);
+      return;
+    }
+
+    if (!inProgress) {
+      setInProgress(true);
+      // Make an API call to fetch the search results
+      await api.get('/donations', {
+        params: {
+          query: searchQuery.trim(),
+        },
+      }).then((response) => {
+        if (response.status === 200) {
+          if (response.data.length > 0) {
+            setDonations(response.data);
+          } else {
+            setDonations(null);
+            msgs.current?.clear();
+            msgs.current?.show({ id: '1', sticky: true, severity: 'error', summary: 'Error', content: errorMessage, closable: true });
+          }
+        } else {
+          msgs.current?.show({ id: '1', sticky: true, severity: 'error', summary: 'Error while searching. Please try again.', closable: true });
+          setDonations(null);
+        }
+      }
+      ).catch(() => {
+        msgs.current?.show({ id: '1', sticky: true, severity: 'error', summary: 'Error while searching. Please try again.', closable: true });
+        setDonations(null);
+      }).finally(() => {
+        setInProgress(false);
+      });
+    }
+  }
+
   useState(() => {
     fetchDonations()
   })
 
   return (
-    <div className="p-4 space-y-4">
-      <h2 className="text-xl font-bold">Donations Upload & Records</h2>
+    <div className='p-3'>
+      <strong className="text-general">Donations Dashboard</strong>
+      {
+        inProgress ?
+          <ProgressBar mode="indeterminate" style={{ height: '2px' }} className="pt-1"></ProgressBar>
+          :
+          <hr />
+      }
+      <small className="text-general">
+        A consolidated place for all the donations data. At your role level, {devotee?.name}, you have the privileges to:
+        <ol>
+          <li key="1"><strong className="text-hover">View</strong> all the donations data.</li>
+          {
+            systemRole === SYSTEM_ROLES.admin &&
+            <li key="2"><strong className="text-hover">Upload</strong> donations data in bulk using Excel sheet</li>
+          }
+        </ol>
+      </small>
+      <div className="min-h-screen">
+        <div className="p-4 space-y-4">
+          {
+            systemRole === SYSTEM_ROLES.admin &&
+            <div>
+              <h2 className="text-xl font-bold">Bulk Insert Donations Data</h2>
+              <FileUpload
+                name="excel"
+                mode="advanced"
+                auto
+                chooseLabel="Upload Excel"
+                customUpload
+                uploadHandler={handleUpload}
+                accept=".xlsx, .xls"
+                emptyTemplate={<p className="m-0">Drag and drop Donations Excel file here</p>}
+              />
+            </div>
+          }
 
-      <FileUpload
-        name="excel"
-        mode="advanced"
-        auto
-        chooseLabel="Upload Excel"
-        customUpload
-        uploadHandler={handleUpload}
-        accept=".xlsx, .xls"
-        emptyTemplate={<p className="m-0">Drag and drop donation Excel here</p>}
-      />
-
-      <DataTable value={donations} paginator rows={10} stripedRows responsiveLayout="scroll">
-        <Column field="id" header="ID" />
-        <Column field="amount" header="Amount" />
-        <Column field="phone" header="Phone Number" />
-        <Column header="Name" body={nameWithLink} />
-        <Column field="payment_mode" header="Mode" />
-        <Column field="internal_note" header="Note" />
-      </DataTable>
-      <Toast ref={toast} position="bottom-center" />
+          <form onSubmit={handleSearch} className="p-inputgroup text-sm mt-7 w-full">
+            <span className="p-float-label">
+              <InputText id="search-input" required maxLength={50}
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  msgs.current?.clear();
+                }}
+              />
+              <label
+                htmlFor="search-input">Type query and press enter or click 🔍
+              </label>
+            </span>
+            <Button
+              icon="pi pi-search"
+              severity="secondary"
+              aria-label="Search"
+              size="small"
+              type="submit"
+            />
+          </form>
+          {searchQuery && (
+            <Button
+              onClick={() =>  {
+                setSearchQuery('');
+                setDonations(allDonations);
+                msgs.current?.clear();
+              }}
+              icon="pi pi-times-circle"
+              rounded
+              text
+              severity="contrast"
+              tooltip="Clear Search"
+              className="flex float-right bottom-[65px] right-[40px] z-1 text-gray-400 hover:text-gray-600"
+              aria-label="Clear search"
+            />
+          )}
+          <small>
+            <strong>Note:</strong>&nbsp;You can search a donation by it&apos;s id, donation_receipt_number, phone number or name of donor, or donation amount
+          </small>
+          {
+            donations && Array.isArray(donations) && donations.length > 0 &&
+            <DataTable value={donations} paginator rows={10} stripedRows responsiveLayout="scroll">
+              <Column field="id" header="ID" />
+              <Column field="amount" header="Amount" />
+              <Column field="phone" header="Phone Number" />
+              <Column header="Name" body={nameWithLink} />
+              <Column field="payment_mode" header="Mode" />
+              <Column field="internal_note" header="Note" />
+            </DataTable>
+          }
+          <Messages ref={msgs} />
+          <Toast ref={toast} position="bottom-center" />
+        </div>
+      </div>
     </div>
   )
 }

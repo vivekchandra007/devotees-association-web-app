@@ -21,6 +21,7 @@ import Kripa from '@/components/kripa';
 export default function Home() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [activeIndex, setActiveIndex] = useState<number>(0);
   const { devotee, isAuthenticated } = useAuth();
   const guestMode: boolean | null = !devotee;
   const LOCAL_STORAGE_STEPS_COMPLETED = "stepsCompleted";
@@ -121,8 +122,16 @@ export default function Home() {
         // in case of Guest Mode, always show the repetitive welcome message at coded intervals
         showRepetitiveWelcomeMessageInGuestMode();
       }
+
+      const initialTabIndex: string | null = searchParams.get('tab');
+      if (initialTabIndex) {
+        const index = parseInt(initialTabIndex, 10);
+        if (!isNaN(index) && index >= 0 && index < 4) {
+          setActiveIndex(index);
+        }
+      }
     }
-  }, [guestMode]);
+  }, [guestMode, searchParams]);
 
   return (
     <>
@@ -146,7 +155,7 @@ export default function Home() {
           </i>
         </Button>
       </span>
-      <TabView className="w-full home-page-tabs">
+      <TabView className="w-full home-page-tabs" activeIndex={activeIndex} onTabChange={(e) => router.push(`/?tab=${e.index}`)}>
         <TabPanel header="Prernā" leftIcon="pi pi-youtube mr-2">
           <div className='p-3'>
             <strong className="text-general">Prernā Sāgar</strong>
