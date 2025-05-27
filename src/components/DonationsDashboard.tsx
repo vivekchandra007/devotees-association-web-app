@@ -129,6 +129,11 @@ export default function DonationsDashboard() {
       </a>
     );
   };
+  const amountFormatted = (rowData: Donation) => {
+    return (
+      <span className="text-general">{rowData.amount ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(rowData.amount) : 'N/A'}</span>
+    );
+  };
 
   async function handleSearch(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -192,78 +197,90 @@ export default function DonationsDashboard() {
         </ol>
       </small>
       <div className="min-h-screen">
-        <div className="p-4 space-y-4">
-          {
-            systemRole === SYSTEM_ROLES.admin &&
-            <div>
-              <h2 className="text-xl font-bold">Bulk Insert Donations Data</h2>
-              <FileUpload
-                name="excel"
-                mode="advanced"
-                auto
-                chooseLabel="Upload Excel"
-                customUpload
-                uploadHandler={handleUpload}
-                accept=".xlsx, .xls"
-                emptyTemplate={<p className="m-0">Drag and drop Donations Excel file here</p>}
-              />
-            </div>
-          }
-
-          <form onSubmit={handleSearch} className="p-inputgroup text-sm mt-7 w-full">
-            <span className="p-float-label">
-              <InputText id="search-input" required maxLength={50}
-                value={searchQuery}
-                onChange={(e) => {
-                  setSearchQuery(e.target.value);
-                  msgs.current?.clear();
-                }}
-              />
-              <label
-                htmlFor="search-input">Type query and press enter or click 🔍
-              </label>
-            </span>
-            <Button
-              icon="pi pi-search"
-              severity="secondary"
-              aria-label="Search"
-              size="small"
-              type="submit"
+        {
+          systemRole === SYSTEM_ROLES.admin &&
+          <div>
+            <h2 className="text-xl font-bold">Bulk Insert Donations Data</h2>
+            <FileUpload
+              name="excel"
+              mode="advanced"
+              auto
+              chooseLabel="Upload Excel"
+              customUpload
+              uploadHandler={handleUpload}
+              accept=".xlsx, .xls"
+              emptyTemplate={<p className="m-0">Drag and drop Donations Excel file here</p>}
             />
-          </form>
-          {searchQuery && (
-            <Button
-              onClick={() =>  {
-                setSearchQuery('');
-                setDonations(allDonations);
+          </div>
+        }
+        <form onSubmit={handleSearch} className="p-inputgroup text-sm mt-4 w-full">
+          <span className="p-float-label">
+            <InputText id="search-input" required maxLength={50}
+              value={searchQuery}
+              onChange={(e) => {
+                setSearchQuery(e.target.value);
                 msgs.current?.clear();
               }}
-              icon="pi pi-times-circle"
-              rounded
-              text
-              severity="contrast"
-              tooltip="Clear Search"
-              className="flex float-right bottom-[65px] right-[40px] z-1 text-gray-400 hover:text-gray-600"
-              aria-label="Clear search"
             />
-          )}
-          <small>
-            <strong>Note:</strong>&nbsp;You can search a donation by it&apos;s id, donation_receipt_number, phone number or name of donor, or donation amount
-          </small>
-          {
-            donations && Array.isArray(donations) && donations.length > 0 &&
-            <DataTable value={donations} paginator rows={10} stripedRows responsiveLayout="scroll">
+            <label
+              htmlFor="search-input">Type query and press enter or click 🔍
+            </label>
+          </span>
+          <Button
+            icon="pi pi-search"
+            severity="secondary"
+            aria-label="Search"
+            size="small"
+            type="submit"
+          />
+        </form>
+        {searchQuery && (
+          <Button
+            onClick={() => {
+              setSearchQuery('');
+              setDonations(allDonations);
+              msgs.current?.clear();
+            }}
+            icon="pi pi-times-circle"
+            rounded
+            text
+            severity="contrast"
+            title="Clear Search"
+            className="flex float-right bottom-[48px] right-[40px] z-1 text-gray-400 hover:text-gray-600"
+            aria-label="Clear search"
+          />
+        )}
+        <small>
+          <strong>Note:</strong>&nbsp;You can search a donation by it&apos;s id, donation_receipt_number, phone number or name of donor, or donation amount
+        </small>
+        {
+          donations && Array.isArray(donations) && donations.length > 0 &&
+          <div className="card overflow-x-auto max-w-[90vw] mt-4">
+            <small className="text-general">
+              Total Donations: {allDonations?.length}
+              {devotee && <span className="ml-2"> | Your Donations: {allDonations?.filter(d => d.phone === devotee.phone).length}</span>}
+            </small>
+            <br />
+            <small className="text-general">
+              Note: Donations are sorted by date in descending order, with the most recent donations appearing first.
+            </small>
+            <br />
+            <small className="text-general">
+              You can click on the name of the donor to view their details.
+            </small>
+            <br />
+            <DataTable value={donations} paginator rows={10} stripedRows size="small">
               <Column field="id" header="ID" />
-              <Column field="amount" header="Amount" />
+              <Column header="Amount" body={amountFormatted} />
               <Column field="phone" header="Phone Number" />
               <Column header="Name" body={nameWithLink} />
               <Column field="payment_mode" header="Mode" />
               <Column field="internal_note" header="Note" />
             </DataTable>
-          }
-          <Messages ref={msgs} />
-          <Toast ref={toast} position="bottom-center" />
-        </div>
+          </div>
+        }
+        <Messages ref={msgs} />
+        <Toast ref={toast} position="bottom-center" />
       </div>
     </div>
   )

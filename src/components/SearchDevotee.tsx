@@ -75,7 +75,7 @@ export default function SearchDevotee() {
                 {devotee?.name}, at your role level, you have the privileges to <strong className="text-hover">search</strong> a devotee registered within this portal. It may be to <strong className="text-hover">help</strong> them or even <strong className="text-hover">refer</strong> them to this portal, if they are not already registered.
             </small>
             <div className="min-h-screen">
-                <form onSubmit={handleSearch} className="p-inputgroup text-sm mt-7 w-full">
+                <form onSubmit={handleSearch} className="p-inputgroup text-sm mt-4 w-full">
                     <span className="p-float-label">
                         <InputText id="search-input" required maxLength={50}
                             value={searchQuery}
@@ -107,8 +107,8 @@ export default function SearchDevotee() {
                         rounded
                         text
                         severity="contrast"
-                        tooltip="Clear Search"
-                        className="flex float-right bottom-[65px] right-[40px] z-1 text-gray-400 hover:text-gray-600"
+                        title="Clear Search"
+                        className="flex float-right bottom-[48px] right-[40px] z-1 text-gray-400 hover:text-gray-600"
                         aria-label="Clear search"
                     />
                 )}
