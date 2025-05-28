@@ -282,7 +282,7 @@ export default function DonationsDashboard() {
         />
       )}
       <small>
-        <strong>Note:</strong>&nbsp;You can search a donation by it&apos;s id, donation_receipt_number, phone number of donot, name of donor, or donation amount
+        <strong>Note:</strong>&nbsp;You can search a donation by it&apos;s id, donation_receipt_number, phone number of donor, name of donor, or donation amount
       </small>
       {
         donations && Array.isArray(donations) && donations.length > 0 &&
