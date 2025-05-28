@@ -75,7 +75,7 @@ async function getAllDonations() {
             orderBy: {
                 date: 'desc'
             },
-            take: 100, // Limit the results to 100
+            take: 10000, // Limit the results to 100
         });
         return Response.json(donations, { status: 200 });
     } catch (error) {
