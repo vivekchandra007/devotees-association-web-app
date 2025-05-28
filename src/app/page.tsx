@@ -4,85 +4,27 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRouter, useSearchParams } from "next/navigation";
 import FullPageSpinner from '@/components/FullPageSpinner';
 import { Button } from 'primereact/button';
-import ProfileCompletionMeter from '@/components/ProfileCompletionMeter';
-import Image from "next/image";
 import Referrals from '@/components/Referrals';
 import { Dialog } from 'primereact/dialog';
 import { useEffect, useState } from 'react';
 import { InputText } from 'primereact/inputtext';
 import api from "@/lib/axios";              // our Custom Axios Wrapper which automatically adds access token in header
 import YouTubeMosaic from '@/components/YouTubeMosaic';
-import { Checkbox } from 'primereact/checkbox';
 import { TabView, TabPanel } from 'primereact/tabview';
-import { classNames } from 'primereact/utils';
-import { Badge } from 'primereact/badge';
 import Kripa from '@/components/kripa';
 
 export default function Home() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const guestMode: boolean | null = searchParams.get('guest') === 'true';
+
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const { devotee, isAuthenticated } = useAuth();
-  const guestMode: boolean | null = !devotee;
-  const LOCAL_STORAGE_STEPS_COMPLETED = "stepsCompleted";
-  const [showWelcomeDialogue, setShowWelcomeDialogue] = useState<boolean>(true);
+  
   const [showReferralModal, setShowReferralModal] = useState<boolean>(false);
-  const [stepsCompleted, setStepsCompleted] = useState<boolean>(false);
   const [devoteeName, setDevoteeName] = useState<string>('');
   const [savingName, setSavingName] = useState<boolean>(false);
 
-  const steps: number = guestMode ? 3 : 4;
-
-  const title = (
-    <small className="text-text">
-      ॥ हरे कृष्ण ॥
-      <br />
-      {devotee?.initiated_name || devotee?.name}{devotee?.gender ? `, ${devotee.spiritual_levels[`title_${devotee?.gender}`]}` : ''} 🙏🏻
-    </small>
-  );
-
-  const guestModeFooter = (
-    <div className="w-full text-left">
-      <small>
-        <strong>Note: We recommed you complete all the above steps at earliest, especially Step 3 to register and create profile, to enjoy seamless and blissfull experience.</strong>
-      </small>
-    </div>
-  )
-
-  const footer = (
-    <div className={classNames('grid items-center mt-5', stepsCompleted ? "grid-cols-12" : "")}>
-      <div className={classNames('text-left', stepsCompleted ? "col-span-6" : "")}>
-        <small onClick={() => setStepsCompleted(!stepsCompleted)} className="cursor-pointer">
-          <Checkbox
-            checked={stepsCompleted}>
-          </Checkbox>
-          &nbsp;&nbsp;&nbsp;I have completed all the above {steps} steps.
-        </small>
-      </div>
-      {
-        stepsCompleted &&
-        <div className="col-span-6">
-          <Button
-            size="small"
-            onClick={() => hideWelcomeMessage(true)}
-            label="Don&apos;t show this message again."
-            severity="danger"
-            raised
-          />
-        </div>
-      }
-    </div>
-  );
-
-  function hideWelcomeMessage(stepsCompleted?: boolean) {
-    setShowWelcomeDialogue(false);
-    if (stepsCompleted) {
-      if (typeof window !== 'undefined') {
-        localStorage.setItem(LOCAL_STORAGE_STEPS_COMPLETED, "true");
-      }
-    }
-    window.scrollTo(0, 0);
-  }
 
   async function saveDevoteeName() {
     if (devotee && devoteeName) {
@@ -95,34 +37,8 @@ export default function Home() {
     }
   }
 
-  function showRepetitiveWelcomeMessageInGuestMode() {
-    if (typeof window !== 'undefined') {
-      const stepsDone = !!Boolean(localStorage.getItem(LOCAL_STORAGE_STEPS_COMPLETED));
-      if (guestMode || !stepsDone) {
-        const repetiionTime = guestMode ? (1000 * 60 * 4) : (1000 * 60 * 21)        // 2 minutes in guestMode and 21 minutes in logged in mode
-        // insist user to complete steps by showing welcome dialogue
-        setShowWelcomeDialogue(true);
-        setTimeout(() => {
-          showRepetitiveWelcomeMessageInGuestMode();
-        }, repetiionTime);
-      }
-    }
-  }
-
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const stepsDone = !!Boolean(localStorage.getItem(LOCAL_STORAGE_STEPS_COMPLETED));
-      if (!guestMode) {
-        setStepsCompleted(stepsDone);
-        setShowWelcomeDialogue(!stepsDone);
-        if (!stepsDone) {
-          showRepetitiveWelcomeMessageInGuestMode();
-        }
-      } else {
-        // in case of Guest Mode, always show the repetitive welcome message at coded intervals
-        showRepetitiveWelcomeMessageInGuestMode();
-      }
-
       const initialTabIndex: string | null = searchParams.get('tab');
       if (initialTabIndex) {
         const index = parseInt(initialTabIndex, 10);
@@ -131,7 +47,7 @@ export default function Home() {
         }
       }
     }
-  }, [guestMode, searchParams]);
+  }, [searchParams]);
 
   return (
     <>
@@ -139,22 +55,6 @@ export default function Home() {
         !guestMode && !isAuthenticated && 
         <FullPageSpinner message="Hare Krishna! Fetching your details..." />
       }
-      <span className={classNames("absolute right-0 md:right-2 z-1", guestMode? 'top-[7vh] md:top-[8.8vh]' : 'top-[17vh] md:top-[13.5vh]')}>
-        <Button
-          rounded
-          raised
-          className="hover:animate-pulse"
-          severity="secondary"
-          aria-label="Steps"
-          size="small"
-          title="Open Welcome Page again to checkout mandatory Steps."
-          onClick={() => setShowWelcomeDialogue(true)}
-        >
-          <i className="pi pi-bell cursor-pointer text-white p-overlay-badge">
-            <Badge severity="danger" className="scale-50"></Badge>
-          </i>
-        </Button>
-      </span>
       <TabView className="w-full home-page-tabs" activeIndex={activeIndex} onTabChange={(e) => router.push(`/?tab=${e.index}`)}>
         <TabPanel header="Prernā" leftIcon="pi pi-youtube mr-2">
           <div className='p-3'>
@@ -206,119 +106,6 @@ export default function Home() {
       </TabView>
 
       <Dialog
-        header={title} keepInViewport closeOnEscape={!guestMode}
-        visible={showWelcomeDialogue}
-        footer={guestMode ? guestModeFooter : (typeof window !== 'undefined' && !Boolean(localStorage.getItem(LOCAL_STORAGE_STEPS_COMPLETED)) && footer)}
-        onHide={() => hideWelcomeMessage()}
-        className="shadow-2xl w-full md:w-[75vw] lg:w-[45vw] text-center text-text size-fit m-auto">
-        <div>
-          <small className="block text-text mb-4">
-            Congratulations! Thanks to your devotion, we are getting a new beautiful temple in Baner, Pune
-          </small>
-          <div className="text-text">
-            <strong className="font-bilbo md:text-4xl">Shri Shri <span className="text-7xl text-special">Radha Krishna</span>&nbsp;Temple</strong>
-          </div>
-          <Image
-            className="m-auto"
-            src="/chant-and-be-happy.png"
-            alt="Devotees' Association"
-            width={200}
-            height={214}
-            priority
-          />
-          <br />
-          <small className="text-text">
-            So, now it&apos;s your turn.
-            <br />
-            Let&apos;s build it brick by brick, step by step
-          </small>
-          <br /><br />
-          <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
-            <div className="col-span-8 md:col-span-10 text-left">
-              <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
-              <small className="text-text"><strong className="text-hover">Step 1:</strong> A Once-In-A-Lifetime, divine chance to dearly serve Shri Shri Radha Krishna — build their eternal home in your area. Do Not Miss. Donate today.</small>
-            </div>
-            <div className="col-span-4 md:col-span-2 mr-1">
-              <Button label="" severity="warning" raised size="small" className="float-right"
-                icon="pi pi-indian-rupee"
-                onClick={() => window.open("https://iskconpunebcec.com/#/newtemple")}>
-                  <Badge severity="warning" value="▸" className="scale-150"></Badge>
-              </Button>
-            </div>
-          </div>
-          <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
-            <div className="col-span-8 md:col-span-10 text-left">
-              <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
-              <small className="text-text"><strong className="text-hover">Step 2:</strong> Join our Whatsapp group to stay updated with the latest news and events.</small>
-            </div>
-            <div className="col-span-4 md:col-span-2 mr-1">
-              <Button label="" severity="success" raised size="small" className="float-right"
-                icon="pi pi-whatsapp"
-                onClick={() => alert('Link to a Whatsapp group')}>
-                  <Badge severity="success" value="▸" className="scale-150"></Badge>
-              </Button>
-            </div>
-          </div>
-          {
-            guestMode ?
-              (
-                <>
-                  <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
-                    <div className="col-span-8 md:col-span-10 text-left">
-                      <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
-                      <small className="text-text"><strong className="text-hover">Step 3:</strong> Create Profile, Get Gifts on your special occassions, Track your Donations, Offer online Prayers and Associate with Devotees. All at one place.</small>
-                    </div>
-                    <div className="col-span-4 md:col-span-2 mr-1">
-                      <Button label="" severity="danger" raised size="small" className="float-right"
-                        icon="pi pi-crown"
-                        onClick={() => router.push(`/login${searchParams ? `?${searchParams}` : ''}`)} >
-                          <Badge severity="danger" value="▸" className="scale-150"></Badge>
-                      </Button>
-                    </div>
-                  </div>
-                </>
-              ) :
-              (
-                <>
-                  <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
-                    <div className="col-span-8 md:col-span-10 text-left">
-                      <div className="grid grid-cols-12 items-center">
-                        <div className="col-span-8 md:col-span-7 text-left">
-                          <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
-                          <small className="text-text"><strong className="text-hover">Step 3:</strong> Keep your profile 100% and upto date</small>
-                        </div>
-                        <div className="col-span-4 md:col-span-5">
-                          <ProfileCompletionMeter devotee={devotee} />
-                        </div>
-                      </div>
-                    </div>
-                    <div className="col-span-4 md:col-span-2 mr-1">
-                      <Button label="" severity="info" raised size="small" className="float-right"
-                        icon="pi pi-user-edit"
-                        onClick={() => router.push('/devotee')}>
-                          <Badge severity="info" value="▸" className="scale-150"></Badge>
-                      </Button>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
-                    <div className="col-span-8 md:col-span-10 text-left">
-                      <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
-                      <small className="text-text"><strong className="text-hover">Step 4:</strong> Let&apos;s Spread the word. Refer Others and become a spiritual catalyst in their life.</small>
-                    </div>
-                    <div className="col-span-4 md:col-span-2 mr-1">
-                      <Button label="" severity="secondary" raised size="small" className="float-right"
-                        icon="pi pi-share-alt"
-                        onClick={() => setShowReferralModal(true)} >
-                          <Badge severity="secondary" value="▸" className="scale-150"></Badge>
-                      </Button>
-                    </div>
-                  </div>
-                </>
-              )
-          }
-        </div>
-      </Dialog>
-      <Dialog
         header="Referrals" keepInViewport
         visible={showReferralModal}
         onHide={() => setShowReferralModal(false)}>
@@ -329,7 +116,7 @@ export default function Home() {
       <Dialog
         header="What should we call you?" keepInViewport
         closeIcon="pi pi-crown"
-        visible={!guestMode && !!devotee && !devotee.name}
+        visible={!!devotee && !devotee.name}
         footer={
           (
             <div className="grid grid-cols-12 items-center">
