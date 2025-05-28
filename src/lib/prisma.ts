@@ -3,7 +3,7 @@
 import { PrismaClient } from '@prisma/client';
 
 // Extend the globalThis interface to include a prisma property
-const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
+const globalForPrisma = globalThis as unknown as { prisma: PrismaClient | undefined };
 
 export const prisma =
   globalForPrisma.prisma ||
