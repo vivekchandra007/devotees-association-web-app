@@ -22,8 +22,6 @@ export async function POST(req: NextRequest) {
         if (!body || !donations || !Array.isArray(donations) || donations.length <= 0) {
             return NextResponse.json({ error: 'No donations found to bulk upload' }, { status: 401 });
         }
-
-        console.log(donations.length);
         
         for (let i = donations.length - 1; i >= 0; i--) {
             const donation = donations[i];

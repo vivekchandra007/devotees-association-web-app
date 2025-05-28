@@ -17,6 +17,7 @@ import { SYSTEM_ROLES } from '@/data/constants'
 import { Button } from 'primereact/button'
 import { InputText } from 'primereact/inputtext'
 import { Messages } from 'primereact/messages'
+import { Dialog } from 'primereact/dialog'
 
 type Donation = Prisma.donationsGetPayload<{
   include: {
@@ -32,6 +33,7 @@ type Donation = Prisma.donationsGetPayload<{
 export default function DonationsDashboard() {
   const { devotee, systemRole } = useAuth();
   const [inProgress, setInProgress] = useState<boolean>(false);
+  const [showBulkUploadDialogue, setShowBulkUploadDialogue] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [donations, setDonations] = useState<Donation[] | null>([]);
   const [allDonations, setAllDonations] = useState<Donation[] | null>([]);
@@ -178,7 +180,7 @@ export default function DonationsDashboard() {
   })
 
   return (
-    <div className='p-3'>
+    <div className='p-3 mih-h-screen'>
       <strong className="text-general">Donations Dashboard</strong>
       {
         inProgress ?
@@ -188,100 +190,109 @@ export default function DonationsDashboard() {
       }
       <small className="text-general">
         A consolidated place for all the donations data. At your role level, {devotee?.name}, you have the privileges to:
-        <ol>
-          <li key="1"><strong className="text-hover">View</strong> all the donations data.</li>
-          {
-            systemRole === SYSTEM_ROLES.admin &&
-            <li key="2"><strong className="text-hover">Upload</strong> donations data in bulk using Excel sheet</li>
-          }
-        </ol>
-      </small>
-      <div className="min-h-screen">
         {
           systemRole === SYSTEM_ROLES.admin &&
-          <div>
-            <h2 className="text-xl font-bold">Bulk Insert Donations Data</h2>
-            <FileUpload
-              name="excel"
-              mode="advanced"
-              auto
-              chooseLabel="Upload Excel"
-              customUpload
-              uploadHandler={handleUpload}
-              accept=".xlsx, .xls"
-              emptyTemplate={<p className="m-0">Drag and drop Donations Excel file here</p>}
-            />
+          <div className="m-5">
+            <strong className="text-hover">• Insert</strong> donations data in bulk by uploading Excel sheet in specific format
+            <br />
+            {
+              systemRole === SYSTEM_ROLES.admin &&
+              <Button
+                icon="pi pi-upload"
+                label="Upload"
+                severity="secondary"
+                aria-label="Upload Donations"
+                size="small"
+                onClick={() => setShowBulkUploadDialogue(true)}
+              />
+            }
+            <Dialog
+              header="Bulk Upload Donations Data" keepInViewport
+              visible={showBulkUploadDialogue}
+              onHide={() => setShowBulkUploadDialogue(false)}>
+              <FileUpload
+                name="excel"
+                mode="advanced"
+                auto
+                chooseLabel="Upload Donations Excel"
+                customUpload
+                uploadHandler={handleUpload}
+                accept=".xlsx, .xls"
+                emptyTemplate={<p className="m-0">Drag and drop Donations Excel file here</p>}
+              />
+            </Dialog>
           </div>
         }
-        <form onSubmit={handleSearch} className="p-inputgroup text-sm mt-4 w-full">
-          <span className="p-float-label">
-            <InputText id="search-input" required maxLength={50}
-              value={searchQuery}
-              onChange={(e) => {
-                setSearchQuery(e.target.value);
-                msgs.current?.clear();
-              }}
-            />
-            <label
-              htmlFor="search-input">Type query and press enter or click 🔍
-            </label>
-          </span>
-          <Button
-            icon="pi pi-search"
-            severity="secondary"
-            aria-label="Search"
-            size="small"
-            type="submit"
-          />
-        </form>
-        {searchQuery && (
-          <Button
-            onClick={() => {
-              setSearchQuery('');
-              setDonations(allDonations);
+        <div className="m-5"><strong className="text-hover">• View</strong> all the donations data.</div>
+      </small>
+      <form onSubmit={handleSearch} className="p-inputgroup text-sm mt-4 w-full">
+        <span className="p-float-label">
+          <InputText id="search-input" required maxLength={50}
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
               msgs.current?.clear();
             }}
-            icon="pi pi-times-circle"
-            rounded
-            text
-            severity="contrast"
-            title="Clear Search"
-            className="flex float-right bottom-[48px] right-[40px] z-1 text-gray-400 hover:text-gray-600"
-            aria-label="Clear search"
           />
-        )}
-        <small>
-          <strong>Note:</strong>&nbsp;You can search a donation by it&apos;s id, donation_receipt_number, phone number or name of donor, or donation amount
-        </small>
-        {
-          donations && Array.isArray(donations) && donations.length > 0 &&
-          <div className="card overflow-x-auto max-w-[90vw] mt-4">
-            <small className="text-general">
-              Total Donations: {allDonations?.length}
-              {devotee && <span className="ml-2"> | Your Donations: {allDonations?.filter(d => d.phone === devotee.phone).length}</span>}
-            </small>
-            <br />
-            <small className="text-general">
-              Note: Donations are sorted by date in descending order, with the most recent donations appearing first.
-            </small>
-            <br />
-            <small className="text-general">
-              You can click on the name of the donor to view their details.
-            </small>
-            <br />
-            <DataTable value={donations} paginator rows={10} stripedRows size="small">
-              <Column field="id" header="ID" />
-              <Column header="Amount" body={amountFormatted} />
-              <Column field="phone" header="Phone Number" />
-              <Column header="Name" body={nameWithLink} />
-              <Column field="payment_mode" header="Mode" />
-              <Column field="internal_note" header="Note" />
-            </DataTable>
-          </div>
-        }
-        <Messages ref={msgs} />
-        <Toast ref={toast} position="bottom-center" />
-      </div>
+          <label
+            htmlFor="search-input">Type query and press enter or click 🔍
+          </label>
+        </span>
+        <Button
+          icon="pi pi-search"
+          severity="secondary"
+          aria-label="Search"
+          size="small"
+          type="submit"
+        />
+      </form>
+      {searchQuery && (
+        <Button
+          onClick={() => {
+            setSearchQuery('');
+            setDonations(allDonations);
+            msgs.current?.clear();
+          }}
+          icon="pi pi-times-circle"
+          rounded
+          text
+          severity="contrast"
+          title="Clear Search"
+          className="flex float-right bottom-[48px] right-[40px] z-1 text-gray-400 hover:text-gray-600"
+          aria-label="Clear search"
+        />
+      )}
+      <small>
+        <strong>Note:</strong>&nbsp;You can search a donation by it&apos;s id, donation_receipt_number, phone number of donot, name of donor, or donation amount
+      </small>
+      {
+        donations && Array.isArray(donations) && donations.length > 0 &&
+        <div className="card overflow-x-auto max-w-[90vw] mt-4">
+          <small className="text-general">
+            Total Donations: {allDonations?.length}
+            {devotee && <span className="ml-2"> | Your Donations: {allDonations?.filter(d => d.phone === devotee.phone).length}</span>}
+          </small>
+          <br />
+          <small className="text-general">
+            Note: Donations are sorted by date in descending order, with the most recent donations appearing first.
+          </small>
+          <br />
+          <small className="text-general">
+            You can click on the name of the donor to view their details.
+          </small>
+          <br />
+          <DataTable value={donations} paginator rows={10} stripedRows size="small">
+            <Column field="id" header="ID" />
+            <Column header="Amount" body={amountFormatted} />
+            <Column field="phone" header="Phone Number" />
+            <Column header="Name" body={nameWithLink} />
+            <Column field="payment_mode" header="Mode" />
+            <Column field="internal_note" header="Note" />
+          </DataTable>
+        </div>
+      }
+      <Messages ref={msgs} />
+      <Toast ref={toast} position="bottom-center" />
     </div>
   )
 }
