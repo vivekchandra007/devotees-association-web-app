@@ -1,5 +1,6 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
+  previewFeatures = ["relationJoins"]
 }
 
 datasource db {
@@ -111,9 +112,7 @@ model donations {
   internal_note           String?   @db.Text
   created_at              DateTime  @default(now()) @db.Timestamp(0)
   updated_at              DateTime  @default(now()) @db.Timestamp(0)
-  devotees                devotees? @relation(fields: [phone], references: [phone], map: "fk_donations_phone")
-
-  @@index([phone], map: "fk_donations_phone")
+  devotees                devotees? @relation(fields: [phone], references: [phone], onDelete: NoAction, onUpdate: Cascade, map: "donation_phone_fkey")
 }
 
 enum devotees_status {

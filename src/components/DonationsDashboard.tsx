@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import * as XLSX from 'xlsx'
 import { FileUpload, FileUploadFilesEvent } from 'primereact/fileupload'
 import { DataTable } from 'primereact/datatable'
@@ -10,7 +10,7 @@ import { Toast } from "primereact/toast";
 import { MessageSeverity } from "primereact/api";
 import { Prisma } from '@prisma/client';
 import _ from "lodash";
-import { parseDateFromStringddmmyyyy } from '@/lib/conversions'
+import { formatDateIntoStringddmmyyyy, parseDateFromStringddmmyyyy } from '@/lib/conversions'
 import { ProgressBar } from 'primereact/progressbar'
 import { useAuth } from '@/hooks/useAuth'
 import { SYSTEM_ROLES } from '@/data/constants'
@@ -71,6 +71,7 @@ export default function DonationsDashboard() {
           detail: 'Error uploading donations',
           life: 4000
         });
+        setInProgress(false);
       }
     }
 
@@ -109,10 +110,17 @@ export default function DonationsDashboard() {
   }
 
   const fetchDonations = async () => {
+    if (inProgress) return; // Prevent multiple fetches if already in progress
     try {
       setInProgress(true);
       // Fetch all donations
-      const res = await api.get('/donations')
+      const res = await api.get('/donations');
+      res.data.forEach((donation: Donation) => {
+        // Ensure date is a Date object if it's not already
+        if (typeof donation.date === 'string') {
+          donation.date = new Date(donation.date);
+        }
+      });
       setDonations(res.data);
       setAllDonations(res.data);
     } catch {
@@ -126,11 +134,20 @@ export default function DonationsDashboard() {
 
   const nameWithLink = (rowData: Donation) => {
     return (
-      <a href={`/devotee?devoteeId=${rowData.devotees?.id}`} rel="noopener noreferrer" className="text-hover underline">
-        {rowData.devotees?.name}
-      </a>
+      rowData && rowData.devotees?.id ?
+        <a href={`/devotee?devoteeId=${rowData.devotees?.id}`} rel="noopener noreferrer" className="text-hover underline">
+          {rowData.devotees?.name}
+        </a>
+      :
+        <span className="text-grey-400">{rowData.name || 'N/A'}</span>
     );
   };
+  const dateFormatted = (rowData: Donation) => {
+    return (
+      <span>{formatDateIntoStringddmmyyyy(rowData.date!)}</span>
+    );
+  };
+
   const amountFormatted = (rowData: Donation) => {
     return (
       <span className="text-general">{rowData.amount ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(rowData.amount) : 'N/A'}</span>
@@ -175,9 +192,9 @@ export default function DonationsDashboard() {
     }
   }
 
-  useState(() => {
+  useEffect(() => {
     fetchDonations()
-  })
+  }, []);
 
   return (
     <div className='p-3 mih-h-screen'>
@@ -217,6 +234,8 @@ export default function DonationsDashboard() {
                 chooseLabel="Upload Donations Excel"
                 customUpload
                 uploadHandler={handleUpload}
+                onBeforeUpload={() => setInProgress(true)}
+                onUpload={() => setShowBulkUploadDialogue(false)}
                 accept=".xlsx, .xls"
                 emptyTemplate={<p className="m-0">Drag and drop Donations Excel file here</p>}
               />
@@ -282,7 +301,8 @@ export default function DonationsDashboard() {
           </small>
           <br />
           <DataTable value={donations} paginator rows={10} stripedRows size="small">
-            <Column field="id" header="ID" />
+            <Column header="Date" body={dateFormatted} />
+            <Column field="donation_receipt_number" header="Receipt No." />
             <Column header="Amount" body={amountFormatted} />
             <Column field="phone" header="Phone Number" />
             <Column header="Name" body={nameWithLink} />

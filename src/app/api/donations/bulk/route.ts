@@ -37,9 +37,6 @@ export async function POST(req: NextRequest) {
             }
         }
 
-        console.log(donations.length);
-        console.log(donations[0]);
-
         const loggedIndevotee = await prisma.devotees.findUnique({
             where: { id: payload },
             select: {
