@@ -18,6 +18,7 @@ import { Button } from 'primereact/button'
 import { InputText } from 'primereact/inputtext'
 import { Messages } from 'primereact/messages'
 import { Dialog } from 'primereact/dialog'
+import { useSearchParams } from 'next/navigation'
 
 type Donation = Prisma.donationsGetPayload<{
   include: {
@@ -32,16 +33,22 @@ type Donation = Prisma.donationsGetPayload<{
 
 export default function DonationsDashboard() {
   const { devotee, systemRole } = useAuth();
+  const searchParams = useSearchParams();
+
   const [inProgress, setInProgress] = useState<boolean>(false);
   const [showBulkUploadDialogue, setShowBulkUploadDialogue] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [showSearchResults, setShowSearchResults] = useState<boolean>(false);
   const [donations, setDonations] = useState<Donation[] | null>([]);
   const [allDonations, setAllDonations] = useState<Donation[] | null>([]);
   const toast = useRef<Toast>(null);
   const msgs = useRef<Messages>(null);
 
+  // If user searched something, we will show search results donations
+  const getApplicableDonations = showSearchResults ? donations : allDonations;
+
   const errorMessage = (
-    <small>No donations found for this devotee. Clear search to view donations from all devotees.</small>
+    <small>No donations found matching this search. Clear search to view donations from all devotees.</small>
   );
 
   const handleUpload = async (e: FileUploadFilesEvent) => {
@@ -109,36 +116,13 @@ export default function DonationsDashboard() {
     return formattedJson;
   }
 
-  const fetchDonations = async () => {
-    if (inProgress) return; // Prevent multiple fetches if already in progress
-    try {
-      setInProgress(true);
-      // Fetch all donations
-      const res = await api.get('/donations');
-      res.data.forEach((donation: Donation) => {
-        // Ensure date is a Date object if it's not already
-        if (typeof donation.date === 'string') {
-          donation.date = new Date(donation.date);
-        }
-      });
-      setDonations(res.data);
-      setAllDonations(res.data);
-    } catch {
-      msgs.current?.clear();
-      msgs.current?.show({ id: '1', sticky: true, severity: 'error', summary: 'Error fetching donations. Please try again.', closable: true });
-      setDonations(null); // Reset donations to null if there's an error
-    } finally {
-      setInProgress(false);
-    }
-  }
-
   const nameWithLink = (rowData: Donation) => {
     return (
       rowData && rowData.devotees?.id ?
         <a href={`/devotee?devoteeId=${rowData.devotees?.id}`} rel="noopener noreferrer" className="text-hover underline">
           {rowData.devotees?.name}
         </a>
-      :
+        :
         <span className="text-grey-400">{rowData.name || 'N/A'}</span>
     );
   };
@@ -147,54 +131,84 @@ export default function DonationsDashboard() {
       <span>{formatDateIntoStringddmmyyyy(rowData.date!)}</span>
     );
   };
-
+  const phoneFormatted = (rowData: Donation) => {
+    return (
+      <span>{rowData.phone?.slice(2)}</span>
+    );
+  };
   const amountFormatted = (rowData: Donation) => {
     return (
       <span className="text-general">{rowData.amount ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(rowData.amount) : 'N/A'}</span>
     );
   };
 
-  async function handleSearch(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    // This function will be called when the search button is clicked
-    if (!searchQuery.trim()) {
-      setDonations(allDonations);
-      return;
+  // This function will be called when the search button is clicked or enter is pressed
+  async function handleSearch(event?: React.FormEvent<HTMLFormElement>) {
+    if (event) {
+      event.preventDefault();
     }
+    fetchDonations();
+  }
 
-    if (!inProgress) {
+  async function fetchDonations(query?: string) {
+    if (inProgress) return; // Prevent multiple fetches if already in progress
+
+    try {
       setInProgress(true);
-      // Make an API call to fetch the search results
-      await api.get('/donations', {
-        params: {
-          query: searchQuery.trim(),
-        },
-      }).then((response) => {
-        if (response.status === 200) {
-          if (response.data.length > 0) {
-            setDonations(response.data);
-          } else {
-            setDonations(null);
-            msgs.current?.clear();
-            msgs.current?.show({ id: '1', sticky: true, severity: 'error', summary: 'Error', content: errorMessage, closable: true });
-          }
-        } else {
-          msgs.current?.show({ id: '1', sticky: true, severity: 'error', summary: 'Error while searching. Please try again.', closable: true });
-          setDonations(null);
-        }
+      let res = null;
+      if (query || searchQuery.trim() !== '') {
+        // Fetch donations according to search query
+        res = await api.get('/donations', {
+          params: {
+            query: query?.trim() || searchQuery.trim(),
+          },
+        });
+      } else {
+        // Fetch all donations if no query is provided
+        res = await api.get('/donations');
       }
-      ).catch(() => {
-        msgs.current?.show({ id: '1', sticky: true, severity: 'error', summary: 'Error while searching. Please try again.', closable: true });
-        setDonations(null);
-      }).finally(() => {
-        setInProgress(false);
-      });
+      if (res && res.status === 200 && res.data && Array.isArray(res.data) && res.data.length > 0) {
+        msgs.current?.clear();
+        const donations = formatDonationsData(res.data);
+        if (query || searchQuery.trim() !== '') {
+          setDonations(donations);
+          setShowSearchResults(true); // Show search results
+        } else {
+          setAllDonations(donations);
+          setShowSearchResults(false); // Show all donations
+        }
+      } else {
+        throw new Error('Failed to fetch donations');
+      }
+    } catch {
+      msgs.current?.clear();
+      msgs.current?.show({ id: '1', sticky: true, severity: 'error', summary: errorMessage, closable: true });
+      setDonations(null); // Reset donations to null if there's an error
+      setShowSearchResults(false); // Do not show search results, instead show all donations
+    } finally {
+      setInProgress(false);
     }
   }
 
+  function formatDonationsData(donations: Donation[]) {
+    donations.forEach((donation: Donation) => {
+      // Ensure date is a Date object if it's not already
+      if (typeof donation.date === 'string') {
+        donation.date = new Date(donation.date);
+      }
+    });
+    return donations;
+  }
+
   useEffect(() => {
-    fetchDonations()
-  }, []);
+    const queryParamPhone: string | null = searchParams.get('phone');
+    if (queryParamPhone && queryParamPhone.length > 0) {
+      setSearchQuery(queryParamPhone.slice(2)); // Set search query to passed devotes phone number without country code
+      fetchDonations(queryParamPhone.slice(2));
+    } else {
+      fetchDonations();
+    }
+  }, [searchParams]);
 
   return (
     <div className='p-3 mih-h-screen'>
@@ -249,8 +263,17 @@ export default function DonationsDashboard() {
           <InputText id="search-input" required maxLength={50}
             value={searchQuery}
             onChange={(e) => {
-              setSearchQuery(e.target.value);
+              // Remove any non-numeric characters from the input
+              const value = e.target.value.replace(/[^0-9a-zA-Z\s]/g, '');
+              setSearchQuery(value);
               msgs.current?.clear();
+              if (value.trim() === '') {
+                if (!allDonations || allDonations.length === 0) {
+                  fetchDonations();
+                } else {
+                  setShowSearchResults(false);
+                }
+              }
             }}
           />
           <label
@@ -265,12 +288,15 @@ export default function DonationsDashboard() {
           type="submit"
         />
       </form>
-      {searchQuery && (
+      {/* {searchQuery && (
         <Button
           onClick={() => {
             setSearchQuery('');
-            setDonations(allDonations);
-            msgs.current?.clear();
+            if (!allDonations || allDonations.length === 0) {
+              fetchDonations();
+            } else {
+              setShowSearchResults(false);
+            }
           }}
           icon="pi pi-times-circle"
           rounded
@@ -280,12 +306,12 @@ export default function DonationsDashboard() {
           className="flex float-right bottom-[48px] right-[40px] z-1 text-gray-400 hover:text-gray-600"
           aria-label="Clear search"
         />
-      )}
+      )} */}
       <small>
         <strong>Note:</strong>&nbsp;You can search a donation by it&apos;s id, donation_receipt_number, phone number of donor, name of donor, or donation amount
       </small>
       {
-        donations && Array.isArray(donations) && donations.length > 0 &&
+        getApplicableDonations && Array.isArray(getApplicableDonations) && getApplicableDonations.length > 0 &&
         <div className="card overflow-x-auto max-w-[90vw] mt-4">
           <small className="text-general">
             Total Donations: {allDonations?.length}
@@ -300,11 +326,11 @@ export default function DonationsDashboard() {
             You can click on the name of the donor to view their details.
           </small>
           <br />
-          <DataTable value={donations} paginator rows={10} stripedRows size="small">
+          <DataTable value={getApplicableDonations} paginator rows={10} stripedRows size="small">
             <Column header="Date" body={dateFormatted} />
             <Column field="donation_receipt_number" header="Receipt No." />
             <Column header="Amount" body={amountFormatted} />
-            <Column field="phone" header="Phone Number" />
+            <Column header="Phone Number" body={phoneFormatted} />
             <Column header="Name" body={nameWithLink} />
             <Column field="payment_mode" header="Mode" />
             <Column field="internal_note" header="Note" />

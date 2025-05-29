@@ -222,16 +222,16 @@ export default function TopNavBar() {
                     (
                         <span className="flex flex-col items-center space-y-1">
                             <Button
-                                icon="pi pi-globe"
+                                icon="pi pi-database"
                                 rounded
                                 text
                                 raised
                                 severity="contrast"
-                                aria-label="Insights"
+                                aria-label="User Data"
                                 size="large"
-                                onClick={() => navigateToPage('insights')}
+                                onClick={() => navigateToPage('user-data')}
                             />
-                            <span className="text-xs mt-1">Insights</span>
+                            <span className="text-xs mt-1">User Data</span>
                         </span>
                     )
             }

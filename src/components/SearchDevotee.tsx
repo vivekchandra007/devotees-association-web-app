@@ -146,7 +146,7 @@ export default function SearchDevotee() {
                                                 <Button
                                                     outlined
                                                     label="View Donations"
-                                                    onClick={() => router.push(`/insights?tab=1&devoteeId=${devoteeDetails?.id}`)}
+                                                    onClick={() => router.push(`/user-data?tab=1&phone=${devoteeDetails?.phone}`)}
                                                     size="small"
                                                     severity="warning"
                                                 />

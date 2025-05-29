@@ -38,7 +38,7 @@ export default function DevoteesPage() {
                 !isAuthenticated &&
                 <FullPageSpinner message="Hare Krishna! Fetching details..." />
             }
-            <TabView activeIndex={activeIndex} onTabChange={(e) => router.push(`/insights?tab=${e.index}`)}>
+            <TabView activeIndex={activeIndex} onTabChange={(e) => router.push(`/user-data?tab=${e.index}`)}>
                 <TabPanel header="Devotees" leftIcon="pi pi-users mr-2" className="min-w-[33vw]">
                     <SearchDevotee />
                 </TabPanel>
