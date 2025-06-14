@@ -289,14 +289,6 @@ export default function TopNavBar() {
                     <div className="text-text">
                         <strong className="font-bilbo text-xl">Shri Shri <span className="text-special text-4xl">Radha Krishna</span>&nbsp;Temple</strong>
                     </div>
-                    {/* <Image
-                        className="m-auto"
-                        src="/chant-and-be-happy.png"
-                        alt="Devotees' Association"
-                        width={150}
-                        height={160}
-                        priority
-                    /> */}
                     <small className="text-text">
                         Your turn now. Let&apos;s build it brick by brick, step by step
                     </small>
@@ -402,16 +394,17 @@ export default function TopNavBar() {
                     </i>
                 </Button>
             </span>
+            {/* Top News Ticker - shown always */}
             {
-            !authInProgress &&
-            <div className="bg-hover text-white grid items-center m-auto justify-items-center text-center -z-2">
-                <small className="font-semibold hover:underline">
-                    <a href="https://iskconpunebcec.com/#/newtemple" target="_blank">
-                        <i className="pi pi-megaphone mr-2 animate-pulse"></i>
-                        Every brick carries a prayer. Let yours be one of them — Support the New Temple now.
-                    </a>
-                </small>
-            </div>
+                !authInProgress &&
+                <div className="bg-hover text-white grid items-center m-auto justify-items-center text-center -z-2 min-h-8">
+                    <small className="font-semibold hover:underline">
+                        <a href="https://iskconpunebcec.com/#/newtemple" target="_blank">
+                            <i className="pi pi-megaphone mr-2 animate-pulse"></i>
+                            Every brick carries a prayer. Let yours be one of them — Support the New Temple now.
+                        </a>
+                    </small>
+                </div>
             }
 
             {/* Main Toolbar - shown only when user is logged in */}
