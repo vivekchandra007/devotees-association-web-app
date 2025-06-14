@@ -4,7 +4,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import videosData from '@/data/videos.json';
 import { OverlayPanel } from 'primereact/overlaypanel';
 import { Dialog } from 'primereact/dialog';
-import Image from 'next/image';
 import { Button } from 'primereact/button';
 import { InputText } from 'primereact/inputtext';
 
@@ -109,7 +108,7 @@ export default function YouTubeMosaic() {
       {/* Shorts Strip */}
       <div className="overflow-x-auto whitespace-nowrap flex gap-2 mb-6">
         {videos.filter(v => v.type === 'short' || v.kind?.includes("short") || v.title.includes("shorts") || v.description?.includes("shorts")).map((short) => (
-          <Image
+          <img
             key={short.id}
             src={short.thumbnail}
             alt={short.title}
@@ -141,7 +140,7 @@ export default function YouTubeMosaic() {
             }}
             onClick={() => setSelectedVideo(video)}
           >
-            <Image
+            <img
               src={video.thumbnail}
               alt={video.title}
               width={100}
