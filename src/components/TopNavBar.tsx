@@ -296,10 +296,8 @@ export default function TopNavBar() {
 
     function hideWelcomeMessage(stepsCompleted?: boolean) {
         setShowWelcomeDialogue(false);
-        if (stepsCompleted) {
-            if (typeof window !== 'undefined') {
-                localStorage.setItem(LOCAL_STORAGE_STEPS_COMPLETED, "true");
-            }
+        if (typeof window !== 'undefined') {
+            localStorage.setItem(LOCAL_STORAGE_STEPS_COMPLETED, "true");
         }
         window.scrollTo(0, 0);
     }
@@ -310,7 +308,6 @@ export default function TopNavBar() {
             <Dialog
                 header={title} keepInViewport closeOnEscape={!guestMode}
                 visible={showWelcomeDialogue}
-                footer={guestMode ? '' : (typeof window !== 'undefined' && !Boolean(localStorage.getItem(LOCAL_STORAGE_STEPS_COMPLETED)) && footer)}
                 onHide={() => hideWelcomeMessage()}
                 className="shadow-2xl w-full md:w-[75vw] lg:w-[45vw] text-center text-text size-fit m-auto">
                 <div className="bg-[url('/chant-and-be-happy3.png')] bg-no-repeat bg-center bg-contain">
@@ -417,7 +414,7 @@ export default function TopNavBar() {
                     }
                 </div>
             </Dialog>
-            {/* <span className={classNames("absolute right-0 md:right-2 z-1", guestMode ? 'top-[7vh] md:top-[8.8vh]' : 'top-[17vh] md:top-[13.5vh]')}>
+            <span className={classNames("absolute right-0 md:right-2 z-1", guestMode ? 'top-[12vh] md:top-[8.8vh]' : 'top-[23vh] md:top-[13.5vh]')}>
                 <Button
                     rounded
                     raised
@@ -432,10 +429,10 @@ export default function TopNavBar() {
                         <Badge severity="danger" className="scale-50"></Badge>
                     </i>
                 </Button>
-            </span> */}
+            </span>
             {
             !authInProgress &&
-            <div className="bg-hover text-white grid items-center m-auto justify-items-center text-center w-[105%] sm:w-[100%] -z-2">
+            <div className="bg-hover text-white grid items-center m-auto justify-items-center text-center -z-2">
                 <small className="font-semibold hover:underline">
                     <a href="https://iskconpunebcec.com/#/newtemple" target="_blank">
                         <i className="pi pi-megaphone mr-2 animate-pulse"></i>
