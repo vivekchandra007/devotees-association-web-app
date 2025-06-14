@@ -16,7 +16,6 @@ import { ProgressBar } from 'primereact/progressbar';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { SYSTEM_ROLES } from '@/data/constants';
 import { Badge } from 'primereact/badge';
-import { Checkbox } from 'primereact/checkbox';
 import ProfileCompletionMeter from './ProfileCompletionMeter';
 
 type dialogueModalContentType = {
@@ -41,7 +40,7 @@ export default function TopNavBar() {
     const guestMode: boolean | null = !devotee;
     const LOCAL_STORAGE_STEPS_COMPLETED = "stepsCompleted";
     const [showWelcomeDialogue, setShowWelcomeDialogue] = useState<boolean>(false);
-    const [stepsCompleted, setStepsCompleted] = useState<boolean>(false);
+    let stepsCompleted = false;
 
     const userProfileActionsPanel = useRef<Menu>(null);
 
@@ -144,7 +143,7 @@ export default function TopNavBar() {
         if (typeof window !== 'undefined') {
             const stepsDone = !!Boolean(localStorage.getItem(LOCAL_STORAGE_STEPS_COMPLETED));
             if (!guestMode) {
-                setStepsCompleted(stepsDone);
+                stepsCompleted = stepsDone;
             }
         }
     }, [guestMode]);
@@ -254,8 +253,6 @@ export default function TopNavBar() {
         </div>
     );
 
-    const steps: number = guestMode ? 3 : 4;
-
     const title = (
         <small className="text-text">
             ॥ हरे कृष्ण ॥
@@ -269,32 +266,7 @@ export default function TopNavBar() {
         </small>
     );
 
-    const footer = (
-        <div className={classNames('grid items-center mt-5', stepsCompleted ? "grid-cols-12" : "")}>
-            <div className={classNames('text-left', stepsCompleted ? "col-span-6" : "")}>
-                <small onClick={() => setStepsCompleted(!stepsCompleted)} className="cursor-pointer">
-                    <Checkbox
-                        checked={stepsCompleted}>
-                    </Checkbox>
-                    &nbsp;&nbsp;&nbsp;I have completed all the above {steps} steps.
-                </small>
-            </div>
-            {
-                stepsCompleted &&
-                <div className="col-span-6">
-                    <Button
-                        size="small"
-                        onClick={() => hideWelcomeMessage(true)}
-                        label="Don&apos;t show this message again."
-                        severity="danger"
-                        raised
-                    />
-                </div>
-            }
-        </div>
-    );
-
-    function hideWelcomeMessage(stepsCompleted?: boolean) {
+    function hideWelcomeMessage() {
         setShowWelcomeDialogue(false);
         if (typeof window !== 'undefined') {
             localStorage.setItem(LOCAL_STORAGE_STEPS_COMPLETED, "true");
