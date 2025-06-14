@@ -9,13 +9,13 @@ export default function Footer() {
                     <div className="row text-center m-2">
                         <div className="col-md-9">
                             <div className="justify-center flex">
-                                <Image src="/logo-dark.png" alt="logo" width={128} height={128} priority/>
+                                <Image src="/logo-dark3.png" alt="logo" width={128} height={128} priority/>
                             </div>
                             <br/>
                             <a className="footer-dark-special-text hover:underline hover:text-hover" href="https://vedabase.io/en/library/cc/adi/3/91/" target="_blank" rel="noopener noreferrer">
                                 द्वौ भूत​-सर्गौ लोके ऽस्मिन् <br />
                                 दैव आसुर एव च​  ।<br/>
-                                विष्णु-भक्तः स्मृतो दैव​ <br />
+                                <span className="p-tag p-tag-warning">विष्णु-भक्तः स्मृतो दैव</span><br />
                                 आसुरस् तद्-विपर्ययः ।।<br/>
                                 <span className="underline hover:text-hover text-sm">(Śrī Caitanya-Caritāmṛta Ādi 3.91)</span>
                             </a>

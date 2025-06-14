@@ -66,12 +66,11 @@ export default function LoginPage() {
     );
 
     const title = (
-        <span className="font-bilbo text-5xl text-text">
-            <span className="text-hover">Dev</span>otees&apos;&nbsp;
-            <span className="text-hover">Association</span>
+        <span className="font-bilbo text-7xl text-text">
+            Madh<span className="text-hover">u</span>ram
             <Divider align="center">
                 <a className="hover:underline" href="https://vedabase.io/en/library/cc/adi/3/91/" target="_blank" rel="noopener noreferrer">
-                    <span className="p-tag p-tag-warning">विष्णु-भक्तः स्मृतो दैव</span>
+                    <span className="p-tag p-tag-warning">Get Associated with Devotees</span>
                 </a>
             </Divider>
         </span>

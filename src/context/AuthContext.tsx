@@ -10,6 +10,7 @@ import { convertDateStringIntoDateObject } from '@/lib/conversions';
 type AuthContextType = {
   devotee: Devotee | null;
   isAuthenticated: boolean;
+  authInProgress: boolean;
   systemRole: string | null;
   login: (accessTokenInLoginResponse: string) => void;
   logout: () => void;
@@ -96,7 +97,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   });
 
   return (
-    <AuthContext.Provider value={{ devotee, isAuthenticated: !!devotee, systemRole, login, logout }}>
+    <AuthContext.Provider value={{ devotee, isAuthenticated: !!devotee, authInProgress, systemRole, login, logout }}>
       {children}
     </AuthContext.Provider>
   );

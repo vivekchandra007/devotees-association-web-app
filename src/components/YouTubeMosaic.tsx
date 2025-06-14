@@ -77,7 +77,7 @@ export default function YouTubeMosaic() {
                 icon="pi pi-play"
                 onClick={() => setSelectedVideo(spotlightVideo)}
                 className="mt-2"
-                severity="danger"
+                severity="warning"
               />
             </div>
           </div>

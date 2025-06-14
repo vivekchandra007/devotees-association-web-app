@@ -30,7 +30,7 @@ export default function TopNavBar() {
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
-    const { devotee, isAuthenticated, systemRole, logout } = useAuth();
+    const { devotee, isAuthenticated, authInProgress, systemRole, logout } = useAuth();
 
     const [isNavigating, setIsNavigating] = useState<boolean>(false);
 
@@ -133,38 +133,18 @@ export default function TopNavBar() {
     useEffect(() => {
         // Do something on route change
         setIsNavigating(false);
-    }, [pathname, searchParams]);
-
-    function showRepetitiveWelcomeMessageInGuestMode() {
-        if (typeof window !== 'undefined') {
-            const stepsDone = !!Boolean(localStorage.getItem(LOCAL_STORAGE_STEPS_COMPLETED));
-            if (guestMode || !stepsDone) {
-                // if user is in guest mode or has not completed steps or welcome dialogue is not already shown
-                // show welcome message in guest mode at coded intervals
-                // 11 minutes in guest mode and 21 minutes in logged in mode
-                if (!showWelcomeDialogue) {
-                    const repetiionTime = guestMode ? (1000 * 60 * 11) : (1000 * 60 * 21);
-                    setTimeout(() => {
-                        // insist user to complete steps by showing welcome dialogue
-                        setShowWelcomeDialogue(true);
-                        showRepetitiveWelcomeMessageInGuestMode();
-                    }, repetiionTime);
-                }
-            }
+        if (!authInProgress && !pathname.includes('/login') && (guestMode || !stepsCompleted)) {
+            setShowWelcomeDialogue(true);
+        } else {
+            setShowWelcomeDialogue(false);
         }
-    }
+    }, [pathname, searchParams, authInProgress]);
 
     useEffect(() => {
         if (typeof window !== 'undefined') {
             const stepsDone = !!Boolean(localStorage.getItem(LOCAL_STORAGE_STEPS_COMPLETED));
             if (!guestMode) {
                 setStepsCompleted(stepsDone);
-                if (!stepsDone) {
-                    showRepetitiveWelcomeMessageInGuestMode();
-                }
-            } else {
-                // in case of Guest Mode, always show the repetitive welcome message at coded intervals
-                showRepetitiveWelcomeMessageInGuestMode();
             }
         }
     }, [guestMode]);
@@ -181,9 +161,9 @@ export default function TopNavBar() {
                 style={{ padding: '8px' }}
                 onClick={() => navigateToPage('')}
             >
-                <Image src="/logo-dark.png" alt="Home" height="32" width="32" className="invert-100" priority />
+                <Image src="/logo-dark4.png" alt="Home" height="32" width="32" className="invert-100" priority />
             </Button>
-            <span className="text-xs mt-1">Home</span>
+            <span className="text-xs mt-1">Madhuram</span>
         </span>
     );
     const centerContent = (
@@ -279,18 +259,15 @@ export default function TopNavBar() {
     const title = (
         <small className="text-text">
             ॥ हरे कृष्ण ॥
-            <br />
-            {devotee?.initiated_name || devotee?.name}{devotee?.gender ? `, ${devotee.spiritual_levels[`title_${devotee?.gender}`]}` : ''} 🙏🏻
+            { 
+                isAuthenticated && devotee && 
+                <span>
+                    <br />
+                    {devotee?.initiated_name || devotee?.name}{devotee?.gender ? `, ${devotee.spiritual_levels[`title_${devotee?.gender}`]}` : ''} 🙏🏻
+                </span>
+            }
         </small>
     );
-
-    const guestModeFooter = (
-        <div className="w-full text-left text-text">
-            <small>
-                <strong>Note: We recommed you complete all the above steps at earliest, especially Step 3 to register and create profile, to enjoy seamless blissfull experience.</strong>
-            </small>
-        </div>
-    )
 
     const footer = (
         <div className={classNames('grid items-center mt-5', stepsCompleted ? "grid-cols-12" : "")}>
@@ -323,8 +300,6 @@ export default function TopNavBar() {
             if (typeof window !== 'undefined') {
                 localStorage.setItem(LOCAL_STORAGE_STEPS_COMPLETED, "true");
             }
-        } else {
-            showRepetitiveWelcomeMessageInGuestMode();
         }
         window.scrollTo(0, 0);
     }
@@ -335,38 +310,35 @@ export default function TopNavBar() {
             <Dialog
                 header={title} keepInViewport closeOnEscape={!guestMode}
                 visible={showWelcomeDialogue}
-                footer={guestMode ? guestModeFooter : (typeof window !== 'undefined' && !Boolean(localStorage.getItem(LOCAL_STORAGE_STEPS_COMPLETED)) && footer)}
+                footer={guestMode ? '' : (typeof window !== 'undefined' && !Boolean(localStorage.getItem(LOCAL_STORAGE_STEPS_COMPLETED)) && footer)}
                 onHide={() => hideWelcomeMessage()}
                 className="shadow-2xl w-full md:w-[75vw] lg:w-[45vw] text-center text-text size-fit m-auto">
-                <div>
+                <div className="bg-[url('/chant-and-be-happy3.png')] bg-no-repeat bg-center bg-contain">
                     <small className="block text-text mb-4">
                         Congratulations! Thanks to your devotion, we are getting a new beautiful temple in Baner, Pune
                     </small>
                     <div className="text-text">
-                        <strong className="font-bilbo md:text-4xl">Shri Shri <span className="text-7xl text-special">Radha Krishna</span>&nbsp;Temple</strong>
+                        <strong className="font-bilbo text-xl">Shri Shri <span className="text-special text-4xl">Radha Krishna</span>&nbsp;Temple</strong>
                     </div>
-                    <Image
+                    {/* <Image
                         className="m-auto"
                         src="/chant-and-be-happy.png"
                         alt="Devotees' Association"
-                        width={200}
-                        height={214}
+                        width={150}
+                        height={160}
                         priority
-                    />
-                    <br />
+                    /> */}
                     <small className="text-text">
-                        So, now it&apos;s your turn.
-                        <br />
-                        Let&apos;s build it brick by brick, step by step
+                        Your turn now. Let&apos;s build it brick by brick, step by step
                     </small>
                     <br /><br />
                     <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
                         <div className="col-span-8 md:col-span-10 text-left">
                             <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
-                            <small className="text-text"><strong className="text-hover">Step 1:</strong> A Once-In-A-Lifetime, divine chance to dearly serve Shri Shri Radha Krishna — build their eternal home in your area. Do Not Miss. Donate today.</small>
+                            <small className="text-text">A Once-In-A-Lifetime divine chance to build temple for Shri Shri Radha Krishna — Do not miss. Donate Now!</small>
                         </div>
                         <div className="col-span-4 md:col-span-2 mr-1">
-                            <Button label="" severity="warning" raised size="small" className="float-right"
+                            <Button label="" severity="warning" raised size="large" className="float-right"
                                 icon="pi pi-indian-rupee"
                                 onClick={() => window.open("https://iskconpunebcec.com/#/newtemple")}>
                                 <Badge severity="warning" value="▸" className="scale-150"></Badge>
@@ -376,10 +348,10 @@ export default function TopNavBar() {
                     <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
                         <div className="col-span-8 md:col-span-10 text-left">
                             <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
-                            <small className="text-text"><strong className="text-hover">Step 2:</strong> Join our Whatsapp group to stay updated with the latest news and events.</small>
+                            <small className="text-text">Join our Whatsapp group to stay updated with the latest news and events — Do not miss. Connect Now!</small>
                         </div>
                         <div className="col-span-4 md:col-span-2 mr-1">
-                            <Button label="" severity="success" raised size="small" className="float-right"
+                            <Button label="" severity="success" raised size="large" className="float-right"
                                 icon="pi pi-whatsapp"
                                 onClick={() => alert('Link to a Whatsapp group')}>
                                 <Badge severity="success" value="▸" className="scale-150"></Badge>
@@ -393,10 +365,10 @@ export default function TopNavBar() {
                                     <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
                                         <div className="col-span-8 md:col-span-10 text-left">
                                             <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
-                                            <small className="text-text"><strong className="text-hover">Step 3:</strong> Create Profile, Get Gifts on your special occassions, Track your Donations, Offer online Prayers and Associate with Devotees. All at one place.</small>
+                                            <small className="text-text">Claim your free account. Gifts, Online Prayers, Spiritual YouTube... — Do not miss. Login Now!</small>
                                         </div>
                                         <div className="col-span-4 md:col-span-2 mr-1">
-                                            <Button label="" severity="danger" raised size="small" className="float-right"
+                                            <Button label="" severity="danger" raised size="large" className="float-right"
                                                 icon="pi pi-crown"
                                                 onClick={() => router.push(`/login${searchParams ? `?${searchParams}` : ''}`)} >
                                                 <Badge severity="danger" value="▸" className="scale-150"></Badge>
@@ -412,7 +384,7 @@ export default function TopNavBar() {
                                             <div className="grid grid-cols-12 items-center">
                                                 <div className="col-span-8 md:col-span-7 text-left">
                                                     <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
-                                                    <small className="text-text"><strong className="text-hover">Step 3:</strong> Keep your profile 100% and upto date</small>
+                                                    <small className="text-text">Keep your profile 100% and upto date</small>
                                                 </div>
                                                 <div className="col-span-4 md:col-span-5">
                                                     <ProfileCompletionMeter devotee={devotee} />
@@ -420,7 +392,7 @@ export default function TopNavBar() {
                                             </div>
                                         </div>
                                         <div className="col-span-4 md:col-span-2 mr-1">
-                                            <Button label="" severity="info" raised size="small" className="float-right"
+                                            <Button label="" severity="info" raised size="large" className="float-right"
                                                 icon="pi pi-user-edit"
                                                 onClick={() => router.push('/devotee')}>
                                                 <Badge severity="info" value="▸" className="scale-150"></Badge>
@@ -430,10 +402,10 @@ export default function TopNavBar() {
                                     <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
                                         <div className="col-span-8 md:col-span-10 text-left">
                                             <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
-                                            <small className="text-text"><strong className="text-hover">Step 4:</strong> Let&apos;s Spread the word. Refer Others and become a spiritual catalyst in their life.</small>
+                                            <small className="text-text">Let&apos;s Spread the word. Refer Others and become a spiritual catalyst in their life.</small>
                                         </div>
                                         <div className="col-span-4 md:col-span-2 mr-1">
-                                            <Button label="" severity="secondary" raised size="small" className="float-right"
+                                            <Button label="" severity="secondary" raised size="large" className="float-right"
                                                 icon="pi pi-share-alt"
                                                 onClick={() => setDialogueModalContent(ReferralsModalContent)} >
                                                 <Badge severity="secondary" value="▸" className="scale-150"></Badge>
@@ -445,7 +417,7 @@ export default function TopNavBar() {
                     }
                 </div>
             </Dialog>
-            <span className={classNames("absolute right-0 md:right-2 z-1", guestMode ? 'top-[7vh] md:top-[8.8vh]' : 'top-[17vh] md:top-[13.5vh]')}>
+            {/* <span className={classNames("absolute right-0 md:right-2 z-1", guestMode ? 'top-[7vh] md:top-[8.8vh]' : 'top-[17vh] md:top-[13.5vh]')}>
                 <Button
                     rounded
                     raised
@@ -453,14 +425,25 @@ export default function TopNavBar() {
                     severity="secondary"
                     aria-label="Steps"
                     size="small"
-                    title="Open Welcome Page again to checkout mandatory Steps."
+                    title="Open Welcome Page again to view checklist"
                     onClick={() => setShowWelcomeDialogue(true)}
                 >
                     <i className="pi pi-bell cursor-pointer text-white p-overlay-badge">
                         <Badge severity="danger" className="scale-50"></Badge>
                     </i>
                 </Button>
-            </span>
+            </span> */}
+            {
+            !authInProgress &&
+            <div className="bg-hover text-white grid items-center m-auto justify-items-center text-center w-[105%] sm:w-[100%] -z-2">
+                <small className="font-semibold hover:underline">
+                    <a href="https://iskconpunebcec.com/#/newtemple" target="_blank">
+                        <i className="pi pi-megaphone mr-2 animate-pulse"></i>
+                        Every brick carries a prayer. Let yours be one of them — Support the New Temple now.
+                    </a>
+                </small>
+            </div>
+            }
 
             {/* Main Toolbar - shown only when user is logged in */}
             {

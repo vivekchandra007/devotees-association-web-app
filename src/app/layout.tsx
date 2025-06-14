@@ -33,8 +33,8 @@ const bilbo = Bilbo_Swash_Caps({
 });
 
 export const metadata: Metadata = {
-  title: "Devotees' Association",
-  description: "Devotees' Association",
+  title: "Madhuram",
+  description: "Get associated with Devotees",
 };
 
 export default function RootLayout({
@@ -64,7 +64,7 @@ export default function RootLayout({
         <Image
           className="absolute -z-10 top-0 left-0 w-full h-full object-cover"
           src="/mahaprabhu5.jpg"
-          alt="Devotees' Association background image"
+          alt="Madhuram background image"
           sizes="100v"
           fill
           priority
