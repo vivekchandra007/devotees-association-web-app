@@ -22,7 +22,7 @@ import { useSearchParams } from 'next/navigation'
 
 type Donation = Prisma.donationsGetPayload<{
   include: {
-    devotees: {
+    phone_ref_value: {
       select: {
         id: true,
         name: true
@@ -89,7 +89,7 @@ export default function DonationsDashboard() {
     const formattedJson: object[] = [];
     // iterate in reverse coz donations are in descending order of date
     for (let i = json.length - 1; i >= 0; i--) {
-      // since we are itrating in reverse, once we reach header i.e. "_1": "Sr", means we iterated through all, so just come out of loop
+      // since we are iterating in reverse, once we reach header i.e. "_1": "Sr", means we iterated through all, so just come out of loop
       if (_.get(json[i], '_1') === "Sr") {
         break;
       }
@@ -118,9 +118,9 @@ export default function DonationsDashboard() {
 
   const nameWithLink = (rowData: Donation) => {
     return (
-      rowData && rowData.devotees?.id ?
-        <a href={`/devotee?devoteeId=${rowData.devotees?.id}`} rel="noopener noreferrer" className="text-hover underline">
-          {rowData.devotees?.name}
+      rowData && rowData.phone_ref_value?.id ?
+        <a href={`/devotee?devoteeId=${rowData.phone_ref_value?.id}`} rel="noopener noreferrer" className="text-hover underline">
+          {rowData.phone_ref_value?.name}
         </a>
         :
         <span className="text-grey-400">{rowData.name || 'N/A'}</span>

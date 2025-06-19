@@ -6,19 +6,25 @@ const devoteeFormDateFields = [ "dob", "spouse_dob", "spouse_marriage_anniversar
 
 type Devotee = Prisma.devoteesGetPayload<{
   include: {
-    system_roles: {
+    system_role_ref_value: {
       select: {
         name: true;
       };
     },
-    spiritual_levels: {
+    spiritual_level_ref_value: {
       select: {
         title_male: true,
         title_female: true,
         title_other: true
       };
     },
-    devotees: {
+    counsellor_id_ref_value: {
+      select: {
+        id: true,
+        name: true
+      }
+    },
+    referred_by_ref_value: {
       select: {
         id: true,
         name: true

@@ -42,7 +42,7 @@ export async function GET(req: NextRequest) {
                 ]
             },
             include: {
-                devotees: {
+                phone_ref_value: {
                     select: {
                         id: true,
                         name: true
@@ -65,7 +65,7 @@ async function getAllDonations() {
     try {
         const donations = await prisma.donations.findMany({
             include: {
-                devotees: {
+                phone_ref_value: {
                     select: {
                         id: true,
                         name: true

@@ -41,7 +41,7 @@ export async function GET(req: NextRequest) {
                 phone: true,
                 status: true,
                 role_id: true,
-                system_roles: {
+                system_role_ref_value: {
                     select: {
                         name: true,
                     },
