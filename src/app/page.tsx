@@ -55,7 +55,17 @@ export default function Home() {
         !guestMode && !isAuthenticated && 
         <FullPageSpinner message="Hare Krishna! Fetching your details..." />
       }
-      <TabView className="w-full home-page-tabs" activeIndex={activeIndex} onTabChange={(e) => router.push(`/?tab=${e.index}`)}>
+      <TabView className="w-full home-page-tabs" activeIndex={activeIndex} 
+        onTabChange={
+          (e) =>  {
+            const params = new URLSearchParams(searchParams.toString())
+            if (params.has('tab')) {
+                params.delete('tab');
+            }
+            const newQueryParams = params.toString();
+            router.push(`/?tab=${e.index}&${newQueryParams || ''}`)
+          }
+        }>
         <TabPanel header="Prernā" leftIcon="pi pi-youtube mr-2">
           <div className='p-3'>
             <strong className="text-general">Prernā Sāgar</strong>
@@ -85,7 +95,7 @@ export default function Home() {
             <strong className="text-general">Gyān Sāgar (Athāto Brahma Jigyāsā)</strong>
             <hr />
             <small className="text-general">
-              Once you Kripā in your life, start with the ultimate question - <strong className="text-hover">Who YOU are?</strong>. A consolidated place for all Knowledge that matters, from <strong className="text-hover">Discovering Your Self</strong> to stories of Bhakts from Grantharāj&nbsp;<strong className="text-hover">Shrimad Bhāgwatam</strong>.
+              Once you get Kripā in your life, start with the ultimate question - <strong className="text-hover">Who YOU are?</strong>. A consolidated place for all Knowledge that matters, from <strong className="text-hover">Discovering Your Self</strong> to stories of Bhakts from Grantharāj&nbsp;<strong className="text-hover">Shrimad Bhāgwatam</strong>.
             </small>
             <div className="min-h-screen">
             </div>

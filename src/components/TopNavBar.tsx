@@ -38,9 +38,8 @@ export default function TopNavBar() {
     const [dialogueModalContent, setDialogueModalContent] = useState<dialogueModalContentType | null>();
 
     const guestMode: boolean | null = !devotee;
-    const LOCAL_STORAGE_STEPS_COMPLETED = "stepsCompleted";
+    const LOCAL_STORAGE_HIDE_WELCOME_MESSAGE = "hideWelcomeMessage";
     const [showWelcomeDialogue, setShowWelcomeDialogue] = useState<boolean>(false);
-    let stepsCompleted = false;
 
     const userProfileActionsPanel = useRef<Menu>(null);
 
@@ -132,21 +131,13 @@ export default function TopNavBar() {
     useEffect(() => {
         // Do something on route change
         setIsNavigating(false);
-        if (!authInProgress && !pathname.includes('/login') && (guestMode || !stepsCompleted)) {
-            setShowWelcomeDialogue(true);
-        } else {
+        const stepsDone = !!Boolean(localStorage.getItem(LOCAL_STORAGE_HIDE_WELCOME_MESSAGE));
+        if (authInProgress || pathname.includes('/login') || !guestMode || stepsDone) {
             setShowWelcomeDialogue(false);
+        } else {
+            setShowWelcomeDialogue(true);
         }
-    }, [pathname, searchParams, authInProgress]);
-
-    useEffect(() => {
-        if (typeof window !== 'undefined') {
-            const stepsDone = !!Boolean(localStorage.getItem(LOCAL_STORAGE_STEPS_COMPLETED));
-            if (!guestMode) {
-                stepsCompleted = stepsDone;
-            }
-        }
-    }, [guestMode]);
+    }, [pathname, authInProgress]);
 
     const startContent = (
         <span className="flex flex-col items-center space-y-1">
@@ -268,8 +259,9 @@ export default function TopNavBar() {
 
     function hideWelcomeMessage() {
         setShowWelcomeDialogue(false);
-        if (typeof window !== 'undefined') {
-            localStorage.setItem(LOCAL_STORAGE_STEPS_COMPLETED, "true");
+        if (typeof window !== 'undefined' && !guestMode) {
+            console.log("setting local storager")
+            localStorage.setItem(LOCAL_STORAGE_HIDE_WELCOME_MESSAGE, "true");
         }
         window.scrollTo(0, 0);
     }
@@ -280,7 +272,7 @@ export default function TopNavBar() {
             <Dialog
                 header={title} keepInViewport closeOnEscape={!guestMode}
                 visible={showWelcomeDialogue}
-                onHide={() => hideWelcomeMessage()}
+                onHide={hideWelcomeMessage}
                 className="shadow-2xl w-full md:w-[75vw] lg:w-[45vw] text-center text-text size-fit m-auto">
                 <div className="bg-[url('/chant-and-be-happy3.png')] bg-no-repeat bg-center bg-contain">
                     <small className="block text-text mb-4">
@@ -331,7 +323,7 @@ export default function TopNavBar() {
                                         <div className="col-span-4 md:col-span-2 mr-1">
                                             <Button label="" severity="danger" raised size="large" className="float-right"
                                                 icon="pi pi-crown"
-                                                onClick={() => router.push(`/login${searchParams ? `?${searchParams}` : ''}`)} >
+                                                onClick={() =>  router.push(`/login?${searchParams || ''}`)}>
                                                 <Badge severity="danger" value="▸" className="scale-150"></Badge>
                                             </Button>
                                         </div>

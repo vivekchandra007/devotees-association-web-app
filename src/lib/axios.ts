@@ -3,7 +3,7 @@
 "use client";
 
 import axios, { AxiosError, AxiosInstance, InternalAxiosRequestConfig } from 'axios';
-import { useRouter } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 
 // Extend InternalAxiosRequestConfig to include the _retry property
 interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
@@ -73,10 +73,16 @@ api.interceptors.response.use(
         localStorage.removeItem('access_token');
         // Clear refresh token cookie
         await axios.post('/api/auth/logout'); // NOTE: use raw axios, not the wrapped one
-        const router = useRouter()
-        // Redirect to /login page
+        const router = useRouter();
+        const searchParams = useSearchParams();
+        const params = new URLSearchParams(searchParams.toString())
+        if (params.has('guest')) {
+            params.delete('guest');
+        }
+        const newQueryParams = params.toString();
+        // Redirect to /login page, passing along all existing query params except "guest"
         if (typeof window !== 'undefined') {
-          router.push('/login');
+          router.push(`/login?${newQueryParams || ''}`);
         }
         return Promise.reject(err);
       } finally {

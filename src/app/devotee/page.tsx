@@ -183,7 +183,12 @@ export default function DevoteePage() {
                 setReadOnly(true);
                 fetchDevotee();
             } else {
-                router.push('/');
+                const params = new URLSearchParams(searchParams.toString())
+                if (params.has('devoteeId')) {
+                    params.delete('devoteeId');
+                }
+                const newQueryParams = params.toString();
+                router.push(`/?${newQueryParams || ''}`);
             }
         }
     }, [devotee, otherDevoteeId, router, systemRole])

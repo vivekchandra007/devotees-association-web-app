@@ -18,7 +18,7 @@ export default function DevoteesPage() {
 
     useEffect(() => {
         if (systemRole === SYSTEM_ROLES.member) {
-            router.push('/');
+            router.push(`/?${searchParams || ''}`);
         }
     }, [systemRole, router, searchParams]);
 
@@ -38,7 +38,16 @@ export default function DevoteesPage() {
                 !isAuthenticated &&
                 <FullPageSpinner message="Hare Krishna! Fetching details..." />
             }
-            <TabView activeIndex={activeIndex} onTabChange={(e) => router.push(`/user-data?tab=${e.index}`)}>
+            <TabView activeIndex={activeIndex} 
+                onTabChange={(e) => { 
+                        const params = new URLSearchParams(searchParams.toString())
+                        if (params.has('tab')) {
+                            params.delete('tab');
+                        }
+                        const newQueryParams = params.toString();
+                        router.push(`/user-data?tab=${e.index}&${newQueryParams || ''}`);
+                    }
+                }>
                 <TabPanel header="Devotees" leftIcon="pi pi-users mr-2" className="min-w-[33vw]">
                     <SearchDevotee />
                 </TabPanel>

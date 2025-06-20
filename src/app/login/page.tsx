@@ -141,7 +141,7 @@ export default function LoginPage() {
     useEffect(() => {
         // Redirect to home page if already has some access token, even if expired. Homepage will check if the token is valid or not and redirect to login page if not valid.
         if (localStorage.getItem('access_token')) {
-            router.push('/');
+            router.push(`/?${searchParams || ''}`);
         } else {
             const script = document.createElement('script');
             script.src = process.env.NEXT_PUBLIC_MSG91_WIDGET_SCRIPT_URL!;

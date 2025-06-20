@@ -75,17 +75,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const login = async (accessTokenInLoginResponse: string) => {
     localStorage.setItem('access_token', accessTokenInLoginResponse);
     await fetchMe();
-    router.push('/'); // Redirect to home page
+    const params = new URLSearchParams(searchParams.toString())
+    if (params.has('guest')) {
+        params.delete('guest');
+    }
+    const newQueryParams = params.toString();
+    router.push(`/?${newQueryParams || ''}`); // Redirect to home page, using existing query params, except "guest" so that user goes back to where he/ she was
   };
 
   const logout = async () => {
     localStorage.removeItem('access_token');
     await axios.post('/api/auth/logout'); // NOTE: use raw axios, not the wrapped one
     setDevotee(null);
-    const queryParams = searchParams.toString();
     const guestMode = !!searchParams.get('guest');
     if(!guestMode) {
-      router.push(`/login${queryParams ? `?${queryParams}` : ''}`)
+      router.push(`/login?${searchParams || ''}`);
     }
   };
 
