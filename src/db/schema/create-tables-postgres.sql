@@ -55,11 +55,11 @@ EXECUTE FUNCTION update_updated_at_column();
 */
 -- 1. ENUM types
 DO $$ BEGIN
-  CREATE TYPE status_enum AS ENUM ('active', 'inactive');
+  CREATE TYPE devotees_status_enum AS ENUM ('active', 'inactive');
 EXCEPTION WHEN duplicate_object THEN null; END $$;
 
 DO $$ BEGIN
-  CREATE TYPE gender_enum AS ENUM ('male', 'female', 'other');
+  CREATE TYPE devotees_gender_enum AS ENUM ('male', 'female', 'other');
 EXCEPTION WHEN duplicate_object THEN null; END $$;
 
 -- 2. Table creation
@@ -67,7 +67,7 @@ CREATE TABLE IF NOT EXISTS devotees (
   id SERIAL PRIMARY KEY,
   name VARCHAR(100),
   initiated_name VARCHAR(100),
-  status status_enum NOT NULL,
+  status devotees_status_enum NOT NULL,
   phone VARCHAR(21) UNIQUE,
   phone_verified BOOLEAN NOT NULL DEFAULT false,
   whatsapp_consent BOOLEAN NOT NULL DEFAULT false,
@@ -79,7 +79,7 @@ CREATE TABLE IF NOT EXISTS devotees (
   source VARCHAR(100) NOT NULL,
   referred_by INTEGER,
   counsellor_id INTEGER,
-  gender gender_enum,
+  gender devotees_gender_enum,
   dob DATE,
   occupation VARCHAR(21),
   occupation_position VARCHAR(100),

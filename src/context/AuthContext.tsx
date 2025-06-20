@@ -89,7 +89,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     setDevotee(null);
     const guestMode = !!searchParams.get('guest');
     if(!guestMode) {
-      router.push(`/login?${searchParams || ''}`);
+      router.push(`/login`);
     }
   };
 

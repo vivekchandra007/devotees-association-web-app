@@ -260,7 +260,6 @@ export default function TopNavBar() {
     function hideWelcomeMessage() {
         setShowWelcomeDialogue(false);
         if (typeof window !== 'undefined' && !guestMode) {
-            console.log("setting local storager")
             localStorage.setItem(LOCAL_STORAGE_HIDE_WELCOME_MESSAGE, "true");
         }
         window.scrollTo(0, 0);
@@ -268,7 +267,7 @@ export default function TopNavBar() {
 
     return (
         <div>
-            {/* Welcome message dialgue */}
+            {/* Welcome message dialogue */}
             <Dialog
                 header={title} keepInViewport closeOnEscape={!guestMode}
                 visible={showWelcomeDialogue}

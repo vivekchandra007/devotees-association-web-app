@@ -130,12 +130,12 @@ export default function Home() {
         footer={
           (
             <div className="grid grid-cols-12 items-center">
-              <div className="col-span-8 md:col-span-10 p-4">
+              <div className="col-span-8 md:col-span-10 pt-4 text-justify">
                 <small>
-                  <strong>Note:</strong>&nbsp;Just tell us your name, so that you can start using this app. Rest of the details, you can always fill later, through Profile menu on top, at your own ease.
+                  <strong>Note:</strong>&nbsp;Just tell us your name to get started. Fill in the rest anytime from the My Profile menu on top.
                 </small>
               </div>
-              <div className="col-span-4 md:col-span-2 mr-1">
+              <div className="col-span-4 md:col-span-2 mr-1 mt-4">
                 <Button
                   className="float-right"
                   size="small"
