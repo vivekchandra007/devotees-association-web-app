@@ -122,7 +122,7 @@ export default function TopNavBar() {
     }
 
     function navigateToPage(page: string) {
-        if (pathname !== `/${page}` || searchParams.size > 0) {
+        if (pathname !== `/${page}`) {
             setIsNavigating(true);
             router.push(`/${page}`);
         }
@@ -131,7 +131,7 @@ export default function TopNavBar() {
     useEffect(() => {
         // Do something on route change
         setIsNavigating(false);
-        const stepsDone = !!Boolean(localStorage.getItem(LOCAL_STORAGE_HIDE_WELCOME_MESSAGE));
+        const stepsDone = Boolean(localStorage.getItem(LOCAL_STORAGE_HIDE_WELCOME_MESSAGE));
         if (authInProgress || pathname.includes('/login') || !guestMode || stepsDone) {
             setShowWelcomeDialogue(false);
         } else {
