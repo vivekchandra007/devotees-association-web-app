@@ -68,7 +68,7 @@ export default function Home() {
         }>
         <TabPanel header="Prernā" leftIcon="pi pi-youtube mr-2">
           <div className='p-3'>
-            <strong className="text-general">Prernā Sāgar</strong>
+            <strong className="text-general">Prernā Sindhu</strong>
             <hr />
             <small className="text-general">
               Start your spiritual journey by taking <strong className="text-hover">Holy Dip</strong> in this Sāgar of <strong className="text-hover">Bhakti</strong> videos, which will <strong className="text-hover">inspire</strong> you to the <strong className="text-hover">soul</strong>. Touch, 3D Touch, Click or Hover on any thumbnail to play. Press Escape, Click x button or just Click outside the video to close player.
@@ -80,7 +80,7 @@ export default function Home() {
         </TabPanel>
         <TabPanel header="Kripā" leftIcon="pi pi-sun mr-2">
           <div className='p-3'>
-            <strong className="text-general">I&apos;m feeling Kripā</strong>
+            <strong className="text-general">Kripā Sindhu (I&apos;m feeling Kripā)</strong>
             <hr />
             <small className="text-general">
               Once you get inspired, <strong className="text-hover">Kripā</strong> (divine blessing) will start showing. Let&apos;s see what <strong className="text-hover">Shloka</strong> from <strong className="text-hover">Shrimad Bhagwad Gita</strong> brings a hidden inspiration for you, today.
@@ -92,7 +92,7 @@ export default function Home() {
         </TabPanel>
         <TabPanel header="Gyān" leftIcon="pi pi-book mr-2">
           <div className='p-3'>
-            <strong className="text-general">Gyān Sāgar (Athāto Brahma Jigyāsā)</strong>
+            <strong className="text-general">Gyān Sindhu (Athāto Brahma Jigyāsā)</strong>
             <hr />
             <small className="text-general">
               Once you get Kripā in your life, start with the ultimate question - <strong className="text-hover">Who YOU are?</strong>. A consolidated place for all Knowledge that matters, from <strong className="text-hover">Discovering Your Self</strong> to stories of Bhakts from Grantharāj&nbsp;<strong className="text-hover">Shrimad Bhāgwatam</strong>.
@@ -103,10 +103,13 @@ export default function Home() {
         </TabPanel>
         <TabPanel header="Bhakti" leftIcon="pi pi-heart-fill mr-2">
           <div className='p-3'>
-            <strong className="text-general">Events</strong>
+            <strong className="text-general">Bhakti Rasāmṛta Sindhu</strong>
             <hr />
             <small className="text-general">
-              Finally, it&apos;s time to do practical - <strong className="text-hover">Prema Bhakti</strong>. Visit temple to take divine darshan of <strong className="text-hover">The Lord</strong> or look out for upcoming events to physically and personally connect with fellow&nbsp;
+              Finally, it&apos;s time to do practical - <strong className="text-hover">Premā Bhakti</strong>.
+              <br />
+              Visit temple to get drenched in the <strong className="text-hover">Nectar of Devotion</strong>
+              , by taking divine darshan of <strong className="text-hover">The Lord</strong> or look out for upcoming events to physically and personally associate with fellow&nbsp;
               <strong className="text-hover">Dev</strong>otees.
             </small>
             <div className="min-h-screen">

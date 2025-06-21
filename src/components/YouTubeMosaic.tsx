@@ -88,7 +88,7 @@ export default function YouTubeMosaic() {
         <InputText
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="Search videos..."
+          placeholder="Start typing to Search specific videos..."
           className="w-full pr-10"
         />
         {searchQuery && (
