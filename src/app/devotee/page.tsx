@@ -194,10 +194,15 @@ export default function DevoteePage() {
     }, [devotee, otherDevoteeId, router, systemRole])
 
     return (
-        <div className="bg-white">
+        <div className="bg-white/94 m-auto">
             {!isAuthenticated && devotee && <FullPageSpinner message="Hare Krishna! Fetching details..." />}
 
-            {inProgress && <FullPageSpinner message="Hare Krishna! Fetching details for the devotee..." />}
+            {
+                inProgress ?
+                    <ProgressBar mode="indeterminate" style={{height: '2px'}} className="pt-1"></ProgressBar>
+                    :
+                    <hr/>
+            }
 
             {formik.isSubmitting && <FullPageSpinner message="Saving Changes" />}
 

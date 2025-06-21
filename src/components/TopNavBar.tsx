@@ -169,7 +169,7 @@ export default function TopNavBar() {
                     size="large"
                     onClick={() => navigateToPage('devotee')}
                 />
-                <span className="text-xs mt-1">My Profile</span>
+                <span className="text-xs mt-1">My Data</span>
             </span>
             {
                 systemRole === SYSTEM_ROLES.member ?
@@ -183,7 +183,7 @@ export default function TopNavBar() {
                                 severity="contrast"
                                 aria-label="Donations"
                                 size="large"
-                                onClick={() => navigateToPage('donations')}
+                                onClick={() => navigateToPage('devotee/donations')}
                             />
                             <span className="text-xs mt-1">Donations</span>
                         </span>
