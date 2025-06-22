@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma'; // adjust to your prisma client
 import { verifyAccessToken } from '@/lib/auth'; // your JWT verification function
 import _ from "lodash";
+import {parseDateFromStringddmmyyyy} from "@/lib/conversions";
 
 // type Donation = Prisma.donationsGetPayload<{}>; 
 
@@ -30,10 +31,10 @@ export async function POST(req: NextRequest) {
             //     return NextResponse.json({ error: 'Donation Data Validation failed', details: parsed.error.flatten() }, { status: 400 });
             // }
             // donation = parsed.data;
-            if (!donation || !donation.id) {
+            if (!donation) {
                 donations.splice(i, 1); // ✅ Safe to delete in reverse
             } else {
-                _.set(donations[i], "date", new Date(_.get(donations[i], "date")));
+                _.set(donations[i], "date", parseDateFromStringddmmyyyy(_.get(donations[i], "date")));
             }
         }
 

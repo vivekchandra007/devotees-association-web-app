@@ -10,7 +10,7 @@ import { Toast } from "primereact/toast";
 import { MessageSeverity } from "primereact/api";
 import { Prisma } from '@prisma/client';
 import _ from "lodash";
-import { formatDateIntoStringddmmyyyy, parseDateFromStringddmmyyyy } from '@/lib/conversions'
+import { formatDateIntoStringddmmyyyy } from '@/lib/conversions'
 import { ProgressBar } from 'primereact/progressbar'
 import { useAuth } from '@/hooks/useAuth'
 import { SYSTEM_ROLES } from '@/data/constants'
@@ -47,7 +47,10 @@ export default function DonationsDashboard() {
   // If user searched something, we will show search results donations
   const getApplicableDonations = showSearchResults ? donations : allDonations;
 
-  const errorMessage = (
+  const errorMessageNoDonations = (
+    <small>No donations exist. Admin can bulk upload donations, exported from ERP portal.</small>
+  );
+  const errorMessageNoSearchResult = (
     <small>No donations found matching this search. Clear search to view donations from all devotees.</small>
   );
 
@@ -71,45 +74,39 @@ export default function DonationsDashboard() {
           detail: 'Donations uploaded successfully',
           life: 4000
         });
-        fetchDonations()
+        setInProgress(false);
+        setShowBulkUploadDialogue(false);
+        fetchDonations();
       } catch {
+        setInProgress(false);
+        setShowBulkUploadDialogue(false);
         toast.current?.show({
           severity: MessageSeverity.ERROR,
           detail: 'Error uploading donations',
           life: 4000
         });
-        setInProgress(false);
       }
     }
 
-    reader.readAsArrayBuffer(file)
+    reader.readAsArrayBuffer(file);
+    setInProgress(true);
   }
 
   const formatIntoProperJson = (json: object[]) => {
     const formattedJson: object[] = [];
     // iterate in reverse coz donations are in descending order of date
     for (let i = json.length - 1; i >= 0; i--) {
-      // since we are iterating in reverse, once we reach header i.e. "_1": "Sr", means we iterated through all, so just come out of loop
-      if (_.get(json[i], '_1') === "Sr") {
-        break;
-      }
-
-      const date = _.get(json[i], '_3');
-      const phone = _.get(json[i], '_9');
-      const amount = _.get(json[i], '_15');
+      const date = _.get(json[i], 'Date');
+      const phone = _.get(json[i], 'Contact Number');
+      const amount = _.get(json[i], 'Amount');
       const donation = {
-        id: _.get(json[i], '_4', ''),
-        donation_receipt_number: _.get(json[i], '_4', ''),
-        name: _.get(json[i], '_8', ''),
+        donation_receipt_number: _.get(json[i], 'Donation Receipt Number'),
+        name: _.get(json[i], 'Donor Name', ''),
         phone: phone ? `91${phone}` : '',
-        cost_center: _.get(json[i], '_10', ''),
-        scheme_name: _.get(json[i], '_13', ''),
-        payment_mode: _.get(json[i], '_14', ''),
         amount: amount ? parseInt(String(amount).replace(/,/g, '').split('.')[0], 10) : null,
-        instrument_number: _.get(json[i], '_16', ''),
-        collected_by: _.get(json[i], '_19', ''),
-        status: _.get(json[i], '_20', ''),
-        date: date ? parseDateFromStringddmmyyyy(date) : (new Date())
+        date: date || formatDateIntoStringddmmyyyy(new Date()),
+        created_by: devotee?.id,
+        updated_by: devotee?.id,
       }
       formattedJson.push(donation);
     }
@@ -182,7 +179,7 @@ export default function DonationsDashboard() {
       }
     } catch {
       msgs.current?.clear();
-      msgs.current?.show({ id: '1', sticky: true, severity: 'error', summary: errorMessage, closable: true });
+      msgs.current?.show({ id: '1', sticky: true, severity: 'error', summary: (query || searchQuery.trim() !== '')? errorMessageNoSearchResult:errorMessageNoDonations, closable: true });
       setDonations(null); // Reset donations to null if there's an error
       setShowSearchResults(false); // Do not show search results, instead show all donations
     } finally {
