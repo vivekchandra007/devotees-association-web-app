@@ -41,10 +41,10 @@ export async function POST(req: NextRequest) {
             where: { id: payload },
             select: {
                 name: true,
-                role_id: true,
+                system_role_id: true,
             },
         });
-        if (!loggedIndevotee?.role_id || loggedIndevotee?.role_id <= 3) {
+        if (!loggedIndevotee?.system_role_id || loggedIndevotee?.system_role_id <= 3) {
             return NextResponse.json({ error: 'Forbidden: You do not have privileges to bulk upload donation' }, { status: 403 });
         }
 

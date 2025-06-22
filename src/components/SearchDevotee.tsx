@@ -133,7 +133,7 @@ export default function SearchDevotee() {
                                                 devoteeDetails?.status !== "active" &&
                                                 <p><strong>Status:</strong> {devoteeDetails?.status}</p>
                                             }
-                                            <p><strong>Role:</strong> {devoteeDetails?.system_role_ref_value?.name}</p>
+                                            <p><strong>Role:</strong> {devoteeDetails?.system_role_id_ref_value?.name}</p>
 
                                             {/* volunteers, leaders and admins can view full details of a devotee as well as their donations */}
                                             <div className="grid grid-cols-2 gap-2 mt-3">

@@ -29,11 +29,16 @@ export default function Home() {
   async function saveDevoteeName() {
     if (devotee && devoteeName) {
       setSavingName(true);
-      await api.post('/devotee', {
-        id: devotee.id,
-        name: devoteeName
-      }); // automatically sends token
-      window.location.reload();
+      try {
+        await api.post('/devotee', {
+          id: devotee.id,
+          name: devoteeName
+        }); // automatically sends token
+        window.location.reload();
+      } catch {
+        setSavingName(false);
+        alert("Failed to save your name. Please try again.");
+      }
     }
   }
 

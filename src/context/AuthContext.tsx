@@ -20,25 +20,31 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 type Devotee = Prisma.devoteesGetPayload<{
   include: {
-    system_role_ref_value: {
+    system_role_id_ref_value: {
       select: {
         name: true;
       };
     },
-    spiritual_level_ref_value: {
+    spiritual_level_id_ref_value: {
       select: {
         title_male: true,
         title_female: true,
         title_other: true
       };
     },
+    source_id_ref_value: {
+      select: {
+        name: true;
+        description: true,
+      }
+    }
     counsellor_id_ref_value: {
       select: {
         id: true,
         name: true
       }
     },
-    referred_by_ref_value: {
+    referred_by_id_ref_value: {
       select: {
         id: true,
         name: true
@@ -61,7 +67,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (res && res.status === 200 && res.data?.devotee) {
         const parsedDevotee: Devotee = convertDateStringIntoDateObject(res.data.devotee);
         setDevotee(parsedDevotee);
-        setSystemRole(res.data.devotee.system_role_ref_value.name);
+        setSystemRole(res.data.devotee.system_role_id_ref_value.name);
       } else {
         throw new Error();
       }

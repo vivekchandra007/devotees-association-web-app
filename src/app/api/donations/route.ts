@@ -17,9 +17,7 @@ export async function GET(req: NextRequest) {
             where: {
                 OR: [
                     {
-                        id: {
-                            contains: query,
-                        }
+                        id: Number.parseInt(query)
                     },
                     {
                         phone: {

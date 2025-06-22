@@ -40,8 +40,8 @@ export async function GET(req: NextRequest) {
                 email: true,
                 phone: true,
                 status: true,
-                role_id: true,
-                system_role_ref_value: {
+                system_role_id: true,
+                system_role_id_ref_value: {
                     select: {
                         name: true,
                     },

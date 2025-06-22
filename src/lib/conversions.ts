@@ -6,25 +6,31 @@ const devoteeFormDateFields = [ "dob", "spouse_dob", "spouse_marriage_anniversar
 
 type Devotee = Prisma.devoteesGetPayload<{
   include: {
-    system_role_ref_value: {
+    system_role_id_ref_value: {
       select: {
         name: true;
       };
     },
-    spiritual_level_ref_value: {
+    spiritual_level_id_ref_value: {
       select: {
         title_male: true,
         title_female: true,
         title_other: true
       };
     },
+    source_id_ref_value: {
+      select: {
+        name: true,
+        description: true,
+      }
+    }
     counsellor_id_ref_value: {
       select: {
         id: true,
         name: true
       }
     },
-    referred_by_ref_value: {
+    referred_by_id_ref_value: {
       select: {
         id: true,
         name: true
@@ -58,7 +64,7 @@ export function parseDateFromStringddmmyyyy(dateStr: string): Date | null {
 
   // Month is 0-based in JavaScript Date
   return new Date(year, month - 1, day);
-};
+}
 
 export function formatDateIntoStringddmmyyyy(date: Date): string | null {
   const day = String(date.getDate()).padStart(2, '0');
@@ -66,4 +72,4 @@ export function formatDateIntoStringddmmyyyy(date: Date): string | null {
   const year = date.getFullYear();
 
   return `${day}/${month}/${year}`;
-};
+}

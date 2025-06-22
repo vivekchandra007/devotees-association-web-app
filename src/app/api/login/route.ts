@@ -2,12 +2,13 @@ import axios from "axios";
 import prisma from '@/lib/prisma';
 import { signAccessToken, signRefreshToken } from "@/lib/auth";
 import { NextResponse } from "next/server";
+import _ from "lodash";
 
 export async function POST(request: Request) {
     const authHeader = request.headers.get("Authorization");
     const body = await request.json()
     const referralCode:number | null = Number.parseInt(body.ref?.slice(11));
-    const source:string | null = body.source;
+    const source:number | undefined = body.source;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
         return Response.json({ error: "Unauthorized" }, { status: 401 });
@@ -41,25 +42,26 @@ export async function POST(request: Request) {
     }
 }
 
-async function insertOrFetchDevotee(phoneNumber: string, referralCode: number|null, source: string|null) {
+async function insertOrFetchDevotee(phoneNumber: string, referralCode: number|null, source: number|undefined) {
     try {
         let devotee = await prisma.devotees.findFirst({
             where: { phone: phoneNumber },
         });
 
         if (!devotee) {
-            devotee = await prisma.devotees.create({
-                data: { 
-                    phone: phoneNumber,
-                    phone_verified: true,
-                    phone_whatsapp: phoneNumber,
-                    status: "active",
-                    role_id: 1,
-                    spiritual_level: 1,
-                    source: source || "self",
-                    referred_by: referralCode
-                },
-            });
+            const data = {
+                phone: phoneNumber,
+                phone_verified: true,
+                phone_whatsapp: phoneNumber,
+            };
+            _.set(data,"status", "active");
+            if (source) {
+                _.set(data,"source_id", source);
+            }
+            if (referralCode) {
+                _.set(data,"referred_by_id", source);
+            }
+            devotee = await prisma.devotees.create({ data });
         }
 
         const accessToken = signAccessToken(devotee.id);

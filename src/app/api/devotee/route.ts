@@ -25,26 +25,32 @@ export async function POST(req: NextRequest) {
     }
 
     if (parsed.data.id !== payload) {
-      // If it is not devotee himself then a role_id > 2 i.e. a leader or admin who can make changes to some devotee's data
+      // If it is not devotee himself then a system_role_id > 2 i.e. a leader or admin who can make changes to some devotee's data
       const loggedIndevotee = await prisma.devotees.findUnique({
         where: { id: payload },
         select: {
           name: true,
-          role_id: true,
+          system_role_id: true,
         },
       });
-      if (!loggedIndevotee?.role_id || loggedIndevotee?.role_id <= 2) {
+      if (!loggedIndevotee?.system_role_id || loggedIndevotee?.system_role_id <= 2) {
         return NextResponse.json({ error: 'Forbidden: You do not have privileges to update details of this devotee.' }, { status: 403 });
       }
     }
-    const updatedDevotee = await prisma.devotees.update({
-      where: { id: parsed.data.id },
-      data: {
-        ...parsed.data
-      },
-    });
-
-    return NextResponse.json({ success: true, devotee: updatedDevotee }, { status: 200 });
+    // cast out "id" from data so that no one can update the id through this query
+    const id = parsed.data.id;
+    delete parsed.data.id;
+    if (!parsed.data.id && id) {
+      const updatedDevotee = await prisma.devotees.update({
+        where: { id },
+        data: {
+          ...parsed.data
+        },
+      });
+      return NextResponse.json({ success: true, devotee: updatedDevotee }, { status: 200 });
+    } else {
+      throw new Error();
+    }
   } catch {
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }
@@ -66,12 +72,12 @@ export async function GET(req: NextRequest) {
     const devotee = await prisma.devotees.findUnique({
       where: { id: devoteeId },
       include: {
-        system_role_ref_value: {
+        system_role_id_ref_value: {
           select: {
             name: true,
           },
         },
-        spiritual_level_ref_value: {
+        spiritual_level_id_ref_value: {
           select: {
             title_male: true,
             title_female: true,
@@ -84,7 +90,7 @@ export async function GET(req: NextRequest) {
             name: true
           }
         },
-        referred_by_ref_value: {
+        referred_by_id_ref_value: {
           select: {
             id: true,
             name: true

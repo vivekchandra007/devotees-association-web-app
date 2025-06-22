@@ -915,10 +915,13 @@ export default function DevoteePage() {
                     <Fieldset legend={<span>For official purposes<i className="pi pi-lock pl-2"></i></span>} toggleable collapsed >
                         <div className="grid md:grid-cols-2 gap-4">
                             <div>
-                                Counsellor ID: {formik.values?.counsellor_id}
+                                Counsellor ID: {formik.values?.counsellor_id_ref_value?.name}
                             </div>
                             <div className="capitalize">
-                                Referred By: {formik.values?.source}
+                                Referred By: {formik.values?.referred_by_id_ref_value?.name}
+                            </div>
+                            <div className="capitalize">
+                                Source: {formik.values?.source_id_ref_value.name}
                             </div>
                         </div>
                     </Fieldset>

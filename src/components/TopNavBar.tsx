@@ -105,7 +105,7 @@ export default function TopNavBar() {
                                 }
                                 <span className="capitalize">
                                     {
-                                        (devotee?.name || '') + ('    ') + (devotee?.gender && !devotee?.initiated_name ? devotee.spiritual_level_ref_value[`title_${devotee?.gender}`] : '')
+                                        (devotee?.name || '') + ('    ') + (devotee?.gender && !devotee?.initiated_name ? devotee.spiritual_level_id_ref_value[`title_${devotee?.gender}`] : '')
                                     }
                                 </span>
                             </span>
@@ -251,7 +251,7 @@ export default function TopNavBar() {
                 isAuthenticated && devotee && 
                 <span>
                     <br />
-                    {devotee?.initiated_name || devotee?.name}{devotee?.gender ? `, ${devotee.spiritual_level_ref_value[`title_${devotee?.gender}`]}` : ''} 🙏🏻
+                    {devotee?.initiated_name || devotee?.name}{devotee?.gender ? `, ${devotee.spiritual_level_id_ref_value[`title_${devotee?.gender}`]}` : ''} 🙏🏻
                 </span>
             }
         </small>

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const devoteeSchema = z.object({
-  id: z.number().int(),
+  id: z.number().int().optional(),
   name: z.string().max(100).optional(),
   initiated_name: z.string().max(100).nullable().optional(),
   dob: z.date().nullable().optional(),
@@ -11,7 +11,7 @@ export const devoteeSchema = z.object({
   email_verified: z.boolean().optional(),
   gender: z.enum(['male', 'female', 'other']).nullable().optional(),
   occupation: z.string().max(21).nullable().optional(),
-  occupation_position: z.string().max(51).nullable().optional(),
+  occupation_position: z.string().max(100).nullable().optional(),
   tax_80g_required: z.boolean().optional(),
   tax_pan: z.string().max(10).nullable().optional(),
   skills: z.any().nullable().optional(),
@@ -24,7 +24,7 @@ export const devoteeSchema = z.object({
   address_gmap_url: z.string().nullable().optional(),
   address_city: z.string().max(100).nullable().optional(),
   address_state: z.string().max(100).nullable().optional(),
-  address_pincode: z.string().max(6).nullable().optional(),
+  address_pincode: z.string().max(20).nullable().optional(),
   address_country: z.string().max(100).nullable().optional(),
   language_preference: z.string().max(21).nullable().optional(),
   marital_status: z.boolean().optional(),

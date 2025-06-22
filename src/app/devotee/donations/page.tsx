@@ -90,7 +90,7 @@ export default function DonationsPage() {
                                     <br />
                                     <small>that is registered under phone number {devotee?.phone?.slice(2)}</small>
                                 </h2>
-                                <small>A donation typically takes a week to reflect here.</small>
+                                <small>Note: A donation typically takes a week to reflect here. You can visit this section later. Till then, take benefit of the rest of this initiate to raise our consciousness.</small>
                             </>
                     }
                 </div>
