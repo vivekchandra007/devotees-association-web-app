@@ -1,7 +1,7 @@
 /* Using Postgres DB, hosted on Prisma (https://console.prisma.io) */
 /* Project: Madhuram, DB: dev */
 
--- Common Trigger function to auto-update 'updated_at' on row change on most tables
+-- Common Trigger function to auto-update 'updated_at' column on row change on any table
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
@@ -22,10 +22,10 @@ CREATE TABLE IF NOT EXISTS system_roles (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
--- Drop if exists (prevent redefinition errors)
+-- Drop trigger for updated_at, if already exists (prevent redefinition errors)
 DROP TRIGGER IF EXISTS set_updated_at_system_roles ON system_roles;
 
--- Trigger binding for system_roles
+-- Create trigger binding for updated_at column
 CREATE TRIGGER set_updated_at_system_roles
 BEFORE UPDATE ON system_roles
 FOR EACH ROW
@@ -44,16 +44,43 @@ CREATE TABLE IF NOT EXISTS spiritual_levels (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+-- Drop trigger for updated_at, if already exists (prevent redefinition errors)
 DROP TRIGGER IF EXISTS set_updated_at_spiritual_levels ON spiritual_levels;
+
+-- Create trigger binding for updated_at column
 CREATE TRIGGER set_updated_at_spiritual_levels
 BEFORE UPDATE ON spiritual_levels
 FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_column();
 
 /* 
-  TABLE #3: devotees
+  TABLE #3: campaigns: to run campaigns like janmashtami, new temple, etc. so as to identify 
+            what users got acquired and what donaitons were made for a specific cause.
 */
--- 1. ENUM types
+CREATE TABLE IF NOT EXISTS campaigns (
+  id SMALLINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  name VARCHAR(40) NOT NULL, 
+  description TEXT NOT NULL,
+  start_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  end_at TIMESTAMP NOT NULL DEFAULT (CURRENT_TIMESTAMP + INTERVAL '1 year'),
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Drop trigger for updated_at, if already exists (prevent redefinition errors)
+DROP TRIGGER IF EXISTS set_updated_at_campaigns ON campaigns;
+
+-- Create trigger binding for updated_at column
+CREATE TRIGGER set_updated_at_campaigns
+BEFORE UPDATE ON campaigns
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
+/* 
+  TABLE #4: devotees
+*/
+-- 1. Define required ENUM types
 DO $$ BEGIN
   CREATE TYPE devotees_status_enum AS ENUM ('active', 'inactive');
 EXCEPTION WHEN duplicate_object THEN null; END $$;
@@ -64,21 +91,21 @@ EXCEPTION WHEN duplicate_object THEN null; END $$;
 
 -- 2. Table creation
 CREATE TABLE IF NOT EXISTS devotees (
-  id SERIAL PRIMARY KEY,
+  id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
   name VARCHAR(100),
   initiated_name VARCHAR(100),
-  status devotees_status_enum NOT NULL,
+  status devotees_status_enum NOT NULL DEFAULT 'active',
   phone VARCHAR(21) UNIQUE,
   phone_verified BOOLEAN NOT NULL DEFAULT false,
   whatsapp_consent BOOLEAN NOT NULL DEFAULT false,
   phone_whatsapp VARCHAR(21),
   email VARCHAR(255) UNIQUE,
   email_verified BOOLEAN NOT NULL DEFAULT false,
-  role_id SMALLINT NOT NULL,
-  spiritual_level SMALLINT NOT NULL,
-  source VARCHAR(100) NOT NULL,
-  referred_by INTEGER,
-  counsellor_id INTEGER,
+  system_role_id SMALLINT NOT NULL DEFAULT 1,         --FK from "systems_roles" tables. Default in "member"
+  spiritual_level_id SMALLINT NOT NULL DEFAULT 1,     --FK from "spiritual_levels" tables. Default is "dev/ devi"
+  source_id INTEGER NOT NULL DEFAULT 1,               --FK from "campaigns" tables. Default is "Self Registration"
+  referred_by_id INTEGER DEFAULT NULL,                --Self Referential FK
+  counsellor_id INTEGER DEFAULT NULL,                 --Self Referential FK
   gender devotees_gender_enum,
   dob DATE,
   occupation VARCHAR(21),
@@ -98,7 +125,7 @@ CREATE TABLE IF NOT EXISTS devotees (
   address_pincode VARCHAR(20),
   address_country VARCHAR(100),
   language_preference VARCHAR(21),
-  marital_status BOOLEAN NOT NULL DEFAULT false,
+  marital_status BOOLEAN,
   spouse_name VARCHAR(100),
   spouse_dob DATE,
   spouse_marriage_anniversary DATE,
@@ -119,69 +146,76 @@ CREATE TABLE IF NOT EXISTS devotees (
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
-  FOREIGN KEY (role_id) REFERENCES system_roles(id),
-  FOREIGN KEY (spiritual_level) REFERENCES spiritual_levels(id)
+  FOREIGN KEY (system_role_id) REFERENCES system_roles(id),
+  FOREIGN KEY (spiritual_level_id) REFERENCES spiritual_levels(id),
+  FOREIGN KEY (source_id) REFERENCES campaigns(id)
 );
 
--- Self Referential Foreign Key
+-- Self Referential Foreign Key for counsellor_id
 ALTER TABLE devotees
 ADD CONSTRAINT fk_counsellor
   FOREIGN KEY (counsellor_id) REFERENCES devotees(id)
   ON DELETE SET NULL
   ON UPDATE CASCADE;
 
+-- Self Referential Foreign Key for referred_by
 ALTER TABLE devotees
 ADD CONSTRAINT fk_referred_by
-  FOREIGN KEY (referred_by) REFERENCES devotees(id)
+  FOREIGN KEY (referred_by_id) REFERENCES devotees(id)
   ON DELETE SET NULL
   ON UPDATE CASCADE;
 
-ALTER TABLE devotees
-ADD COLUMN created_by INTEGER REFERENCES devotees(id) DEFAULT NULL,
-ADD COLUMN updated_by INTEGER REFERENCES devotees(id) DEFAULT NULL
-
--- Drop if exists (prevent redefinition errors)
+-- Drop trigger for updated_at, if already exists (prevent redefinition errors)
 DROP TRIGGER IF EXISTS set_updated_at_devotees ON devotees;
 
--- Create the trigger
+-- Create trigger binding for updated_at column
 CREATE TRIGGER set_updated_at_devotees
 BEFORE UPDATE ON devotees
 FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_column();
 
-
 /* 
-  TABLE #4: donations
+  TABLE #5: donations
 */
 CREATE TABLE IF NOT EXISTS donations (
-  id VARCHAR(100) PRIMARY KEY,
-  donation_receipt_number VARCHAR(100) NOT NULL,
+  id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+  donation_receipt_number VARCHAR(100) UNIQUE,
+  campaign_id INTEGER DEFAULT 2,      --FK from "campaigns" tables. Default is "Bulk Upload"
   name VARCHAR(100),
   phone VARCHAR(21),
-  cost_center VARCHAR(100),
-  scheme_name VARCHAR(100),
-  payment_mode VARCHAR(20),
+  payment_mode VARCHAR(20) DEFAULT NULL,
   amount INTEGER NOT NULL CHECK (amount >= 0),
-  instrument_number VARCHAR(100),
-  collected_by VARCHAR(100),
-  status VARCHAR(21) NOT NULL DEFAULT 'Not Verified',
   date DATE DEFAULT CURRENT_DATE,
   internal_note TEXT,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  FOREIGN KEY (campaign_id) REFERENCES campaigns(id)
 );
 
-ALTER TABLE donations
-ADD COLUMN created_by INTEGER REFERENCES devotees(id) DEFAULT NULL,
-ADD COLUMN updated_by INTEGER REFERENCES devotees(id) DEFAULT NULL
-
--- Drop if exists (prevent redefinition errors)
+-- Drop trigger for updated_at, if already exists (prevent redefinition errors)
 DROP TRIGGER IF EXISTS set_updated_at_donations ON donations;
 
--- Create the trigger
+-- Create trigger binding for updated_at column
 CREATE TRIGGER set_updated_at_donations
 BEFORE UPDATE ON donations
 FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_column();
 
+/* 
+  Pending Alter of Tables which refer to devotees table for storing `created_by` and `updated_by`
+*/
+-- campaigns
+ALTER TABLE campaigns
+ADD COLUMN created_by INTEGER REFERENCES devotees(id) DEFAULT NULL,
+ADD COLUMN updated_by INTEGER REFERENCES devotees(id) DEFAULT NULL
 
+-- devotees (self referential)
+ALTER TABLE devotees
+ADD COLUMN created_by INTEGER REFERENCES devotees(id) DEFAULT NULL,
+ADD COLUMN updated_by INTEGER REFERENCES devotees(id) DEFAULT NULL
+
+-- donations
+ALTER TABLE donations
+ADD COLUMN created_by INTEGER REFERENCES devotees(id) DEFAULT NULL,
+ADD COLUMN updated_by INTEGER REFERENCES devotees(id) DEFAULT NULL
