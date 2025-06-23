@@ -63,7 +63,7 @@ export function parseDateFromStringddmmyyyy(dateStr: string): Date | null {
   if (!day || !month || !year) return null;
 
   // Month is 0-based in JavaScript Date
-  return new Date(year, month - 1, day);
+  return new Date(Date.UTC(year, month - 1, day));
 }
 
 export function formatDateIntoStringddmmyyyy(date: Date): string | null {

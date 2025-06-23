@@ -48,10 +48,10 @@ export default function DonationsDashboard() {
   const getApplicableDonations = showSearchResults ? donations : allDonations;
 
   const errorMessageNoDonations = (
-    <small>No donations exist. Admin can bulk upload donations, exported from ERP portal.</small>
+    <small>No donations exist. Only an admin can bulk upload donations, exported from ERP portal.</small>
   );
   const errorMessageNoSearchResult = (
-    <small>No donations found matching this search. Clear search to view donations from all devotees.</small>
+    <small>No donations found matching <strong>{searchQuery}</strong>. Showing you all donations instead.</small>
   );
 
   const handleUpload = async (e: FileUploadFilesEvent) => {
@@ -220,38 +220,46 @@ export default function DonationsDashboard() {
         A consolidated place for all the donations data. At your role level, {devotee?.name}, you have the privileges to:
         {
           systemRole === SYSTEM_ROLES.admin &&
-          <div className="m-5">
-            <strong className="text-hover">• Insert</strong> donations data in bulk by uploading Excel sheet in specific format
-            <br />
-            {
-              systemRole === SYSTEM_ROLES.admin &&
-              <Button
-                icon="pi pi-upload"
-                label="Upload"
-                severity="secondary"
-                aria-label="Upload Donations"
-                size="small"
-                onClick={() => setShowBulkUploadDialogue(true)}
-              />
-            }
-            <Dialog
-              header="Bulk Upload Donations Data" keepInViewport
-              visible={showBulkUploadDialogue}
-              onHide={() => setShowBulkUploadDialogue(false)}>
-              <FileUpload
-                name="excel"
-                mode="advanced"
-                auto
-                chooseLabel="Upload Donations Excel"
-                customUpload
-                uploadHandler={handleUpload}
-                onBeforeUpload={() => setInProgress(true)}
-                onUpload={() => setShowBulkUploadDialogue(false)}
-                accept=".xlsx, .xls"
-                emptyTemplate={<p className="m-0">Drag and drop Donations Excel file here</p>}
-              />
-            </Dialog>
-          </div>
+            <div className="m-5">
+              <strong className="text-hover">• Insert</strong> donations data in bulk by uploading Excel sheet in
+              specific format:&nbsp;
+              <a
+                  href="/Sample-Donations-Bulk-Data-Upload-Format-For-Madhuram.xlsx"
+                  download
+                  className="text-blue-600 underline hover:text-blue-800"
+              >
+                download sample sheet
+              </a>
+              <br/>
+              {
+                  systemRole === SYSTEM_ROLES.admin &&
+                  <Button
+                      icon="pi pi-upload"
+                      label="Upload"
+                      severity="secondary"
+                      aria-label="Upload Donations"
+                      size="small"
+                      onClick={() => setShowBulkUploadDialogue(true)}
+                  />
+              }
+              <Dialog
+                  header="Bulk Upload Donations Data" keepInViewport
+                  visible={showBulkUploadDialogue}
+                  onHide={() => setShowBulkUploadDialogue(false)}>
+                <FileUpload
+                    name="excel"
+                    mode="advanced"
+                    auto
+                    chooseLabel="Upload Donations Excel"
+                    customUpload
+                    uploadHandler={handleUpload}
+                    onBeforeUpload={() => setInProgress(true)}
+                    onUpload={() => setShowBulkUploadDialogue(false)}
+                    accept=".xlsx, .xls"
+                    emptyTemplate={<p className="m-0">Drag and drop Donations Excel file here</p>}
+                />
+              </Dialog>
+            </div>
         }
         <div className="m-5"><strong className="text-hover">• View</strong> all the donations data.</div>
       </small>
@@ -304,6 +312,7 @@ export default function DonationsDashboard() {
           aria-label="Clear search"
         />
       )} */}
+      <Messages ref={msgs} />
       <small>
         <strong>Note:</strong>&nbsp;You can search a donation by it&apos;s id, donation_receipt_number, phone number of donor, name of donor, or donation amount
       </small>
@@ -329,12 +338,10 @@ export default function DonationsDashboard() {
             <Column header="Amount" body={amountFormatted} />
             <Column header="Phone Number" body={phoneFormatted} />
             <Column header="Name" body={nameWithLink} />
-            <Column field="payment_mode" header="Mode" />
-            <Column field="internal_note" header="Note" />
+            <Column field="internal_note" header="Internal Note" />
           </DataTable>
         </div>
       }
-      <Messages ref={msgs} />
       <Toast ref={toast} position="bottom-center" />
     </div>
   )
