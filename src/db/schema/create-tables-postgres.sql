@@ -82,7 +82,7 @@ EXECUTE FUNCTION update_updated_at_column();
 */
 -- 1. Define required ENUM types
 DO $$ BEGIN
-  CREATE TYPE devotees_status_enum AS ENUM ('active', 'inactive');
+  CREATE TYPE devotees_status_enum AS ENUM ('active', 'inactive', 'deceased');
 EXCEPTION WHEN duplicate_object THEN null; END $$;
 
 DO $$ BEGIN

@@ -11,12 +11,13 @@ import { Toast } from "primereact/toast";
 import { Messages } from "primereact/messages";
 import { ProgressBar } from "primereact/progressbar";
 import { useRef, useState } from "react";
-import {SYSTEM_ROLES} from "@/data/constants";
+import {STATUSES, SYSTEM_ROLES} from "@/data/constants";
 import {Dialog} from "primereact/dialog";
 import {FileUpload, FileUploadFilesEvent} from "primereact/fileupload";
 import * as XLSX from "xlsx";
 import {MessageSeverity} from "primereact/api";
 import _ from "lodash";
+import getCountryCallingCode from "@/data/countryCallingCodes";
 
 export default function DevoteesDashboard() {
     const { devotee, systemRole } = useAuth();
@@ -102,12 +103,16 @@ export default function DevoteesDashboard() {
                 const taxPan = _.get(devoteeRow, 'PAN');
                 const spouseMarriageAnniversary = _.get(devoteeRow, 'DOM');
                 const dob = _.get(devoteeRow, 'Date of Birth');
-                const phoneFormatted = `91${String(phone).replace(/'/g, '')}`; // → "919999999999"
+                let countryCallingCode = "91";
+                if (addressCountry) {
+                    countryCallingCode = getCountryCallingCode(countryCallingCode) || "91";
+                }
+                const phoneFormatted = `${countryCallingCode}${String(phone).replace(/'/g, '')}`; // → "919999999999"
                 const donation = {
                     phone: phoneFormatted,
-                    source_id: 2,
-                    phone_verified: true,
                     phone_whatsapp: phoneFormatted,
+                    status: 'inactive',
+                    source_id: 2,
                     created_by: devotee?.id,
                     updated_by: devotee?.id
                 }
@@ -300,7 +305,7 @@ export default function DevoteesDashboard() {
                     text
                     severity="contrast"
                     title="Clear Search"
-                    className="flex float-right bottom-[48px] right-[40px] z-1 text-gray-400 hover:text-gray-600"
+                    className="flex float-right bottom-[51px] right-[70px] z-1 text-gray-400 hover:text-gray-600"
                     aria-label="Clear search"
                 />
             )}
@@ -316,16 +321,13 @@ export default function DevoteesDashboard() {
                             searchResult.map((devoteeDetails: typeof devotee) => (
                                 <BlockUI
                                     key={devoteeDetails?.id}
-                                    blocked={devoteeDetails?.status !== "active"}
+                                    blocked={devoteeDetails?.status === STATUSES.deceased}
                                     template={<i className="pi pi-lock" style={{fontSize: '3rem'}}></i>}>
                                     <Card>
                                         <h3>{devoteeDetails?.name}</h3>
                                         <p><strong>Phone:</strong> {devoteeDetails?.phone?.slice(2)}</p>
                                         <p><strong>Email:</strong> {devoteeDetails?.email}</p>
-                                        {
-                                            devoteeDetails?.status !== "active" &&
-                                            <p><strong>Status:</strong> {devoteeDetails?.status}</p>
-                                        }
+                                        <p><strong>Status:</strong> {devoteeDetails?.status}</p>
                                         <p><strong>Role:</strong> {devoteeDetails?.system_role_id_ref_value?.name}</p>
 
                                         {/* volunteers, leaders and admins can view full details of a devotee as well as their donations */}

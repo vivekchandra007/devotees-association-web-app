@@ -151,15 +151,5 @@ enum devotees_gender_enum {
 enum devotees_status_enum {
   active
   inactive
-}
-
-enum gender_enum {
-  male
-  female
-  other
-}
-
-enum status_enum {
-  active
-  inactive
+  deceased
 }

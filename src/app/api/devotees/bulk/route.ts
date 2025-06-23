@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma'; // adjust to your prisma client
 import { verifyAccessToken } from '@/lib/auth'; // your JWT verification function
 import _ from "lodash";
 import {convertDateStringIntoDateObject} from "@/lib/conversions";
-import {devoteeSchema} from "@/schema/devoteeFormSchema";
+import {devoteeBulkInsertSchema} from "@/schema/devoteeBulkSchema";
 
 // type Donation = Prisma.donationsGetPayload<{}>; 
 
@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
             if (taxPan?.length > 10) {
                 delete devotee["tax_pan"];
             }
-            const parsed = devoteeSchema.safeParse(devotee);
+            const parsed = devoteeBulkInsertSchema.safeParse(devotee);
             if (!parsed.success) {
                 devotees.splice(i, 1); // ✅ Safe to delete in reverse
                 continue;

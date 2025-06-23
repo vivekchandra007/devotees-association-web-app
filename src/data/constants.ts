@@ -4,3 +4,8 @@ export const SYSTEM_ROLES = {
     leader: "leader",
     admin: "admin"
 }
+export const STATUSES = {
+    active: "active",
+    inactive: "inactive",
+    deceased: "deceased"
+}
