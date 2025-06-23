@@ -3,7 +3,7 @@
 import { useAuth } from "@/hooks/useAuth";
 import FullPageSpinner from "@/components/FullPageSpinner";
 import { TabView, TabPanel } from "primereact/tabview";
-import SearchDevotee from "@/components/SearchDevotee";
+import DevoteesDashboard from "@/components/DevoteesDashboard";
 import { useEffect, useState } from "react";
 import { SYSTEM_ROLES } from "@/data/constants";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -49,7 +49,7 @@ export default function DevoteesPage() {
                     }
                 }>
                 <TabPanel header="Devotees" leftIcon="pi pi-users mr-2" className="min-w-[33vw]">
-                    <SearchDevotee />
+                    <DevoteesDashboard />
                 </TabPanel>
                 <TabPanel header="Donations" leftIcon="pi pi-indian-rupee mr-2" className="min-w-[33vw]">
                     <DonationsDashboard />

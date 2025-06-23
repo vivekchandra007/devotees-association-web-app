@@ -7,22 +7,163 @@ import { BlockUI } from "primereact/blockui";
 import { Button } from "primereact/button";
 import { Card } from "primereact/card";
 import { InputText } from "primereact/inputtext";
+import { Toast } from "primereact/toast";
 import { Messages } from "primereact/messages";
 import { ProgressBar } from "primereact/progressbar";
 import { useRef, useState } from "react";
+import {SYSTEM_ROLES} from "@/data/constants";
+import {Dialog} from "primereact/dialog";
+import {FileUpload, FileUploadFilesEvent} from "primereact/fileupload";
+import * as XLSX from "xlsx";
+import {MessageSeverity} from "primereact/api";
+import _ from "lodash";
 
 export default function DevoteesDashboard() {
-    const { devotee } = useAuth();
-    const [searchInProgress, setSearchInProgress] = useState<boolean>(false);
+    const { devotee, systemRole } = useAuth();
+    const [showBulkUploadDialogue, setShowBulkUploadDialogue] = useState<boolean>(false);
+    const [inProgress, setInProgress] = useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [searchResult, setSearchResult] = useState<object | null>(null);
     const router = useRouter();
 
+    const toast = useRef<Toast>(null);
     const msgs = useRef<Messages>(null);
 
     const errorMessage = (
         <small>No devotee found with <strong>{searchQuery}</strong> in their name, phone number or email. If they are someone you know, please refer them using the <strong>Referrals</strong> option on top menu.</small>
     );
+
+    const handleUpload = async (e: FileUploadFilesEvent) => {
+        const file = e.files[0];
+        const reader = new FileReader();
+
+        reader.onload = async (evt) => {
+            const data = new Uint8Array(evt.target?.result as ArrayBuffer)
+            const workbook = XLSX.read(data, { type: 'array' })
+            const sheet = workbook.Sheets[workbook.SheetNames[0]]
+            let json: object[] = XLSX.utils.sheet_to_json(sheet);
+
+            // Format and then upload all rows in bulk update
+            json = formatIntoProperJson(json);
+
+            try {
+                await api.post('/devotees/bulk', { devotees: json });
+                toast.current?.show({
+                    severity: MessageSeverity.SUCCESS,
+                    detail: 'New Devotees inserted successfully',
+                    life: 4000
+                });
+                setInProgress(false);
+                setShowBulkUploadDialogue(false);
+            } catch {
+                /*if (axios.isAxiosError(error)) {
+                    if (error.response) {
+                        const flattenedErrors: string[] = [];
+                        if (error.response.data.error && error.response.data.details.fieldErrors) {
+                            for (const [field, messages] of Object.entries(error.response.data.details.fieldErrors)) {
+                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                                // @ts-expect-error
+                                messages.forEach((msg) => {
+                                    flattenedErrors.push(`${field}: ${msg}`);
+                                });
+                            }
+                            alert(`${error.response.data.error}: ${flattenedErrors.join('\n')}`);
+                        }
+                    }
+                }*/
+                setInProgress(false);
+                setShowBulkUploadDialogue(false);
+                toast.current?.show({
+                    severity: MessageSeverity.ERROR,
+                    detail: 'Error inserting devotees in DB',
+                    life: 4000
+                });
+            }
+        }
+
+        reader.readAsArrayBuffer(file);
+        setInProgress(true);
+    }
+
+    const formatIntoProperJson = (json: object[]) => {
+        const formattedJson: object[] = [];
+        json.forEach(devoteeRow => {
+            // At least "Contact No." is required to insert a devotee row coz that's mandatory and must be unique in our devotees DB
+            const phone = _.get(devoteeRow, 'Contact No.');
+            if (phone) {
+                const name = _.get(devoteeRow, 'Name');
+                const addressLine1 = _.get(devoteeRow, 'Address Line 1');
+                const addressLine2 = _.get(devoteeRow, 'Address Line 2');
+                const addressArea = _.get(devoteeRow, 'Location');
+                const addressCity = _.get(devoteeRow, 'City / Town');
+                const addressState = _.get(devoteeRow, 'State');
+                const addressCountry = _.get(devoteeRow, 'Country');
+                const addressPincode = _.get(devoteeRow, 'Pincode');
+                const taxPan = _.get(devoteeRow, 'PAN');
+                const spouseMarriageAnniversary = _.get(devoteeRow, 'DOM');
+                const dob = _.get(devoteeRow, 'Date of Birth');
+                const phoneFormatted = `91${String(phone).replace(/'/g, '')}`; // → "919999999999"
+                const donation = {
+                    phone: phoneFormatted,
+                    source_id: 2,
+                    phone_verified: true,
+                    phone_whatsapp: phoneFormatted,
+                    created_by: devotee?.id,
+                    updated_by: devotee?.id
+                }
+                if (name) {
+                    _.set(donation, 'name', name);
+                }
+                if (addressLine1) {
+                    _.set(donation, 'address_line1', addressLine1);
+                }
+                if (addressLine2) {
+                    _.set(donation, 'address_line2', addressLine2);
+                }
+                if (addressArea) {
+                    _.set(donation, 'address_area', addressArea);
+                }
+                if (addressCity) {
+                    _.set(donation, 'address_city', addressCity);
+                }
+                if (addressState) {
+                    _.set(donation, 'address_state', addressState);
+                }
+                if (addressCountry) {
+                    _.set(donation, 'address_country', addressCountry);
+                }
+                if (addressPincode) {
+                    _.set(donation, 'address_pincode', String(addressPincode));
+                }
+                if (taxPan) {
+                    _.set(donation, 'tax_pan', taxPan);
+                }
+                if (spouseMarriageAnniversary) {
+                    _.set(donation, 'spouse_marriage_anniversary', excelSerialDateToDDMMYYYY(spouseMarriageAnniversary));
+                }
+                if (dob) {
+                    _.set(donation, 'dob', excelSerialDateToDDMMYYYY(dob));
+                }
+                // finally, push this properly formatted donation info
+                formattedJson.push(donation);
+            }
+        });
+        return formattedJson;
+    }
+
+    function excelSerialDateToDDMMYYYY(serial: number): string {
+        // 👉 for e.g. for "27222" excel date, actual date is "19/11/1995"
+        const excelEpoch = new Date(1900, 0, 1);
+        const jsDate = new Date(excelEpoch.getTime() + (serial - 2) * 86400000); // 86400000 = ms in a day
+
+        return jsDate.toLocaleDateString('en-CA');
+
+        // const day = String(jsDate.getDate()).padStart(2, '0');
+        // const month = String(jsDate.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+        // const year = jsDate.getFullYear();
+        //
+        // return `${day}/${month}/${year}`;
+    }
 
     async function handleSearch(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -32,8 +173,8 @@ export default function DevoteesDashboard() {
             return;
         }
 
-        if (!searchInProgress) {
-            setSearchInProgress(true);
+        if (!inProgress) {
+            setInProgress(true);
             // Make an API call to fetch the search results
             await api.get('/devotees', {
                 params: {
@@ -57,109 +198,161 @@ export default function DevoteesDashboard() {
                 msgs.current?.show({ id: '1', sticky: true, severity: 'error', summary: 'Error while searching. Please try again.', closable: true });
                 setSearchResult(null);
             }).finally(() => {
-                setSearchInProgress(false);
+                setInProgress(false);
             });
         }
     }
 
     return (
-        <div className='p-3'>
+        <div className="p-3 min-h-screen">
             <strong className="text-general">Devotees Dashboard</strong>
             {
-                searchInProgress ?
-                    <ProgressBar mode="indeterminate" style={{ height: '2px' }} className="pt-1"></ProgressBar>
+                inProgress ?
+                    <ProgressBar mode="indeterminate" style={{height: '2px'}} className="pt-1"></ProgressBar>
                     :
-                    <hr />
+                    <hr/>
             }
             <small className="text-general">
-                {devotee?.name}, at your role level, you have the privileges to <strong className="text-hover">search</strong> a devotee registered within this portal. It may be to <strong className="text-hover">help</strong> them or even <strong className="text-hover">refer</strong> them to this portal, if they are not already registered.
+                A consolidated place for all devotees&apos; data. At your role level, {devotee?.name}, you have the
+                privileges to:
+                {
+                    systemRole === SYSTEM_ROLES.admin &&
+                    <div className="m-5">
+                        <strong className="text-hover">• Insert</strong> new devotees with their data, in bulk by
+                        uploading Excel sheet
+                        in
+                        specific format:&nbsp;
+                        <a
+                            href="/Sample-DEVOTEES-Bulk-Data-Upload-Format-For-Madhuram.xlsx"
+                            download
+                            className="text-blue-600 underline hover:text-blue-800"
+                        >
+                            download sample sheet
+                        </a>
+                        <br/>
+                        <div className="py-3">
+                            <Button
+                                icon="pi pi-upload"
+                                label="Upload"
+                                severity="secondary"
+                                aria-label="Upload Devotees Data"
+                                size="small"
+                                onClick={() => setShowBulkUploadDialogue(true)}
+                            />
+                        </div>
+                        <strong>Note:</strong>&nbsp;These devotees&apos; status will be &#34;inactive&#34; until they themselves login for the first time.
+                        <Dialog
+                            header="Bulk Upload Devotees with their Data" keepInViewport
+                            visible={showBulkUploadDialogue}
+                            onHide={() => setShowBulkUploadDialogue(false)}>
+                            <FileUpload
+                                name="excel"
+                                mode="advanced"
+                                auto
+                                chooseLabel="Upload DEVOTEES Excel got from ERP Portal"
+                                customUpload
+                                uploadHandler={handleUpload}
+                                onBeforeUpload={() => setInProgress(true)}
+                                onUpload={() => setShowBulkUploadDialogue(false)}
+                                accept=".xlsx, .xls"
+                                emptyTemplate={<p className="m-0">or Simply, Drag and drop Devotees Excel file here</p>}
+                            />
+                        </Dialog>
+                    </div>
+                }
+                <div className="m-5">
+                    <strong
+                        className="text-hover">• Search</strong> a devotee registered within this portal. It may be to <strong
+                    className="text-hover">help</strong> them or even <strong className="text-hover">refer</strong> them to
+                    this portal, if they are not already registered.
+                </div>
             </small>
-            <div className="min-h-screen">
-                <form onSubmit={handleSearch} className="p-inputgroup text-sm mt-4 w-full">
+            <form onSubmit={handleSearch} className="p-inputgroup text-sm px-5 my-1">
                     <span className="p-float-label">
                         <InputText id="search-input" required maxLength={50}
-                            value={searchQuery}
-                            onChange={(e) => {
-                                setSearchQuery(e.target.value);
-                                msgs.current?.clear();
-                            }}
+                                   value={searchQuery}
+                                   onChange={(e) => {
+                                       setSearchQuery(e.target.value);
+                                       msgs.current?.clear();
+                                   }}
                         />
                         <label
                             htmlFor="search-input">Type query and press enter or click 🔍
                         </label>
                     </span>
-                    <Button
-                        icon="pi pi-search"
-                        severity="secondary"
-                        aria-label="Search"
-                        size="small"
-                        type="submit"
-                    />
-                </form>
-                {searchQuery && (
-                    <Button
-                        onClick={() => {
-                            setSearchQuery('');
-                            setSearchResult(null);
-                            msgs.current?.clear();
-                        }}
-                        icon="pi pi-times-circle"
-                        rounded
-                        text
-                        severity="contrast"
-                        title="Clear Search"
-                        className="flex float-right bottom-[48px] right-[40px] z-1 text-gray-400 hover:text-gray-600"
-                        aria-label="Clear search"
-                    />
-                )}
-                <small>
-                    <strong>Note:</strong>&nbsp;You can search a devotee by their name, phone number or email.
-                </small>
-                {
-                    searchQuery && searchResult &&
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
-                        {
-                            Array.isArray(searchResult) && searchResult.length > 0 &&
-                            (
-                                searchResult.map((devoteeDetails: typeof devotee) => (
-                                    <BlockUI
-                                        key={devoteeDetails?.id}
-                                        blocked={devoteeDetails?.status !== "active"} template={<i className="pi pi-lock" style={{ fontSize: '3rem' }}></i>}>
-                                        <Card>
-                                            <h3>{devoteeDetails?.name}</h3>
-                                            <p><strong>Phone:</strong> {devoteeDetails?.phone?.slice(2)}</p>
-                                            <p><strong>Email:</strong> {devoteeDetails?.email}</p>
-                                            {
-                                                devoteeDetails?.status !== "active" &&
-                                                <p><strong>Status:</strong> {devoteeDetails?.status}</p>
-                                            }
-                                            <p><strong>Role:</strong> {devoteeDetails?.system_role_id_ref_value?.name}</p>
+                <Button
+                    icon="pi pi-search"
+                    severity="secondary"
+                    aria-label="Search"
+                    size="small"
+                    type="submit"
+                />
+            </form>
+            {searchQuery && (
+                <Button
+                    onClick={() => {
+                        setSearchQuery('');
+                        setSearchResult(null);
+                        msgs.current?.clear();
+                    }}
+                    icon="pi pi-times-circle"
+                    rounded
+                    text
+                    severity="contrast"
+                    title="Clear Search"
+                    className="flex float-right bottom-[48px] right-[40px] z-1 text-gray-400 hover:text-gray-600"
+                    aria-label="Clear search"
+                />
+            )}
+            <small className="px-5">
+                <strong>Note:</strong>&nbsp;You can search a devotee by their name, phone number or email.
+            </small>
+            {
+                searchQuery && searchResult &&
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
+                    {
+                        Array.isArray(searchResult) && searchResult.length > 0 &&
+                        (
+                            searchResult.map((devoteeDetails: typeof devotee) => (
+                                <BlockUI
+                                    key={devoteeDetails?.id}
+                                    blocked={devoteeDetails?.status !== "active"}
+                                    template={<i className="pi pi-lock" style={{fontSize: '3rem'}}></i>}>
+                                    <Card>
+                                        <h3>{devoteeDetails?.name}</h3>
+                                        <p><strong>Phone:</strong> {devoteeDetails?.phone?.slice(2)}</p>
+                                        <p><strong>Email:</strong> {devoteeDetails?.email}</p>
+                                        {
+                                            devoteeDetails?.status !== "active" &&
+                                            <p><strong>Status:</strong> {devoteeDetails?.status}</p>
+                                        }
+                                        <p><strong>Role:</strong> {devoteeDetails?.system_role_id_ref_value?.name}</p>
 
-                                            {/* volunteers, leaders and admins can view full details of a devotee as well as their donations */}
-                                            <div className="grid grid-cols-2 gap-2 mt-3">
-                                                <Button
-                                                    outlined
-                                                    label="View Profile"
-                                                    onClick={() => router.push(`/devotee?devoteeId=${devoteeDetails?.id}`)}
-                                                    size="small"
-                                                />
-                                                <Button
-                                                    outlined
-                                                    label="View Donations"
-                                                    onClick={() => router.push(`/user-data?tab=1&phone=${devoteeDetails?.phone}`)}
-                                                    size="small"
-                                                    severity="warning"
-                                                />
-                                            </div>
-                                        </Card>
-                                    </BlockUI>
-                                ))
-                            )
-                        }
-                    </div>
-                }
-                <Messages ref={msgs} />
-            </div>
+                                        {/* volunteers, leaders and admins can view full details of a devotee as well as their donations */}
+                                        <div className="grid grid-cols-2 gap-2 mt-3">
+                                            <Button
+                                                outlined
+                                                label="View Profile"
+                                                onClick={() => router.push(`/devotee?devoteeId=${devoteeDetails?.id}`)}
+                                                size="small"
+                                            />
+                                            <Button
+                                                outlined
+                                                label="View Donations"
+                                                onClick={() => router.push(`/user-data?tab=1&phone=${devoteeDetails?.phone}`)}
+                                                size="small"
+                                                severity="warning"
+                                            />
+                                        </div>
+                                    </Card>
+                                </BlockUI>
+                            ))
+                        )
+                    }
+                </div>
+            }
+            <Messages ref={msgs}/>
+            <Toast ref={toast} position="bottom-center" />
         </div>
     )
 }

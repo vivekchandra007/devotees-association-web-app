@@ -57,6 +57,6 @@ export async function POST(req: NextRequest) {
         console.log(`${result.count} donations bulk inserted by ${loggedIndevotee.name}.`);
         return NextResponse.json({ success: true, message: `${result.count} donations inserted.` }, { status: 200 });
     } catch {
-        return NextResponse.json({ error: 'Server error while inserting donations. Check request payload and it\' format' }, { status: 500 });
+        return NextResponse.json({ error: 'Server error while inserting donations. Check request payload and it\'s format' }, { status: 500 });
     }
 }

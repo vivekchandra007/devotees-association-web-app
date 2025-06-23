@@ -2,8 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma'; // adjust to your prisma client
 import { verifyAccessToken } from '@/lib/auth'; // your JWT verification function
 import _ from "lodash";
-import {parseDateFromStringddmmyyyy} from "@/lib/conversions";
-import {donationSchema} from "@/schema/donationSchema";
+import {convertDateStringIntoDateObject} from "@/lib/conversions";
+import {devoteeSchema} from "@/schema/devoteeFormSchema";
 
 // type Donation = Prisma.donationsGetPayload<{}>; 
 
@@ -20,23 +20,29 @@ export async function POST(req: NextRequest) {
         }
 
         const body = await req.json();
-        const donations = body.donations;
-        if (!body || !donations || !Array.isArray(donations) || donations.length <= 0) {
-            return NextResponse.json({ error: 'No donations found to bulk upload' }, { status: 401 });
+        const devotees = body.devotees;
+        if (!body || !devotees || !Array.isArray(devotees) || devotees.length <= 0) {
+            return NextResponse.json({ error: 'No devotees found to bulk upload' }, { status: 401 });
         }
         
-        for (let i = donations.length - 1; i >= 0; i--) {
-            let donation = donations[i];
-            const parsed = donationSchema.safeParse(donation);
+        for (let i = devotees.length - 1; i >= 0; i--) {
+            let devotee = devotees[i];
+            devotee = convertDateStringIntoDateObject(devotee);
+            const taxPan = _.get(devotee, 'tax_pan', undefined);
+            if (taxPan?.length > 10) {
+                delete devotee["tax_pan"];
+            }
+            const parsed = devoteeSchema.safeParse(devotee);
             if (!parsed.success) {
-                return NextResponse.json({ error: 'Donation Data Validation failed', details: parsed.error.flatten() }, { status: 400 });
+                devotees.splice(i, 1); // ✅ Safe to delete in reverse
+                continue;
             }
-            donation = parsed.data;
-            if (!donation) {
-                donations.splice(i, 1); // ✅ Safe to delete in reverse
-            } else {
-                _.set(donations[i], "date", parseDateFromStringddmmyyyy(_.get(donations[i], "date")));
+            devotee = parsed.data;
+            if (!devotee) {
+                devotees.splice(i, 1); // ✅ Safe to delete in reverse
+                continue;
             }
+            devotees[i] = devotee;
         }
 
         const loggedIndevotee = await prisma.devotees.findUnique({
@@ -47,16 +53,16 @@ export async function POST(req: NextRequest) {
             },
         });
         if (!loggedIndevotee?.system_role_id || loggedIndevotee?.system_role_id <= 3) {
-            return NextResponse.json({ error: 'Forbidden: You do not have privileges to bulk upload donation' }, { status: 403 });
+            return NextResponse.json({ error: 'Forbidden: You do not have privileges to bulk upload devotees data' }, { status: 403 });
         }
 
-        const result = await prisma.donations.createMany({
-            data: donations,
+        const result = await prisma.devotees.createMany({
+            data: devotees,
             skipDuplicates: true // Optional: skips records with duplicate IDs
         });
-        console.log(`${result.count} donations bulk inserted by ${loggedIndevotee.name}.`);
-        return NextResponse.json({ success: true, message: `${result.count} donations inserted.` }, { status: 200 });
+        console.log(`${result.count} devotees bulk inserted by ${loggedIndevotee.name}.`);
+        return NextResponse.json({ success: true, message: `${result.count} devotees inserted.` }, { status: 200 });
     } catch {
-        return NextResponse.json({ error: 'Server error while inserting donations. Check request payload and it\' format' }, { status: 500 });
+        return NextResponse.json({ error: 'Server error while inserting devotees. Check request payload and it\'s format' }, { status: 500 });
     }
 }

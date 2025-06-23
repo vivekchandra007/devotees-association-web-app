@@ -71,7 +71,7 @@ export default function DonationsDashboard() {
         await api.post('/donations/bulk', { donations: json });
         toast.current?.show({
           severity: MessageSeverity.SUCCESS,
-          detail: 'Donations uploaded successfully',
+          detail: 'New Donations inserted successfully',
           life: 4000
         });
         setInProgress(false);
@@ -82,7 +82,7 @@ export default function DonationsDashboard() {
         setShowBulkUploadDialogue(false);
         toast.current?.show({
           severity: MessageSeverity.ERROR,
-          detail: 'Error uploading donations',
+          detail: 'Error inserting donations data',
           life: 4000
         });
       }
@@ -208,7 +208,7 @@ export default function DonationsDashboard() {
   }, [searchParams]);
 
   return (
-    <div className='p-3 mih-h-screen'>
+    <div className="p-3 mih-h-screen">
       <strong className="text-general">Donations Dashboard</strong>
       {
         inProgress ?
@@ -224,24 +224,23 @@ export default function DonationsDashboard() {
               <strong className="text-hover">• Insert</strong> donations data in bulk by uploading Excel sheet in
               specific format:&nbsp;
               <a
-                  href="/Sample-Donations-Bulk-Data-Upload-Format-For-Madhuram.xlsx"
+                  href="/Sample-DONATIONS-Bulk-Data-Upload-Format-For-Madhuram.xlsx"
                   download
                   className="text-blue-600 underline hover:text-blue-800"
               >
                 download sample sheet
               </a>
               <br/>
-              {
-                  systemRole === SYSTEM_ROLES.admin &&
-                  <Button
-                      icon="pi pi-upload"
-                      label="Upload"
-                      severity="secondary"
-                      aria-label="Upload Donations"
-                      size="small"
-                      onClick={() => setShowBulkUploadDialogue(true)}
-                  />
-              }
+              <div className="py-3">
+                <Button
+                    icon="pi pi-upload"
+                    label="Upload"
+                    severity="secondary"
+                    aria-label="Upload Donations"
+                    size="small"
+                    onClick={() => setShowBulkUploadDialogue(true)}
+                />
+              </div>
               <Dialog
                   header="Bulk Upload Donations Data" keepInViewport
                   visible={showBulkUploadDialogue}
@@ -250,20 +249,22 @@ export default function DonationsDashboard() {
                     name="excel"
                     mode="advanced"
                     auto
-                    chooseLabel="Upload Donations Excel"
+                    chooseLabel="Upload DONATIONS Excel got from ERP portal"
                     customUpload
                     uploadHandler={handleUpload}
                     onBeforeUpload={() => setInProgress(true)}
                     onUpload={() => setShowBulkUploadDialogue(false)}
                     accept=".xlsx, .xls"
-                    emptyTemplate={<p className="m-0">Drag and drop Donations Excel file here</p>}
+                    emptyTemplate={<p className="m-0">or Simply, drag and drop the Donations Excel file here</p>}
                 />
               </Dialog>
             </div>
         }
-        <div className="m-5"><strong className="text-hover">• View</strong> all the donations data.</div>
+        <div className="m-5">
+          <strong className="text-hover">• View</strong> all the donations data.
+        </div>
       </small>
-      <form onSubmit={handleSearch} className="p-inputgroup text-sm mt-4 w-full">
+      <form onSubmit={handleSearch} className="p-inputgroup text-sm px-5 my-1">
         <span className="p-float-label">
           <InputText id="search-input" required maxLength={50}
             value={searchQuery}
@@ -312,8 +313,9 @@ export default function DonationsDashboard() {
           aria-label="Clear search"
         />
       )} */}
-      <small>
-        <strong>Note:</strong>&nbsp;You can search a donation by it&apos;s id, donation_receipt_number, phone number of donor, name of donor, or donation amount
+      <small className="px-5">
+        <strong>Note:</strong>&nbsp;You can search a donation by it&apos;s id, donation_receipt_number, phone number of
+        donor, name of donor, or donation amount
       </small>
       <Messages ref={msgs} />
       {
