@@ -8,7 +8,7 @@ type Devotee = Prisma.devoteesGetPayload<{
   include: {
     system_role_id_ref_value: {
       select: {
-        name: true;
+        name: true,
       };
     },
     spiritual_level_id_ref_value: {

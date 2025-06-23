@@ -22,7 +22,7 @@ type Devotee = Prisma.devoteesGetPayload<{
   include: {
     system_role_id_ref_value: {
       select: {
-        name: true;
+        name: true,
       };
     },
     spiritual_level_id_ref_value: {
@@ -34,10 +34,10 @@ type Devotee = Prisma.devoteesGetPayload<{
     },
     source_id_ref_value: {
       select: {
-        name: true;
+        name: true,
         description: true,
       }
-    }
+    },
     counsellor_id_ref_value: {
       select: {
         id: true,

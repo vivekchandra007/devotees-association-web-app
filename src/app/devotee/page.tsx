@@ -33,7 +33,7 @@ export default function DevoteePage() {
     const router = useRouter();
     const toast = useRef<Toast>(null);
     const { devotee, isAuthenticated, systemRole } = useAuth();
-    const otherDevoteeId = Number.parseInt(searchParams.get('devoteeId')!);
+    const otherDevoteeId = Number.parseInt(searchParams.get('devoteeId')!) !== devotee?.id? Number.parseInt(searchParams.get('devoteeId')!) : null;
 
     const [readOnly, setReadOnly] = useState<boolean>();
     const [inProgress, setInProgress] = useState<boolean>(false);
@@ -176,6 +176,7 @@ export default function DevoteePage() {
                             detail: 'Could not retrieve devotee details. Try refreshing page or go to Home page and try again after some time',
                             life: 10000
                         });
+                        router.push('/');
                     } finally {
                         setInProgress(false);
                     }
@@ -194,14 +195,11 @@ export default function DevoteePage() {
     }, [devotee, otherDevoteeId, router, systemRole])
 
     return (
-        <div className="bg-white/94 m-auto">
+        <div className="bg-white/90 m-auto">
             {!isAuthenticated && devotee && <FullPageSpinner message="Hare Krishna! Fetching details..." />}
 
             {
-                inProgress ?
-                    <ProgressBar mode="indeterminate" style={{height: '2px'}} className="pt-1"></ProgressBar>
-                    :
-                    <hr/>
+                inProgress && <ProgressBar mode="indeterminate" style={{height: '2px'}} className="pt-1"></ProgressBar>
             }
 
             {formik.isSubmitting && <FullPageSpinner message="Saving Changes" />}

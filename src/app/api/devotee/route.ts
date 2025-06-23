@@ -84,6 +84,12 @@ export async function GET(req: NextRequest) {
             title_other: true
           }
         },
+        source_id_ref_value: {
+          select: {
+            name: true,
+            description: true,
+          }
+        },
         counsellor_id_ref_value: {
           select: {
             id: true,
