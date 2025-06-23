@@ -11,7 +11,7 @@ import { Messages } from "primereact/messages";
 import { ProgressBar } from "primereact/progressbar";
 import { useRef, useState } from "react";
 
-export default function SearchDevotee() {
+export default function DevoteesDashboard() {
     const { devotee } = useAuth();
     const [searchInProgress, setSearchInProgress] = useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
