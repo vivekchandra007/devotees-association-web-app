@@ -312,10 +312,10 @@ export default function DonationsDashboard() {
           aria-label="Clear search"
         />
       )} */}
-      <Messages ref={msgs} />
       <small>
         <strong>Note:</strong>&nbsp;You can search a donation by it&apos;s id, donation_receipt_number, phone number of donor, name of donor, or donation amount
       </small>
+      <Messages ref={msgs} />
       {
         getApplicableDonations && Array.isArray(getApplicableDonations) && getApplicableDonations.length > 0 &&
         <div className="card overflow-x-auto max-w-[90vw] mt-4">

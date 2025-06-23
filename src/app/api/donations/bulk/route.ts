@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'; // adjust to your prisma client
 import { verifyAccessToken } from '@/lib/auth'; // your JWT verification function
 import _ from "lodash";
 import {parseDateFromStringddmmyyyy} from "@/lib/conversions";
+import {donationSchema} from "@/schema/donationSchema";
 
 // type Donation = Prisma.donationsGetPayload<{}>; 
 
@@ -25,12 +26,12 @@ export async function POST(req: NextRequest) {
         }
         
         for (let i = donations.length - 1; i >= 0; i--) {
-            const donation = donations[i];
-            //const parsed = donationSchema.safeParse(donation);
-            // if (!parsed.success) {
-            //     return NextResponse.json({ error: 'Donation Data Validation failed', details: parsed.error.flatten() }, { status: 400 });
-            // }
-            // donation = parsed.data;
+            let donation = donations[i];
+            const parsed = donationSchema.safeParse(donation);
+            if (!parsed.success) {
+                return NextResponse.json({ error: 'Donation Data Validation failed', details: parsed.error.flatten() }, { status: 400 });
+            }
+            donation = parsed.data;
             if (!donation) {
                 donations.splice(i, 1); // ✅ Safe to delete in reverse
             } else {
@@ -53,9 +54,9 @@ export async function POST(req: NextRequest) {
             data: donations,
             skipDuplicates: true // Optional: skips records with duplicate IDs
         });
-        console.log(`${result.count} donations inserted.`);
+        console.log(`${result.count} donations bulk inserted by ${loggedIndevotee.name}.`);
         return NextResponse.json({ success: true, message: `${result.count} donations inserted.` }, { status: 200 });
     } catch {
-        return NextResponse.json({ error: 'Server error' }, { status: 500 });
+        return NextResponse.json({ error: 'Server error while inserting donations. Check request payload and it\' format' }, { status: 500 });
     }
 }
