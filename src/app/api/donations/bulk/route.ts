@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
             skipDuplicates: true // Optional: skips records with duplicate IDs
         });
         const duplicateMessage = donations.length > result.count? ` ${donations.length - result.count} donations skipped because they already exist (duplicate).`:'';
-        const skippedMessage = skippedDonations.length > 0? ` ${skippedDonations.length} donations skipped because of invalid data in them. Correct them in sheet and re-upload. Their "donation_receipt_number" are: ${skippedDonations.flat()}`:''
+        const skippedMessage = skippedDonations.length > 0? ` ${skippedDonations.length} donations skipped because of invalid data in them. Correct them in sheet and re-upload. Their donation receipt numbers are: ${skippedDonations.flat()}`:''
         console.log(`${result.count} donations bulk inserted by ${loggedIndevotee?.name}.${duplicateMessage} ${skippedMessage}`);
         // Successful insert and success message in response
         return NextResponse.json({

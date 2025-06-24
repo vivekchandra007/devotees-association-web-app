@@ -65,7 +65,7 @@ export async function POST(req: NextRequest) {
             skipDuplicates: true // Optional: skips records with duplicate IDs
         });
         const duplicateMessage = devotees.length > result.count? ` ${devotees.length - result.count} devotees skipped because they already exist (duplicate).`:'';
-        const skippedMessage = skippedDevotees.length > 0? ` ${skippedDevotees.length} skipped because of invalid data in them. Correct them in sheet and re-upload. Their "phone number" are: ${skippedDevotees.flat()}`:''
+        const skippedMessage = skippedDevotees.length > 0? ` ${skippedDevotees.length} skipped because of invalid data in them. Correct them in sheet and re-upload. Their phone numbers are: ${skippedDevotees.flat()}`:''
         console.log(`${result.count} devotees bulk inserted by ${loggedIndevotee?.name}.${duplicateMessage} ${skippedMessage}`);
         // Successful insert and success message in response
         return NextResponse.json({
