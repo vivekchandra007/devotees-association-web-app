@@ -68,23 +68,29 @@ export default function DonationsDashboard() {
 
       // Format and upload each row
       try {
-        await api.post('/donations/bulk', { donations: json });
-        toast.current?.show({
-          severity: MessageSeverity.SUCCESS,
-          detail: 'New Donations inserted successfully',
-          life: 4000
-        });
-        setInProgress(false);
-        setShowBulkUploadDialogue(false);
-        fetchDonations();
+        const res = await api.post('/donations/bulk', { donations: json });
+        if (res && res.status === 200 && res.data && res.data.success) {
+          toast.current?.show({
+            severity: MessageSeverity.SUCCESS,
+            detail: res.data.message,
+            sticky: true,
+            closable: true
+          });
+          setInProgress(false);
+          await fetchDonations();
+        } else {
+          throw new Error();
+        }
       } catch {
         setInProgress(false);
-        setShowBulkUploadDialogue(false);
         toast.current?.show({
           severity: MessageSeverity.ERROR,
-          detail: 'Error inserting donations data',
-          life: 4000
+          detail: 'Error inserting donations data in DB. Cross check data in sheet.',
+          sticky: true,
+          closable: true
         });
+      } finally {
+        setShowBulkUploadDialogue(false);
       }
     }
 
@@ -96,13 +102,20 @@ export default function DonationsDashboard() {
     const formattedJson: object[] = [];
     // iterate in reverse coz donations are in descending order of date
     for (let i = json.length - 1; i >= 0; i--) {
-      const date = _.get(json[i], 'Date');
       const phone = _.get(json[i], 'Contact Number');
+      let phoneFormatted: string = String(phone).replace(/'/g, '');
+      if (phoneFormatted.length > 10) {
+        phoneFormatted = phoneFormatted.slice(-10); // gets last 10 characters (just in case, if people already appended country code like 91 to the phone number)
+      }
+      const countryCallingCode = "91";
+      phoneFormatted = `${countryCallingCode}${phoneFormatted}`; // → "919999999999"
+
+      const date = _.get(json[i], 'Date');
       const amount = _.get(json[i], 'Amount');
       const donation = {
         donation_receipt_number: _.get(json[i], 'Donation Receipt Number'),
         name: _.get(json[i], 'Donor Name', ''),
-        phone: phone ? `91${phone}` : '',
+        phone: phoneFormatted,
         amount: amount ? parseInt(String(amount).replace(/,/g, '').split('.')[0], 10) : null,
         date: date || formatDateIntoStringddmmyyyy(new Date()),
         created_by: devotee?.id,
@@ -144,7 +157,7 @@ export default function DonationsDashboard() {
     if (event) {
       event.preventDefault();
     }
-    fetchDonations();
+    await fetchDonations();
   }
 
   async function fetchDonations(query?: string) {
@@ -294,7 +307,7 @@ export default function DonationsDashboard() {
           type="submit"
         />
       </form>
-      {/* {searchQuery && (
+       {searchQuery && (
         <Button
           onClick={() => {
             setSearchQuery('');
@@ -309,10 +322,10 @@ export default function DonationsDashboard() {
           text
           severity="contrast"
           title="Clear Search"
-          className="flex float-right bottom-[48px] right-[40px] z-1 text-gray-400 hover:text-gray-600"
+          className="flex float-right bottom-[51px] right-[70px] z-1 text-gray-400 hover:text-gray-600"
           aria-label="Clear search"
         />
-      )} */}
+      )}
       <small className="px-5">
         <strong>Note:</strong>&nbsp;You can search a donation by it&apos;s id, donation_receipt_number, phone number of
         donor, name of donor, or donation amount

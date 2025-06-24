@@ -24,6 +24,8 @@ export async function POST(req: NextRequest) {
         if (!body || !donations || !Array.isArray(donations) || donations.length <= 0) {
             return NextResponse.json({ error: 'No donations found to bulk upload' }, { status: 401 });
         }
+
+        const skippedDonations: string[] = [];
         
         for (let i = donations.length - 1; i >= 0; i--) {
             let donation = donations[i];
@@ -34,6 +36,7 @@ export async function POST(req: NextRequest) {
             donation = parsed.data;
             if (!donation) {
                 donations.splice(i, 1); // ✅ Safe to delete in reverse
+                skippedDonations.push(donation["donation_receipt_number"]);
             } else {
                 _.set(donations[i], "date", parseDateFromStringddmmyyyy(_.get(donations[i], "date")));
             }
@@ -54,8 +57,16 @@ export async function POST(req: NextRequest) {
             data: donations,
             skipDuplicates: true // Optional: skips records with duplicate IDs
         });
-        console.log(`${result.count} donations bulk inserted by ${loggedIndevotee.name}.`);
-        return NextResponse.json({ success: true, message: `${result.count} donations inserted.` }, { status: 200 });
+        const duplicateMessage = donations.length > result.count? ` ${donations.length - result.count} donations skipped because they already exist (duplicate).`:'';
+        const skippedMessage = skippedDonations.length > 0? ` ${skippedDonations.length} donations skipped because of invalid data in them. Correct them in sheet and re-upload. Their "donation_receipt_number" are: ${skippedDonations.flat()}`:''
+        console.log(`${result.count} donations bulk inserted by ${loggedIndevotee?.name}.${duplicateMessage} ${skippedMessage}`);
+        // Successful insert and success message in response
+        return NextResponse.json({
+            success: true,
+            message: `${result.count} donations inserted.${duplicateMessage} ${skippedMessage}`
+        }, {
+            status: 200
+        });
     } catch {
         return NextResponse.json({ error: 'Server error while inserting donations. Check request payload and it\'s format' }, { status: 500 });
     }

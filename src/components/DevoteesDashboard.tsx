@@ -48,50 +48,36 @@ export default function DevoteesDashboard() {
             json = formatIntoProperJson(json);
 
             try {
-                await api.post('/devotees/bulk', { devotees: json });
-                toast.current?.show({
-                    severity: MessageSeverity.SUCCESS,
-                    detail: 'New Devotees inserted successfully',
-                    life: 4000
-                });
-                setInProgress(false);
-                setShowBulkUploadDialogue(false);
+                setInProgress(true);
+                const res = await api.post('/devotees/bulk', { devotees: json });
+                if (res && res.status === 200 && res.data && res.data.success) {
+                    msgs.current?.clear();
+                    msgs.current?.show({ sticky: true, severity: MessageSeverity.SUCCESS, content: res.data.message, closable: true });
+                } else {
+                    throw new Error();
+                }
             } catch {
-                /*if (axios.isAxiosError(error)) {
-                    if (error.response) {
-                        const flattenedErrors: string[] = [];
-                        if (error.response.data.error && error.response.data.details.fieldErrors) {
-                            for (const [field, messages] of Object.entries(error.response.data.details.fieldErrors)) {
-                                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                                // @ts-expect-error
-                                messages.forEach((msg) => {
-                                    flattenedErrors.push(`${field}: ${msg}`);
-                                });
-                            }
-                            alert(`${error.response.data.error}: ${flattenedErrors.join('\n')}`);
-                        }
-                    }
-                }*/
+                msgs.current?.clear();
+                msgs.current?.show({ sticky: true, severity: MessageSeverity.ERROR, content: 'Error inserting devotees in DB. Cross check data in sheet.', closable: true });
+            } finally {
                 setInProgress(false);
                 setShowBulkUploadDialogue(false);
-                toast.current?.show({
-                    severity: MessageSeverity.ERROR,
-                    detail: 'Error inserting devotees in DB',
-                    life: 4000
-                });
             }
         }
-
         reader.readAsArrayBuffer(file);
-        setInProgress(true);
     }
 
     const formatIntoProperJson = (json: object[]) => {
         const formattedJson: object[] = [];
         json.forEach(devoteeRow => {
             // At least "Contact No." is required to insert a devotee row coz that's mandatory and must be unique in our devotees DB
-            const phone = _.get(devoteeRow, 'Contact No.');
-            if (phone) {
+            const phone = _.get(devoteeRow, 'Contact No.', '');
+            let phoneFormatted: string = String(phone).replace(/'/g, '');
+            if (phoneFormatted && phoneFormatted !== '' && phoneFormatted.length >= 10) {
+                if (phoneFormatted.length > 10) {
+                    phoneFormatted = phoneFormatted.slice(-10); // gets last 10 characters (just in case, if people already appended country code like 91 to their phone number)
+                }
+
                 const name = _.get(devoteeRow, 'Name');
                 const addressLine1 = _.get(devoteeRow, 'Address Line 1');
                 const addressLine2 = _.get(devoteeRow, 'Address Line 2');
@@ -103,11 +89,12 @@ export default function DevoteesDashboard() {
                 const taxPan = _.get(devoteeRow, 'PAN');
                 const spouseMarriageAnniversary = _.get(devoteeRow, 'DOM');
                 const dob = _.get(devoteeRow, 'Date of Birth');
+
                 let countryCallingCode = "91";
                 if (addressCountry) {
                     countryCallingCode = getCountryCallingCode(countryCallingCode) || "91";
                 }
-                const phoneFormatted = `${countryCallingCode}${String(phone).replace(/'/g, '')}`; // → "919999999999"
+                phoneFormatted = `${countryCallingCode}${phoneFormatted}`; // → "919999999999"
                 const donation = {
                     phone: phoneFormatted,
                     phone_whatsapp: phoneFormatted,
@@ -144,10 +131,10 @@ export default function DevoteesDashboard() {
                     _.set(donation, 'tax_pan', taxPan);
                 }
                 if (spouseMarriageAnniversary) {
-                    _.set(donation, 'spouse_marriage_anniversary', excelSerialDateToDDMMYYYY(spouseMarriageAnniversary));
+                    _.set(donation, 'spouse_marriage_anniversary', excelSerialDateToDateString(spouseMarriageAnniversary));
                 }
                 if (dob) {
-                    _.set(donation, 'dob', excelSerialDateToDDMMYYYY(dob));
+                    _.set(donation, 'dob', excelSerialDateToDateString(dob));
                 }
                 // finally, push this properly formatted donation info
                 formattedJson.push(donation);
@@ -156,18 +143,11 @@ export default function DevoteesDashboard() {
         return formattedJson;
     }
 
-    function excelSerialDateToDDMMYYYY(serial: number): string {
+    function excelSerialDateToDateString(serial: number): string {
         // 👉 for e.g. for "27222" excel date, actual date is "19/11/1995"
         const excelEpoch = new Date(1900, 0, 1);
         const jsDate = new Date(excelEpoch.getTime() + (serial - 2) * 86400000); // 86400000 = ms in a day
-
         return jsDate.toLocaleDateString('en-CA');
-
-        // const day = String(jsDate.getDate()).padStart(2, '0');
-        // const month = String(jsDate.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
-        // const year = jsDate.getFullYear();
-        //
-        // return `${day}/${month}/${year}`;
     }
 
     async function handleSearch(event: React.FormEvent<HTMLFormElement>) {

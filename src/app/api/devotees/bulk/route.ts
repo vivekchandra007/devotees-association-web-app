@@ -24,6 +24,8 @@ export async function POST(req: NextRequest) {
         if (!body || !devotees || !Array.isArray(devotees) || devotees.length <= 0) {
             return NextResponse.json({ error: 'No devotees found to bulk upload' }, { status: 401 });
         }
+
+        const skippedDevotees: string[] = [];
         
         for (let i = devotees.length - 1; i >= 0; i--) {
             let devotee = devotees[i];
@@ -35,14 +37,16 @@ export async function POST(req: NextRequest) {
             const parsed = devoteeBulkInsertSchema.safeParse(devotee);
             if (!parsed.success) {
                 devotees.splice(i, 1); // ✅ Safe to delete in reverse
-                continue;
+                skippedDevotees.push(devotee.phone.slice(-10));
+            } else {
+                devotee = parsed.data;
+                if (!devotee) {
+                    devotees.splice(i, 1); // ✅ Safe to delete in reverse
+                    skippedDevotees.push(devotee.phone.slice(-10));
+                } else {
+                    devotees[i] = devotee;
+                }
             }
-            devotee = parsed.data;
-            if (!devotee) {
-                devotees.splice(i, 1); // ✅ Safe to delete in reverse
-                continue;
-            }
-            devotees[i] = devotee;
         }
 
         const loggedIndevotee = await prisma.devotees.findUnique({
@@ -60,8 +64,16 @@ export async function POST(req: NextRequest) {
             data: devotees,
             skipDuplicates: true // Optional: skips records with duplicate IDs
         });
-        console.log(`${result.count} devotees bulk inserted by ${loggedIndevotee.name}.`);
-        return NextResponse.json({ success: true, message: `${result.count} devotees inserted.` }, { status: 200 });
+        const duplicateMessage = devotees.length > result.count? ` ${devotees.length - result.count} devotees skipped because they already exist (duplicate).`:'';
+        const skippedMessage = skippedDevotees.length > 0? ` ${skippedDevotees.length} skipped because of invalid data in them. Correct them in sheet and re-upload. Their "phone number" are: ${skippedDevotees.flat()}`:''
+        console.log(`${result.count} devotees bulk inserted by ${loggedIndevotee?.name}.${duplicateMessage} ${skippedMessage}`);
+        // Successful insert and success message in response
+        return NextResponse.json({
+            success: true,
+            message: `${result.count} devotees inserted.${duplicateMessage} ${skippedMessage}`
+        }, {
+            status: 200
+        });
     } catch {
         return NextResponse.json({ error: 'Server error while inserting devotees. Check request payload and it\'s format' }, { status: 500 });
     }
