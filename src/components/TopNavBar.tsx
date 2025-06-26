@@ -137,7 +137,7 @@ export default function TopNavBar() {
         } else {
             setShowWelcomeDialogue(true);
         }
-    }, [pathname, authInProgress]);
+    }, [pathname, authInProgress, guestMode]);
 
     const startContent = (
         <span className="flex flex-col items-center space-y-1">
@@ -258,18 +258,24 @@ export default function TopNavBar() {
     );
 
     function hideWelcomeMessage() {
-        setShowWelcomeDialogue(false);
-        if (typeof window !== 'undefined' && !guestMode) {
-            localStorage.setItem(LOCAL_STORAGE_HIDE_WELCOME_MESSAGE, "true");
+        if (typeof window !== 'undefined') {
+            setShowWelcomeDialogue(false);
+            const prevValueOfHideWelcomeMessage = localStorage.getItem(LOCAL_STORAGE_HIDE_WELCOME_MESSAGE);
+            if (!guestMode) {
+                localStorage.setItem(LOCAL_STORAGE_HIDE_WELCOME_MESSAGE, "true");
+            }
+            if (!guestMode && !Boolean(prevValueOfHideWelcomeMessage)) {
+                window.location.reload();
+            }
+            window.scrollTo(0, 0);
         }
-        window.scrollTo(0, 0);
     }
 
     return (
         <div>
             {/* Welcome message dialogue */}
             <Dialog
-                header={title} keepInViewport closeOnEscape={!guestMode}
+                header={title} keepInViewport closeOnEscape
                 visible={showWelcomeDialogue}
                 onHide={hideWelcomeMessage}
                 className="shadow-2xl w-full md:w-[75vw] lg:w-[45vw] text-center text-text size-fit m-auto">
@@ -291,8 +297,8 @@ export default function TopNavBar() {
                         </div>
                         <div className="col-span-4 md:col-span-2 mr-1">
                             <Button label="" severity="warning" raised size="large" className="float-right"
-                                icon="pi pi-indian-rupee"
-                                onClick={() => window.open("https://iskconpunebcec.com/#/newtemple")}>
+                                    icon="pi pi-indian-rupee"
+                                    onClick={() => window.open("https://iskconpunebcec.com/#/newtemple")}>
                                 <Badge severity="warning" value="▸" className="scale-150"></Badge>
                             </Button>
                         </div>
@@ -304,8 +310,8 @@ export default function TopNavBar() {
                         </div>
                         <div className="col-span-4 md:col-span-2 mr-1">
                             <Button label="" severity="success" raised size="large" className="float-right"
-                                icon="pi pi-whatsapp"
-                                onClick={() => alert('Link to a Whatsapp group')}>
+                                    icon="pi pi-whatsapp"
+                                    onClick={() => alert('Link to a Whatsapp group')}>
                                 <Badge severity="success" value="▸" className="scale-150"></Badge>
                             </Button>
                         </div>
@@ -321,8 +327,8 @@ export default function TopNavBar() {
                                         </div>
                                         <div className="col-span-4 md:col-span-2 mr-1">
                                             <Button label="" severity="danger" raised size="large" className="float-right"
-                                                icon="pi pi-crown"
-                                                onClick={() =>  router.push(`/login?${searchParams || ''}`)}>
+                                                    icon="pi pi-crown"
+                                                    onClick={() =>  router.push(`/login?${searchParams || ''}`)}>
                                                 <Badge severity="danger" value="▸" className="scale-150"></Badge>
                                             </Button>
                                         </div>
@@ -345,8 +351,8 @@ export default function TopNavBar() {
                                         </div>
                                         <div className="col-span-4 md:col-span-2 mr-1">
                                             <Button label="" severity="info" raised size="large" className="float-right"
-                                                icon="pi pi-user-edit"
-                                                onClick={() => router.push('/devotee')}>
+                                                    icon="pi pi-user-edit"
+                                                    onClick={() => router.push('/devotee')}>
                                                 <Badge severity="info" value="▸" className="scale-150"></Badge>
                                             </Button>
                                         </div>
@@ -358,8 +364,8 @@ export default function TopNavBar() {
                                         </div>
                                         <div className="col-span-4 md:col-span-2 mr-1">
                                             <Button label="" severity="secondary" raised size="large" className="float-right"
-                                                icon="pi pi-share-alt"
-                                                onClick={() => setDialogueModalContent(ReferralsModalContent)} >
+                                                    icon="pi pi-share-alt"
+                                                    onClick={() => setDialogueModalContent(ReferralsModalContent)} >
                                                 <Badge severity="secondary" value="▸" className="scale-150"></Badge>
                                             </Button>
                                         </div>
@@ -369,7 +375,7 @@ export default function TopNavBar() {
                     }
                 </div>
             </Dialog>
-            <span className={classNames("absolute right-0 md:right-2 z-1", guestMode ? 'top-[12vh] md:top-[8.8vh]' : 'top-[23vh] md:top-[13.5vh]')}>
+            <span className={classNames("absolute right-0 md:right-2 z-1", guestMode ? 'top-[12vh] md:top-[11vh]' : 'top-[23vh] md:top-[16vh]')}>
                 <Button
                     rounded
                     raised

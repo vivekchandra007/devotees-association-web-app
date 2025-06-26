@@ -4,7 +4,6 @@ import { useAuth } from '@/hooks/useAuth';
 import { useRouter, useSearchParams } from "next/navigation";
 import FullPageSpinner from '@/components/FullPageSpinner';
 import { Button } from 'primereact/button';
-import Referrals from '@/components/Referrals';
 import { Dialog } from 'primereact/dialog';
 import { useEffect, useState } from 'react';
 import { InputText } from 'primereact/inputtext';
@@ -12,6 +11,7 @@ import api from "@/lib/axios";              // our Custom Axios Wrapper which au
 import YouTubeMosaic from '@/components/YouTubeMosaic';
 import { TabView, TabPanel } from 'primereact/tabview';
 import Kripa from '@/components/kripa';
+import {STATUSES} from "@/data/constants";
 
 export default function Home() {
   const router = useRouter();
@@ -21,7 +21,6 @@ export default function Home() {
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const { devotee, isAuthenticated } = useAuth();
   
-  const [showReferralModal, setShowReferralModal] = useState<boolean>(false);
   const [devoteeName, setDevoteeName] = useState<string>('');
   const [savingName, setSavingName] = useState<boolean>(false);
 
@@ -32,7 +31,8 @@ export default function Home() {
       try {
         await api.post('/devotee', {
           id: devotee.id,
-          name: devoteeName
+          name: devoteeName,
+          status: STATUSES.active
         }); // automatically sends token
         window.location.reload();
       } catch {
@@ -53,6 +53,10 @@ export default function Home() {
       }
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    setDevoteeName(devotee?.name? devotee.name:'');
+  }, [devotee]);
 
   return (
     <>
@@ -124,23 +128,15 @@ export default function Home() {
       </TabView>
 
       <Dialog
-        header="Referrals" keepInViewport
-        visible={showReferralModal}
-        onHide={() => setShowReferralModal(false)}>
-        <span className="mb-5">
-          <Referrals />
-        </span>
-      </Dialog>
-      <Dialog
-        header="What should we call you?" keepInViewport
+        header={devotee?.name? "Confirm us your name":"What should we call you?"} keepInViewport
         closeIcon="pi pi-crown"
-        visible={!!devotee && !devotee.name}
+        visible={!!devotee && (!devotee.name || devotee.status !== STATUSES.active)}
         footer={
           (
             <div className="grid grid-cols-12 items-center">
               <div className="col-span-8 md:col-span-10 pt-4 text-justify">
                 <small>
-                  <strong>Note:</strong>&nbsp;Just tell us your name to get started. Fill in the rest anytime from the My Profile menu on top.
+                  <strong>Note:</strong>&nbsp;Just {devotee?.name? "confirm":"tell"} us your name to get started. Fill in the rest anytime from the My Data menu on top.
                 </small>
               </div>
               <div className="col-span-4 md:col-span-2 mr-1 mt-4">
@@ -149,7 +145,7 @@ export default function Home() {
                   size="small"
                   type="button"
                   onClick={() => saveDevoteeName()}
-                  label={savingName ? "Saving..." : "Save"}
+                  label={savingName ? (devotee?.name? "Confirming":"Saving...") : (devotee?.name? "Confirm":"Save")}
                   icon="pi pi-save"
                   loading={savingName}
                   disabled={savingName || !devoteeName}
@@ -159,7 +155,7 @@ export default function Home() {
             </div>
           )
         }
-        onHide={() => setShowReferralModal(false)}>
+        onHide={() => setDevoteeName(devotee?.name || '')}>
         <div className="p-inputgroup mt-2 sm:mt-7">
           <span className="p-inputgroup-addon">
             <i className="pi pi-user"></i>

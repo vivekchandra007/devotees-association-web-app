@@ -1,7 +1,8 @@
 import { z } from 'zod';
 
 export const devoteeSchema = z.object({
-  id: z.number().int().optional(),
+  id: z.number().int(),
+  status: z.enum(['active', 'inactive', 'deceased']).optional(),
   name: z.string().max(100).optional(),
   initiated_name: z.string().max(100).nullable().optional(),
   dob: z.date().nullable().optional(),

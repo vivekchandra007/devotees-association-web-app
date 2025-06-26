@@ -38,14 +38,11 @@ export async function POST(req: NextRequest) {
       }
     }
     // cast out "id" from data so that no one can update the id through this query
-    const id = parsed.data.id;
-    delete parsed.data.id;
-    if (!parsed.data.id && id) {
+    const {id, ...dataWithoutId} = parsed.data;
+    if (dataWithoutId && id) {
       const updatedDevotee = await prisma.devotees.update({
         where: { id },
-        data: {
-          ...parsed.data
-        },
+        data: dataWithoutId,
       });
       return NextResponse.json({ success: true, devotee: updatedDevotee }, { status: 200 });
     } else {
