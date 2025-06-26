@@ -70,12 +70,8 @@ export default function DonationsDashboard() {
       try {
         const res = await api.post('/donations/bulk', { donations: json });
         if (res && res.status === 200 && res.data && res.data.success) {
-          toast.current?.show({
-            severity: MessageSeverity.SUCCESS,
-            detail: res.data.message,
-            sticky: true,
-            closable: true
-          });
+          msgs.current?.clear();
+          msgs.current?.show({ sticky: true, severity: MessageSeverity.SUCCESS, content: res.data.message, closable: true });
           setInProgress(false);
           await fetchDonations();
         } else {
@@ -83,12 +79,8 @@ export default function DonationsDashboard() {
         }
       } catch {
         setInProgress(false);
-        toast.current?.show({
-          severity: MessageSeverity.ERROR,
-          detail: 'Error inserting donations data in DB. Cross check data in sheet.',
-          sticky: true,
-          closable: true
-        });
+        msgs.current?.clear();
+        msgs.current?.show({ sticky: true, severity: MessageSeverity.ERROR, content: 'Error inserting donations data in DB. Cross check data in sheet.', closable: true });
       } finally {
         setShowBulkUploadDialogue(false);
       }

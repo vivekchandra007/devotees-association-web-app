@@ -292,6 +292,7 @@ export default function DevoteesDashboard() {
             <small className="px-5">
                 <strong>Note:</strong>&nbsp;You can search a devotee by their name, phone number or email.
             </small>
+            <Messages ref={msgs}/>
             {
                 searchQuery && searchResult &&
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
@@ -333,7 +334,6 @@ export default function DevoteesDashboard() {
                     }
                 </div>
             }
-            <Messages ref={msgs}/>
             <Toast ref={toast} position="bottom-center" />
         </div>
     )
