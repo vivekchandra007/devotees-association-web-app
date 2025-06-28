@@ -247,13 +247,6 @@ export default function TopNavBar() {
     const title = (
         <small className="text-text">
             ॥ हरे कृष्ण ॥
-            { 
-                isAuthenticated && devotee && 
-                <span>
-                    <br />
-                    {devotee?.initiated_name || devotee?.name}{devotee?.gender ? `, ${devotee.spiritual_level_id_ref_value[`title_${devotee?.gender}`]}` : ''} 🙏🏻
-                </span>
-            }
         </small>
     );
 
@@ -279,24 +272,31 @@ export default function TopNavBar() {
                 visible={showWelcomeDialogue}
                 onHide={hideWelcomeMessage}
                 className="shadow-2xl w-full md:w-[75vw] lg:w-[45vw] text-center text-text size-fit m-auto">
-                <div className="bg-[url('/chant-and-be-happy3.png')] bg-no-repeat bg-center bg-contain">
+                <div className="bg-[url('/chant-and-be-happy3.png')] bg-no-repeat bg-center bg-contain pb-0">
                     <small className="block text-text mb-4">
-                        Congratulations! Thanks to your devotion, we are getting a new beautiful temple in Baner, Pune
+                        Congratulations,
+                        {
+                            isAuthenticated && devotee &&
+                            <span>
+                                {devotee?.initiated_name || devotee?.name}{devotee?.gender ? `, ${devotee.spiritual_level_id_ref_value[`title_${devotee?.gender}`]}` : ''} 🙏🏻
+                            </span>
+                        }
+                        <br/>Thanks to your devotion, we are about to get a new beautiful temple in Baner, Pune
                     </small>
                     <div className="text-text">
                         <strong className="font-bilbo text-xl">Shri Shri <span className="text-special text-4xl">Radha Krishna</span>&nbsp;Temple</strong>
                     </div>
                     <small className="text-text">
-                        Your turn now. Let&apos;s build it brick by brick, step by step
+                        Your turn now. Let&apos;s begin step by step
                     </small>
                     <br /><br />
                     <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
                         <div className="col-span-8 md:col-span-10 text-left">
                             <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
-                            <small className="text-text">A Once-In-A-Lifetime divine chance to build temple for Shri Shri Radha Krishna — Do not miss. Donate Now!</small>
+                            <small className="text-text">A Once-In-A-Lifetime divine chance to help build this temple — Do not miss. Donate Now!</small>
                         </div>
                         <div className="col-span-4 md:col-span-2 mr-1">
-                            <Button label="" severity="warning" raised size="large" className="float-right"
+                            <Button label="" severity="warning" raised className="float-right"
                                     icon="pi pi-indian-rupee"
                                     onClick={() => window.open("https://iskconpunebcec.com/#/newtemple")}>
                                 <Badge severity="warning" value="▸" className="scale-150"></Badge>
@@ -306,10 +306,12 @@ export default function TopNavBar() {
                     <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
                         <div className="col-span-8 md:col-span-10 text-left">
                             <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
-                            <small className="text-text">Join our Whatsapp group to stay updated with the latest news and events — Do not miss. Connect Now!</small>
+                            <small data-pr-tooltip="Join our Whatsapp group to stay updated with the latest news and events — Do not miss. Connect Now!" className="text-text">
+                                Join our Whatsapp group
+                            </small>
                         </div>
                         <div className="col-span-4 md:col-span-2 mr-1">
-                            <Button label="" severity="success" raised size="large" className="float-right"
+                            <Button label="" severity="success" raised size="small" className="float-right"
                                     icon="pi pi-whatsapp"
                                     onClick={() => alert('Link to a Whatsapp group')}>
                                 <Badge severity="success" value="▸" className="scale-150"></Badge>
@@ -342,7 +344,7 @@ export default function TopNavBar() {
                                             <div className="grid grid-cols-12 items-center">
                                                 <div className="col-span-8 md:col-span-7 text-left">
                                                     <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
-                                                    <small className="text-text">Keep your profile 100% and upto date</small>
+                                                    <small className="text-text">Keep profile up to date</small>
                                                 </div>
                                                 <div className="col-span-4 md:col-span-5">
                                                     <ProfileCompletionMeter devotee={devotee} />
@@ -350,7 +352,7 @@ export default function TopNavBar() {
                                             </div>
                                         </div>
                                         <div className="col-span-4 md:col-span-2 mr-1">
-                                            <Button label="" severity="info" raised size="large" className="float-right"
+                                            <Button label="" severity="info" raised size="small" className="float-right"
                                                     icon="pi pi-user-edit"
                                                     onClick={() => router.push('/devotee')}>
                                                 <Badge severity="info" value="▸" className="scale-150"></Badge>
@@ -360,10 +362,12 @@ export default function TopNavBar() {
                                     <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
                                         <div className="col-span-8 md:col-span-10 text-left">
                                             <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
-                                            <small className="text-text">Let&apos;s Spread the word. Refer Others and become a spiritual catalyst in their life.</small>
+                                            <small data-pr-tooltip="Let's Spread the word. Refer Others and become a spiritual catalyst in their life." className="text-text">
+                                                Refer Others, Earn Blessings
+                                            </small>
                                         </div>
                                         <div className="col-span-4 md:col-span-2 mr-1">
-                                            <Button label="" severity="secondary" raised size="large" className="float-right"
+                                            <Button label="" severity="secondary" raised size="small" className="float-right"
                                                     icon="pi pi-share-alt"
                                                     onClick={() => setDialogueModalContent(ReferralsModalContent)} >
                                                 <Badge severity="secondary" value="▸" className="scale-150"></Badge>
@@ -373,9 +377,11 @@ export default function TopNavBar() {
                                 </>
                             )
                     }
+                    <br/>
+                    <Button label="close" severity="secondary" size="small" className="w-full" outlined onClick={hideWelcomeMessage}/>
                 </div>
             </Dialog>
-            <span className={classNames("absolute right-0 md:right-2 z-1", guestMode ? 'top-[12vh] md:top-[11vh]' : 'top-[23vh] md:top-[16vh]')}>
+            {/*<span className={classNames("absolute right-0 md:right-2 z-1", guestMode ? 'top-[12vh] md:top-[11vh]' : 'top-[23vh] md:top-[16vh]')}>
                 <Button
                     rounded
                     raised
@@ -390,15 +396,16 @@ export default function TopNavBar() {
                         <Badge severity="danger" className="scale-50"></Badge>
                     </i>
                 </Button>
-            </span>
+            </span>*/}
             {/* Top News Ticker - shown always */}
             {
                 !authInProgress &&
                 <div className="bg-hover text-white grid items-center m-auto justify-items-center text-center -z-2 min-h-8">
-                    <small className="font-semibold hover:underline">
-                        <a href="https://iskconpunebcec.com/#/newtemple" target="_blank">
+                    <small className="font-semibold hover:underline cursor-pointer">
+                        <a onClick={() => setShowWelcomeDialogue(true)} target="_blank">
                             <i className="pi pi-megaphone mr-2 animate-pulse"></i>
                             Every brick carries a prayer. Let yours be one of them — Support the New Temple now.
+                            <span className="underline pl-2">Click here.</span>
                         </a>
                     </small>
                 </div>

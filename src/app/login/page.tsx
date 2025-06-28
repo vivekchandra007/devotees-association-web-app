@@ -78,8 +78,6 @@ export default function LoginPage() {
 
     const subTitle = (
         <span className="text-sm text-general">
-            ॥ हरे कृष्ण ॥
-            <br />
             As mentioned in&nbsp;
             <a className="hover:text-hover text-text" href="https://vedabase.io/en/library/cc/adi/3/91/" target="_blank" rel="noopener noreferrer">
                 <span className="underline">Śrī Caitanya-Caritāmṛta Ādi 3.91</span>&nbsp;&nbsp;<span className="pi pi-external-link" />

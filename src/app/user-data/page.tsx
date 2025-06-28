@@ -40,12 +40,11 @@ export default function DevoteesPage() {
             }
             <TabView activeIndex={activeIndex} 
                 onTabChange={(e) => { 
-                        const params = new URLSearchParams(searchParams.toString())
+                        const params = new URLSearchParams(searchParams.toString());
                         if (params.has('tab')) {
                             params.delete('tab');
                         }
-                        const newQueryParams = params.toString();
-                        router.push(`/user-data?tab=${e.index}&${newQueryParams || ''}`);
+                        router.push(`/user-data?tab=${e.index}`);
                     }
                 }>
                 <TabPanel header="Devotees" leftIcon="pi pi-users mr-2" className="min-w-[33vw]">

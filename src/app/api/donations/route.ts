@@ -1,41 +1,24 @@
 import prisma from '@/lib/prisma';
-import { NextRequest } from 'next/server';
+import {NextRequest, NextResponse} from 'next/server';
+import {Prisma} from "@prisma/client";
 
-export async function GET(req: NextRequest) {
-    const { searchParams } = new URL(req.url);
-    if (!searchParams || searchParams.size === 0) {
-        return getAllDonations();
-    }
+export async function POST(req: NextRequest) {
+    const body = await req.json();
+    const { first, rows, sortField, sortOrder, globalFilter } = body;
 
-    // Get the phone number from query parameters
-    const query = searchParams.get('query') || '';
-    if (!query) {
-        return getAllDonations();
-    }
-    try {
-        const donations = await prisma.donations.findMany({
-            where: {
-                OR: [
-                    {
-                        phone: {
-                            contains: query,
-                        }
-                    },
-                    {
-                        name: {
-                            contains: query,
-                        }
-                    },
-                    {
-                        donation_receipt_number: {
-                            contains: query,
-                        }
-                    },
-                    {
-                        amount: parseInt(query, 10) || 0, // Convert query to number if it's a valid number
-                    }
-                ]
-            },
+    const where = globalFilter ? {
+            OR: [
+                { name: { contains: globalFilter, mode: 'insensitive' as Prisma.QueryMode } },
+                { phone: { contains: globalFilter, mode: 'insensitive' as Prisma.QueryMode } },
+                { donation_receipt_number: { contains: globalFilter, mode: 'insensitive' as Prisma.QueryMode } },
+                { amount: globalFilter.length < 9 && parseInt(globalFilter, 10)? parseInt(globalFilter, 10) : 0 }
+            ]
+        }
+        : {};
+
+    const [records, total] = await Promise.all([
+        prisma.donations.findMany({
+            where,
             include: {
                 phone_ref_value: {
                     select: {
@@ -44,37 +27,14 @@ export async function GET(req: NextRequest) {
                     },
                 },
             },
-            orderBy: {
-                date: 'desc'
-            },
-            take: 50, // Limit the results to 50
-        });
-        return Response.json(donations, { status: 200 });
-    } catch (error) {
-        console.error('Error fetching donations', error);
-        return new Response('Failed to fetch donations', { status: 500 });
-    }
-}
+            skip: first,
+            take: rows,
+            orderBy: { [sortField ?? 'date']: sortOrder === -1 ? 'desc' : 'asc' },
+        }),
+        prisma.donations.count({ where }),
+    ]);
 
-async function getAllDonations() {
-    try {
-        const donations = await prisma.donations.findMany({
-            include: {
-                phone_ref_value: {
-                    select: {
-                        id: true,
-                        name: true
-                    },
-                },
-            },
-            orderBy: {
-                date: 'desc'
-            },
-            take: 10000, // Limit the results to 100
-        });
-        return Response.json(donations, { status: 200 });
-    } catch (error) {
-        console.error('Error fetching donations', error);
-        return new Response('Failed to fetch donations', { status: 500 });
-    }
+    return NextResponse.json({ success: true, records, total }, {
+        status: 200
+    });
 }
