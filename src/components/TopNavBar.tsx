@@ -151,9 +151,9 @@ export default function TopNavBar() {
                 style={{ padding: '8px' }}
                 onClick={() => navigateToPage('')}
             >
-                <Image src="/logo-dark4.png" alt="Home" height="32" width="32" className="invert-100" priority />
+                <Image src="/logo-light.png" alt="Home" height="32" width="32" className="invert-100" priority />
             </Button>
-            <span className="text-xs mt-1">Madhuram</span>
+            <span className="text-xs mt-1">Hare Krishna</span>
         </span>
     );
     const centerContent = (

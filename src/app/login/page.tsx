@@ -72,9 +72,16 @@ export default function LoginPage() {
                     {/*Hare <span className="text-hover">Krishna</span>*/}
                 </span>
                 <Image
-                    src="/login-hero-text-english4.png"
+                    src="/hero-text4.png"
                     alt="Hare Krishna"
-                    width="500"
+                    width="600"
+                    height="100"
+                    priority
+                />
+                <Image
+                    src="/divider.png"
+                    alt="----"
+                    width="600"
                     height="100"
                     priority
                 />

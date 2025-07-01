@@ -9,7 +9,10 @@ export default function Footer() {
                     <div className="row text-center m-2">
                         <div className="col-md-9">
                             <div className="justify-center flex">
-                                <Image src="/logo-dark3.png" alt="logo" width={128} height={128} priority/>
+                                <Image src="/logo-light.png" alt="logo" width={128} height={128} priority/>
+                            </div>
+                            <div className="justify-center flex">
+                                <Image src="/hero-text4-dark.png" alt="logo" width={200} height={128} priority/>
                             </div>
                             <br/>
                             <a className="footer-dark-special-text hover:underline hover:text-hover" href="https://vedabase.io/en/library/cc/adi/3/91/" target="_blank" rel="noopener noreferrer">
@@ -96,8 +99,8 @@ export default function Footer() {
                     <p className="copyright left">Developed with प्रेम❤️🙏भक्ति by {packageInfo.author}</p>
                     <p className="copyright right">
                         Copyright © 2025 &nbsp;
-                        <a className="underline hover:text-hover" href="https://shri-krishna.in/" target="_blank" rel="noopener noreferrer">
-                            Shri-Krishna.in
+                        <a className="underline hover:text-hover" href="https://harekrishna.app" target="_blank" rel="noopener noreferrer">
+                            HareKrishna.app
                         </a>
                         &nbsp;- All Rights Reserved.
                     </p>

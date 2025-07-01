@@ -33,8 +33,8 @@ const bilbo = Bilbo_Swash_Caps({
 });
 
 export const metadata: Metadata = {
-  title: "Madhuram",
-  description: "Get associated with Devotees",
+  title: "Hare Krishna - The App",
+  description: "where Your Devotion meets Our Association",
 };
 
 export default function RootLayout({
@@ -64,7 +64,7 @@ export default function RootLayout({
         <Image
           className="absolute -z-10 top-0 left-0 w-full h-full object-cover"
           src="/mahaprabhu5.jpg"
-          alt="Madhuram background image"
+          alt="mahaprabhu background image"
           sizes="100v"
           fill
           priority
