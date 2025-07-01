@@ -66,25 +66,36 @@ export default function LoginPage() {
     );
 
     const title = (
-        <span className="font-bilbo text-7xl text-text">
-            Madh<span className="text-hover">u</span>ram
-            <Divider align="center">
-                <a className="hover:underline" href="https://vedabase.io/en/library/cc/adi/3/91/" target="_blank" rel="noopener noreferrer">
-                    <span className="p-tag p-tag-warning">Get Associated with Devotees</span>
-                </a>
-            </Divider>
-        </span>
-    );
+            <>
+                <span className="font-bilbo text-7xl text-text">
+                    {/*|| हरे <span className="text-hover">कृष्ण ||</span>*/}
+                    {/*Hare <span className="text-hover">Krishna</span>*/}
+                </span>
+                <Image
+                    src="/login-hero-text-english.png"
+                    alt="Hare Krishna"
+                    width="500"
+                    height="100"
+                    priority
+                />
+                <Divider align="center">
+                    <span className="p-tag p-tag-warning">where Your Devotion meets Our Association</span>
+                </Divider>
+            </>
+        )
+    ;
 
     const subTitle = (
         <span className="text-sm text-general">
-            As mentioned in&nbsp;
-            <a className="hover:text-hover text-text" href="https://vedabase.io/en/library/cc/adi/3/91/" target="_blank" rel="noopener noreferrer">
-                <span className="underline">Śrī Caitanya-Caritāmṛta Ādi 3.91</span>&nbsp;&nbsp;<span className="pi pi-external-link" />
+            As per&nbsp;
+            <a className="hover:text-hover text-text" href="https://vedabase.io/en/library/cc/adi/3/91/" target="_blank"
+               rel="noopener noreferrer">
+                <span className="underline">Śrī Caitanya-Caritāmṛta Ādi 3.91</span>&nbsp;<span
+                className="pi pi-external-link [zoom:0.7]"/>
             </a>
-            <br />
+            <br/>
             The devotees of Lord Viṣṇu are godly <span className="text-hover">(dev)</span>
-            <br />
+            <br/>
             and Association of Devotees is one of the most important activity in Bhakti.
             <br />
             So, come and get associated with us, <span className="text-hover">dev</span>
