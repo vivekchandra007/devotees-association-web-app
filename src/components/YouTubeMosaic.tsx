@@ -114,6 +114,7 @@ export default function YouTubeMosaic() {
             alt={short.title}
             width={120}
             height={90}
+            loading="lazy"
             className="rounded-lg cursor-pointer"
             onClick={() => setSelectedVideo(short)}
           />
@@ -145,6 +146,7 @@ export default function YouTubeMosaic() {
               alt={video.title}
               width={100}
               height={60}
+              loading="lazy"
               className="rounded"
             />
           </div>

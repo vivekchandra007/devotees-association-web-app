@@ -399,7 +399,7 @@ export default function TopNavBar() {
             </span>*/}
             {/* Top News Ticker - shown always */}
             {
-                !authInProgress &&
+                !authInProgress && (devotee || guestMode) && !pathname.includes('/login') &&
                 <div className="bg-hover text-white grid items-center m-auto justify-items-center text-center -z-2 min-h-8">
                     <small className="font-semibold hover:underline cursor-pointer">
                         <a onClick={() => setShowWelcomeDialogue(true)} target="_blank">

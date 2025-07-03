@@ -72,15 +72,8 @@ export default function LoginPage() {
                     {/*Hare <span className="text-hover">Krishna</span>*/}
                 </span>
                 <Image
-                    src="/hero-text4.png"
+                    src="/hero-text5.png"
                     alt="Hare Krishna"
-                    width="600"
-                    height="100"
-                    priority
-                />
-                <Image
-                    src="/divider.png"
-                    alt="----"
                     width="600"
                     height="100"
                     priority
@@ -107,21 +100,6 @@ export default function LoginPage() {
             <br />
             So, come and get associated with us, <span className="text-hover">dev</span>
         </span>
-    );
-    const footer = (
-        <div>
-            <small>
-                <hr className="text-gray-100 mb-2" />
-                <span className="flex justify-content-space-between text-hover">
-                    <a href="https://iskconpunebcec.com/#/Home" target="_blank" rel="noopener noreferrer" className="underline hover:text-hover">
-                        ISKCON BCEC
-                    </a>
-                    <a href="https://iskconpunebcec.com/#/newtemple" className="underline hover:text-hover" target="_blank" rel="noopener noreferrer">
-                        NEW TEMPLE
-                    </a>
-                </span>
-            </small>
-        </div>
     );
 
     const configuration = {
@@ -170,7 +148,7 @@ export default function LoginPage() {
         <>
             {authInProgress && <FullPageSpinner message="Hare Krishna! OTP verifed. Redirecting to Home Page" />}
             <Card title={title}
-                subTitle={subTitle} footer={footer} header={header}
+                subTitle={subTitle} header={header}
                 className="shadow-2xl w-93 md:w-110 text-center component-transparent">
                 <div>
                     <Button id="btn-sign-in" label="Login with your Mobile Number" severity="danger" raised
