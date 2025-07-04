@@ -27,6 +27,12 @@ type Donation = Prisma.donationsGetPayload<{
         id: true,
         name: true
       }
+    },
+    campaign_id_ref_value: {
+      select: {
+        id: true,
+        name: true
+      }
     }
   };
 }>;
@@ -51,15 +57,19 @@ export default function DonationsDashboard() {
     globalFilter: '',
   });
 
-  const fetchDonations = async () => {
+  const fetchDonations = async (customParams?: object) => {
     if (inProgress) return;
 
     setInProgress(true);
     msgs.current?.clear();
     try {
-      const res = await api.post('/donations', lazyParams);
+      const res = await api.post('/donations', customParams || lazyParams);
       if (res && res.status === 200 && res.data && res.data.success && res.data.total > 0) {
         const { data } = res;
+        if (customParams) {
+          // global call for reports with customParams
+          return data.records;
+        }
         setDonations(data.records);
         setTotalRecords(data.total);
       } else {
@@ -182,6 +192,45 @@ export default function DonationsDashboard() {
     }
     await fetchDonations();
   }
+
+  const exportExcel = async () => {
+    const allDonations: Donation[] = await fetchDonations({
+      first: 0,
+      rows: 0,
+      sortField: 'date',
+      sortOrder: -1,
+      filters: {},
+      globalFilter: lazyParams.globalFilter,
+    });
+    const data: never[] = [];
+    allDonations?.forEach(donation => {
+      const formattedData = {
+        id: donation.id,
+        donation_receipt_number: donation.donation_receipt_number,
+        amount: donation.amount,
+        name: donation.name,
+        phone: donation.phone?.slice(-10),
+        devoteId: donation.phone_ref_value?.id,
+        date: formatDateIntoStringddmmyyyy(new Date(donation.date!)),
+        campaign: donation.campaign_id_ref_value?.name,
+        internal_note: donation.internal_note
+      }
+      data.push(formattedData as never);
+    });
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Donations");
+    XLSX.writeFile(workbook, "donations-report.xlsx");
+  };
+
+  // const exportPDF = () => {
+  //   const doc = new jsPDF();
+  //   autoTable(doc, {
+  //     head: [selectedCols.map(col => col.header)],
+  //     body: donations.map(row => selectedCols.map(col => row[col.field])),
+  //   });
+  //   doc.save("donations-report.pdf");
+  // };
 
   return (
       <div className="p-3 mih-h-screen">
@@ -313,7 +362,7 @@ export default function DonationsDashboard() {
         <Messages ref={msgs} />
         {
           donations && Array.isArray(donations) && donations.length > 0 &&
-            <div className="card overflow-x-auto max-w-[99vw] mt-4">
+            <div className="card overflow-x-auto max-w-[90vw] mt-4">
               <hr/>
               <br/>
               <small className="text-general">
@@ -326,6 +375,19 @@ export default function DonationsDashboard() {
                 Note: Find the most recent donation first. Click on the name of the donor to view their details.
               </small>
               <br/><br/>
+              <div className="flex gap-4 mt-4">
+                <Button icon="pi pi-download"
+                        rounded
+                        raised
+                        severity="warning"
+                        label="Export to Excel"
+                        aria-label="Export to Excel"
+                        size="small"
+                        onClick={exportExcel}>
+                </Button>
+                {/*<Button onClick={exportPDF}>📄 Export to PDF</Button>*/}
+              </div>
+              <br/><br/>
               <DataTable
                   value={donations}
                   lazy
@@ -334,7 +396,7 @@ export default function DonationsDashboard() {
                   first={lazyParams.first}
                   rows={lazyParams.rows}
                   loading={inProgress}
-                  onPage={(e) =>  {
+                  onPage={(e) => {
                     setLazyParams({...lazyParams, first: e.first});
                     fetchDonations();
                   }}

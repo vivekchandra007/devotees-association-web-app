@@ -52,6 +52,7 @@ body {
 .component-transparent {
   background-color: rgba(255, 255, 255, 0.7);
   backdrop-filter: saturate(210%) blur(6px);
+  border-radius: 0;
 }
 
 .p-tabview-nav-link {

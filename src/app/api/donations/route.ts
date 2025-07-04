@@ -17,6 +17,28 @@ export async function POST(req: NextRequest) {
         : {};
 
     const [records, total] = await Promise.all([
+        rows <= 0?
+            (
+                prisma.donations.findMany({
+                    where,
+                    include: {
+                        phone_ref_value: {
+                            select: {
+                                id: true,
+                                name: true
+                            },
+                        },
+                        campaign_id_ref_value: {
+                            select: {
+                                id: true,
+                                name: true
+                            }
+                        },
+                    },
+                    orderBy: { [sortField ?? 'date']: sortOrder === -1 ? 'desc' : 'asc' },
+                })
+            ):
+                (
         prisma.donations.findMany({
             where,
             include: {
@@ -26,11 +48,17 @@ export async function POST(req: NextRequest) {
                         name: true
                     },
                 },
+                campaign_id_ref_value: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                },
             },
             skip: first,
             take: rows,
             orderBy: { [sortField ?? 'date']: sortOrder === -1 ? 'desc' : 'asc' },
-        }),
+        })),
         prisma.donations.count({ where }),
     ]);
 
