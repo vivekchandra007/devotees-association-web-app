@@ -4,6 +4,7 @@ import React, { useEffect, useRef, useState } from 'react'
 import * as XLSX from 'xlsx'
 import { FileUpload, FileUploadFilesEvent } from 'primereact/fileupload'
 import {DataTable, SortOrder} from 'primereact/datatable'
+import { Calendar } from 'primereact/calendar';
 import { Column } from 'primereact/column'
 import api from '@/lib/axios'
 import { Toast } from "primereact/toast";
@@ -45,6 +46,7 @@ export default function DonationsDashboard() {
   const [showBulkUploadDialogue, setShowBulkUploadDialogue] = useState<boolean>(false);
   const [donations, setDonations] = useState<Donation[] | null>([]);
   const [totalRecords, setTotalRecords] = useState(0);
+  const [range, setRange] = useState<[Date | null, Date | null]>([new Date(), new Date(new Date().setDate(new Date().getDate() + 1))]);
   const toast = useRef<Toast>(null);
   const msgs = useRef<Messages>(null);
 
@@ -94,6 +96,13 @@ export default function DonationsDashboard() {
     }
     fetchDonations();
   }, []);
+
+  useEffect(() => {
+    const [start, end] = range;
+    if (start && end) {
+      console.log(`Searching between ${start} and ${end}`);
+    }
+  }, [range]);
 
   const handleUpload = async (e: FileUploadFilesEvent) => {
     const file = e.files[0]
@@ -356,12 +365,25 @@ export default function DonationsDashboard() {
                 aria-label="Clear search"
             />
         )}
+        <div className="text-sm px-5 my-1">
+          <Calendar
+              value={range}
+              onChange={(e) => setRange(e.value as [Date, Date])}
+              selectionMode="range"
+              readOnlyInput
+              showIcon
+              placeholder="Select Date Range"
+          />
+        </div>
+        {/*<Button label="Apply Filter" onClick={handleSearch} disabled={!range[0] || !range[1]} />*/}
+        <br/>
         <small className="px-5">
-          <strong>Note:</strong>&nbsp;Search a donation by it&apos;s donor&apos;s name, phone number, donation amount or receipt number
+          <strong>Note:</strong>&nbsp;Search a donation by it&apos;s donor&apos;s name, phone number, donation amount,
+          receipt number or within a date range
         </small>
-        <Messages ref={msgs} />
+        <Messages ref={msgs}/>
         {
-          donations && Array.isArray(donations) && donations.length > 0 &&
+            donations && Array.isArray(donations) && donations.length > 0 &&
             <div className="card overflow-x-auto max-w-[90vw] mt-4">
               <hr/>
               <br/>
