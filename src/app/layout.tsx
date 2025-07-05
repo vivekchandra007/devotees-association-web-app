@@ -33,8 +33,44 @@ const bilbo = Bilbo_Swash_Caps({
 });
 
 export const metadata: Metadata = {
-  title: "Hare Krishna - The App",
-  description: "where Your Devotion meets Our Association",
+  title: 'HareKrishna.app – where Your Devotion meets Our Association',
+  description: 'HareKrishna.app is your spiritual home for connecting with devotees, watching inspiring content, offering prayers, and participating in prema-bhakti-sevā for Shri Shri Radha Krishna.',
+  keywords: [
+    'Hare Krishna', 'Hare Krishna App', 'Hare Krishna Official App',
+    'ISKCON Official App', 'ISKCON Global App', 'Bhakti App',
+    'Devotee Association', 'Devotees Association', 'Association of Devotees',
+    'Radha Krishna Temple', 'ISKCON Pune', 'Spiritual App', 'Spiritual Youtube',
+    'Online Prayers', 'Serve Krishna', 'Bhagavad Gita', 'Shrimad Bhagavatam', 'Shrimad Bhagwad Gita',
+    'Devotional Videos', 'Radha Krishna Bhakti', 'Krishna Consciousness',
+    'HareKrishna.app', 'Join ISKCON', 'Devotee App', 'Register at ISKCON'
+  ],
+  metadataBase: new URL('https://harekrishna.app'),
+  openGraph: {
+    title: 'HareKrishna.app – where Your Devotion meets Our Association',
+    description: 'Your spiritual home to connect with devotees and offer prema-bhakti-sevā to Shri Shri Radha Krishna.',
+    url: 'https://harekrishna.app',
+    siteName: 'HareKrishna.app',
+    type: 'website',
+    images: [
+      {
+        url: 'https://harekrishna.app/metadata/og-cover.jpg', // Replace with your OG image path
+        width: 1200,
+        height: 630,
+        alt: 'HareKrishna.app Logo with Radha Krishna',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'HareKrishna.app – Where Devotion Finds Association',
+    description: 'Join the global family of devotees and serve Shri Shri Radha Krishna with love.',
+    images: ['https://harekrishna.app/metadata/og-cover.jpg'],
+    site: '@HareKrishnaApp', // Add if you have a Twitter
+  },
+  icons: {
+    icon: '/metadata/favicon.ico',
+    apple: '/metadata/apple-touch-icon.png',
+  },
 };
 
 export default function RootLayout({

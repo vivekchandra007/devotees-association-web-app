@@ -9,10 +9,10 @@ export default function Footer() {
                     <div className="row text-center m-2">
                         <div className="col-md-9">
                             <div className="justify-center flex">
-                                <Image src="/logo-light.png" alt="logo" width={128} height={128} priority/>
+                                <Image src="/metadata/icon-dark.png" alt="logo" width={128} height={128} priority/>
                             </div>
                             <div className="justify-center flex">
-                                <Image src="/hero-text4-dark.png" alt="logo" width={200} height={128} priority/>
+                                <Image src="/metadata/logo-dark.png" alt="logo" width={200} height={128} priority/>
                             </div>
                             <br/>
                             <a className="footer-dark-special-text hover:underline hover:text-hover" href="https://vedabase.io/en/library/cc/adi/3/91/" target="_blank" rel="noopener noreferrer">
