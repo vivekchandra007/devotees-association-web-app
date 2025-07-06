@@ -56,7 +56,7 @@ export const metadata: Metadata = {
         url: 'https://harekrishna.app/metadata/og-cover.jpg', // Replace with your OG image path
         width: 1200,
         height: 630,
-        alt: 'HareKrishna.app Logo with Radha Krishna',
+        alt: 'HareKrishna.app Logo with tagline – where Your Devotion meets Our Association',
       },
     ],
   },
