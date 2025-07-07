@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma';
 import { NextRequest } from 'next/server';
+import {GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY} from "@/data/constants";
 
 export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
@@ -50,7 +51,8 @@ export async function GET(req: NextRequest) {
             orderBy: {
                 name: 'asc'
             },
-            take: 10, // Limit the results to 10
+            take: 10, // Limit the results to 10,
+            cacheStrategy: GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY
         });
         return Response.json(devotees, { status: 200 });
     } catch (error) {

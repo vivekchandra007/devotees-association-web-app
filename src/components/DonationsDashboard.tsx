@@ -20,6 +20,9 @@ import { InputText } from 'primereact/inputtext'
 import { Messages } from 'primereact/messages'
 import { Dialog } from 'primereact/dialog'
 import { useSearchParams } from 'next/navigation'
+import jsPDF from "jspdf"
+import autoTable, {RowInput} from "jspdf-autotable";
+import {getCurrentDateDDMMYYYY} from "@/lib/utils";
 
 type Donation = Prisma.donationsGetPayload<{
   include: {
@@ -59,12 +62,49 @@ export default function DonationsDashboard() {
     globalFilter: '',
   });
 
+  const fetchAllDonations = async() => {
+    if (inProgress) return;
+
+    try {
+      setInProgress(true);
+      const allDonations: Donation[] = await fetchDonations({
+        first: 0,
+        rows: 0,
+        sortField: 'date',
+        sortOrder: -1,
+        filters: {},
+        globalFilter: lazyParams.globalFilter,
+      });
+      const data: Donation[] = [];
+      allDonations?.forEach(donation => {
+        const formattedData = {
+          id: donation.id,
+          donation_receipt_number: donation.donation_receipt_number,
+          amount: donation.amount,
+          name: donation.name,
+          phone: donation.phone?.slice(-10),
+          devoteId: donation.phone_ref_value?.id,
+          date: formatDateIntoStringddmmyyyy(new Date(donation.date!)),
+          campaign: donation.campaign_id_ref_value?.name,
+          internal_note: donation.internal_note
+        }
+        data.push(formattedData as never);
+      });
+      return data;
+    } catch {
+      msgs.current?.show({ sticky: true, severity: MessageSeverity.ERROR, content: 'Unable to export. Please try again.', closable: true });
+      return [];
+    } finally {
+      setInProgress(false);
+    }
+  }
+
   const fetchDonations = async (customParams?: object) => {
     if (inProgress) return;
 
-    setInProgress(true);
-    msgs.current?.clear();
     try {
+      setInProgress(true);
+      msgs.current?.clear();
       const res = await api.post('/donations', customParams || lazyParams);
       if (res && res.status === 200 && res.data && res.data.success && res.data.total > 0) {
         const { data } = res;
@@ -190,9 +230,19 @@ export default function DonationsDashboard() {
   };
   const amountFormatted = (rowData: Donation) => {
     return (
-      <span className="text-general">{rowData.amount ? new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(rowData.amount) : 'N/A'}</span>
+      <span className="text-general">{formatDonationAmount(rowData.amount, true)}</span>
     );
   };
+
+  const formatDonationAmount = (amount:number|null|undefined, withRupeeSymbol?: boolean) => {
+    return amount ? (
+        withRupeeSymbol?
+            new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(amount):
+            new Intl.NumberFormat('en-IN').format(amount)
+        )
+        :
+        'N/A'
+  }
 
   // This function will be called when the search button is clicked or enter is pressed
   async function handleSearch(event?: React.FormEvent<HTMLFormElement>) {
@@ -203,43 +253,34 @@ export default function DonationsDashboard() {
   }
 
   const exportExcel = async () => {
-    const allDonations: Donation[] = await fetchDonations({
-      first: 0,
-      rows: 0,
-      sortField: 'date',
-      sortOrder: -1,
-      filters: {},
-      globalFilter: lazyParams.globalFilter,
-    });
-    const data: never[] = [];
-    allDonations?.forEach(donation => {
-      const formattedData = {
-        id: donation.id,
-        donation_receipt_number: donation.donation_receipt_number,
-        amount: donation.amount,
-        name: donation.name,
-        phone: donation.phone?.slice(-10),
-        devoteId: donation.phone_ref_value?.id,
-        date: formatDateIntoStringddmmyyyy(new Date(donation.date!)),
-        campaign: donation.campaign_id_ref_value?.name,
-        internal_note: donation.internal_note
-      }
-      data.push(formattedData as never);
-    });
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Donations");
-    XLSX.writeFile(workbook, "donations-report.xlsx");
+    const allDonations: Donation[]|undefined = await fetchAllDonations();
+    if (allDonations && Array.isArray(allDonations) && allDonations.length > 0) {
+      const worksheet = XLSX.utils.json_to_sheet(allDonations);
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Donations");
+      XLSX.writeFile(workbook, `harekrishna_donations_${getCurrentDateDDMMYYYY()}.xlsx`);
+    }
   };
 
-  // const exportPDF = () => {
-  //   const doc = new jsPDF();
-  //   autoTable(doc, {
-  //     head: [selectedCols.map(col => col.header)],
-  //     body: donations.map(row => selectedCols.map(col => row[col.field])),
-  //   });
-  //   doc.save("donations-report.pdf");
-  // };
+  const exportPDF = async () => {
+    const allDonations: Donation[]|undefined = await fetchAllDonations();
+    if (allDonations && Array.isArray(allDonations) && allDonations.length > 0) {
+      const doc = new jsPDF();
+      autoTable(doc, {
+        head: [['Date', 'Amount', 'Name', 'Phone', 'Receipt No.']],
+        body: [...allDonations.map(
+            (donation: Donation) => [
+              donation.date,
+              `Rs. ${formatDonationAmount(donation.amount)}`,
+              donation.name,
+              donation.phone,
+              donation.donation_receipt_number
+            ]
+        ) as RowInput[]],
+      });
+      doc.save(`harekrishna_donations_${getCurrentDateDDMMYYYY()}.pdf`);
+    }
+  };
 
   return (
       <div className="p-3 mih-h-screen">
@@ -329,7 +370,7 @@ export default function DonationsDashboard() {
 
         <form onSubmit={handleSearch} className="p-inputgroup text-sm px-5 my-1">
           <span className="p-float-label">
-            <InputText id="search-input" required maxLength={50}
+            <InputText id="search-input" maxLength={50}
                        value={lazyParams.globalFilter}
                        onChange={(e) => {
                          // Remove any non-numeric characters from the input
@@ -339,7 +380,7 @@ export default function DonationsDashboard() {
                        }}
             />
             <label
-                htmlFor="search-input">Type query and press enter or click 🔍
+                htmlFor="search-input">Type and press enter or click 🔍
             </label>
           </span>
           <Button
@@ -376,40 +417,14 @@ export default function DonationsDashboard() {
           />
         </div>
         {/*<Button label="Apply Filter" onClick={handleSearch} disabled={!range[0] || !range[1]} />*/}
-        <br/>
-        <small className="px-5">
-          <strong>Note:</strong>&nbsp;Search a donation by it&apos;s donor&apos;s name, phone number, donation amount,
-          receipt number or within a date range
+        <small className="pl-6">
+          <strong>Search</strong>&nbsp;donation(s) by it&apos;s donor&apos;s name, phone number, donation amount,
+          receipt number, within a date range and/ or within an amount range
         </small>
         <Messages ref={msgs}/>
         {
             donations && Array.isArray(donations) && donations.length > 0 &&
             <div className="card overflow-x-auto max-w-[90vw] mt-4">
-              <hr/>
-              <br/>
-              <small className="text-general">
-                Donations: {totalRecords}
-                {devotee && lazyParams.globalFilter === '' && <span
-                    className="ml-2"> | Your Donations: {donations?.filter(d => d.phone === devotee.phone).length}</span>}
-              </small>
-              <br/>
-              <small className="text-general">
-                Note: Find the most recent donation first. Click on the name of the donor to view their details.
-              </small>
-              <br/><br/>
-              <div className="flex gap-4 mt-4">
-                <Button icon="pi pi-download"
-                        rounded
-                        raised
-                        severity="warning"
-                        label="Export to Excel"
-                        aria-label="Export to Excel"
-                        size="small"
-                        onClick={exportExcel}>
-                </Button>
-                {/*<Button onClick={exportPDF}>📄 Export to PDF</Button>*/}
-              </div>
-              <br/><br/>
               <DataTable
                   value={donations}
                   lazy
@@ -438,7 +453,43 @@ export default function DonationsDashboard() {
                 <Column field="phone" header="Phone Number" body={phoneFormatted} sortable/>
                 <Column field="donation_receipt_number" header="Receipt" sortable/>
               </DataTable>
-              <div className="text-sm p-2 pb-0 m-auto text-center"><strong>{totalRecords} donations</strong></div>
+              <hr/>
+              <small className="text-general">
+                <strong>Note:</strong> By default, find the most recent donation first but you can always sort column as per your wish by clicking them.
+                Click on a&nbsp;
+                <a href="javascript:void(0);" rel="noopener noreferrer" className="text-hover underline">
+                  highlighted
+                </a>
+                &nbsp;donor name to view their complete details.
+              </small>
+              <br/>
+              <br/>
+              <small className="text-general">
+              Donations: {totalRecords}
+                {devotee && lazyParams.globalFilter === '' && <span
+                    className="ml-2"> | Your Donations: {donations?.filter(d => d.phone === devotee.phone).length}</span>}
+              </small>
+              <hr />
+              <br />
+              <small className="text-general"><strong>Export as:</strong></small>
+              <br/>
+              <Button icon="pi pi-download"
+                      raised
+                      severity="success"
+                      label="Excel"
+                      aria-label="Export to Excel"
+                      size="small"
+                      onClick={exportExcel}>
+              </Button>
+              &nbsp;
+              <Button icon="pi pi-file-pdf"
+                      raised
+                      severity="danger"
+                      label="PDF"
+                      aria-label="Export to PDF"
+                      size="small"
+                      onClick={exportPDF}>
+              </Button>
             </div>
         }
         <Toast ref={toast} position="bottom-center"/>

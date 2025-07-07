@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
             name: true
           }
         }
-      }, 
+      },
     });
     if (!devotee) throw new Error();
 

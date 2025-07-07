@@ -3,6 +3,10 @@ import { prisma } from '@/lib/prisma'; // adjust to your prisma client
 import { verifyAccessToken } from '@/lib/auth'; // your JWT verification function
 import { devoteeSchema } from '@/schema/devoteeFormSchema';
 import { convertDateStringIntoDateObject } from '@/lib/conversions';
+import {
+  GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY,
+  SPECIFIC_PRISMA_ACCELERATE_CACHE_STRATEGY_SHORTER
+} from "@/data/constants";
 
 export async function POST(req: NextRequest) {
   try {
@@ -32,6 +36,7 @@ export async function POST(req: NextRequest) {
           name: true,
           system_role_id: true,
         },
+        cacheStrategy: GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY
       });
       if (!loggedIndevotee?.system_role_id || loggedIndevotee?.system_role_id <= 2) {
         return NextResponse.json({ error: 'Forbidden: You do not have privileges to update details of this devotee.' }, { status: 403 });
@@ -100,6 +105,7 @@ export async function GET(req: NextRequest) {
           }
         }
       },
+      cacheStrategy: SPECIFIC_PRISMA_ACCELERATE_CACHE_STRATEGY_SHORTER
     });
 
     if (!devotee) throw new Error();

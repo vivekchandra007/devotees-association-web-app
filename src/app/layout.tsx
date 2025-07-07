@@ -34,7 +34,7 @@ const bilbo = Bilbo_Swash_Caps({
 
 export const metadata: Metadata = {
   title: 'HareKrishna.app – where Your Devotion meets Our Association',
-  description: 'HareKrishna.app is your spiritual home for connecting with devotees, watching inspiring content, offering prayers, and participating in prema-bhakti-sevā for Shri Shri Radha Krishna.',
+  description: 'Connect with devotees, access inspiring content, and join the ISKCON community with this Hare Krishna app. Your spiritual journey begins here!',
   keywords: [
     'Hare Krishna', 'Hare Krishna App', 'Hare Krishna Official App',
     'ISKCON Official App', 'ISKCON Global App', 'Bhakti App',

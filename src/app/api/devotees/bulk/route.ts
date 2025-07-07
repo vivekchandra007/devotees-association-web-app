@@ -4,8 +4,7 @@ import { verifyAccessToken } from '@/lib/auth'; // your JWT verification functio
 import _ from "lodash";
 import {convertDateStringIntoDateObject} from "@/lib/conversions";
 import {devoteeBulkInsertSchema} from "@/schema/devoteeBulkSchema";
-
-// type Donation = Prisma.donationsGetPayload<{}>; 
+import {GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY} from "@/data/constants";
 
 export async function POST(req: NextRequest) {
     try {
@@ -55,6 +54,7 @@ export async function POST(req: NextRequest) {
                 name: true,
                 system_role_id: true,
             },
+            cacheStrategy: GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY
         });
         if (!loggedIndevotee?.system_role_id || loggedIndevotee?.system_role_id <= 3) {
             return NextResponse.json({ error: 'Forbidden: You do not have privileges to bulk upload devotees data' }, { status: 403 });

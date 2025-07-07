@@ -6,7 +6,7 @@ import { withAccelerate } from '@prisma/extension-accelerate'
 let options = {};
 if (process.env.NODE_ENV !== 'production') {
   options = {
-    log: ['query'], // Optional: helpful during development
+    log: ['query', 'info', 'warn', 'error'], // Optional: helpful during development
   };
 }
 

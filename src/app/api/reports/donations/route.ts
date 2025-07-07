@@ -1,5 +1,10 @@
-import { NextResponse } from 'next/server';
+import {NextRequest, NextResponse} from 'next/server';
 import { prisma } from '@/lib/prisma';
+import {verifyAccessToken} from "@/lib/auth";
+import {
+    GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY,
+    SPECIFIC_PRISMA_ACCELERATE_CACHE_STRATEGY_LONGER
+} from "@/data/constants";
 
 type GroupedDonation = {
     phone?: string | undefined;
@@ -9,14 +14,40 @@ type GroupedDonation = {
     _count?: number;
 };
 
-export async function GET() {
+export async function GET(req: NextRequest) {
     try {
+        const token = req.headers.get('authorization')?.replace('Bearer ', '');
+        if (!token) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const payload = verifyAccessToken(token); // get devoteeId from token
+        if (!payload) {
+            return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+        }
+
+        const loggedIndevotee = await prisma.devotees.findUnique({
+            where: { id: payload },
+            select: {
+                name: true,
+                system_role_id: true,
+            },
+            cacheStrategy: GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY
+        });
+        if (!loggedIndevotee?.system_role_id || loggedIndevotee?.system_role_id === 1) {
+            return NextResponse.json({ error: 'Forbidden: You do not have view donations reports/ charts' }, { status: 403 });
+        }
+
         // Step 1: Lookup devotee names by phone numbers
         const donations = await prisma.donations.findMany({
             select: {
                 phone: true,
                 name: true,
             },
+            // for ADMIN ( > 3), serve from a SHORTER cache coz they can modify donations data
+            // for NON ADMIN ( <= 3), serve from a LONGER cache coz they themselves can't modify donations data
+            cacheStrategy: loggedIndevotee.system_role_id <=3 ?
+                SPECIFIC_PRISMA_ACCELERATE_CACHE_STRATEGY_LONGER: GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY
         });
 
         // Step 2: Group donations by phone and get total amount per phone
@@ -31,6 +62,10 @@ export async function GET() {
                     amount: 'desc',
                 },
             },
+            // for ADMIN ( > 3), serve from a SHORTER cache coz they can modify donations data
+            // for NON ADMIN ( <= 3), serve from a LONGER cache coz they themselves can't modify donations data
+            cacheStrategy: loggedIndevotee.system_role_id <=3 ?
+                SPECIFIC_PRISMA_ACCELERATE_CACHE_STRATEGY_LONGER: GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY
         });
 
         const phones = groupedDonations.map((d: GroupedDonation) => d.phone!).filter(Boolean);
@@ -46,6 +81,10 @@ export async function GET() {
                     name: true,
                     id: true,
                 },
+                // for ADMIN ( > 3), serve from a SHORTER cache coz they can modify donations data
+                // for NON ADMIN ( <= 3), serve from a LONGER cache coz they themselves can't modify donations data
+                cacheStrategy: loggedIndevotee.system_role_id <=3 ?
+                    SPECIFIC_PRISMA_ACCELERATE_CACHE_STRATEGY_LONGER: GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY
             })
             :
             [];
