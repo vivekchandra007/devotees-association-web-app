@@ -340,34 +340,6 @@ export default function DonationsDashboard() {
             <strong className="text-hover">• View</strong> donations data.
           </div>
         </small>
-
-        {/*{
-        getApplicableDonations && Array.isArray(getApplicableDonations) && getApplicableDonations.length > 0 &&
-        <div className="card overflow-x-auto max-w-[90vw] mt-4">
-          <small className="text-general">
-            Total Donations: {allDonations?.length}
-            {devotee && <span className="ml-2"> | Your Donations: {allDonations?.filter(d => d.phone === devotee.phone).length}</span>}
-          </small>
-          <br />
-          <small className="text-general">
-            Note: Donations are sorted by date in descending order, with the most recent donations appearing first.
-          </small>
-          <br />
-          <small className="text-general">
-            You can click on the name of the donor to view their details.
-          </small>
-          <br />
-          <DataTable value={getApplicableDonations} paginator rows={10} stripedRows size="small">
-            <Column header="Date" body={dateFormatted} />
-            <Column field="donation_receipt_number" header="Receipt No." />
-            <Column header="Amount" body={amountFormatted} />
-            <Column header="Phone Number" body={phoneFormatted} />
-            <Column header="Name" body={nameWithLink} />
-            <Column field="internal_note" header="Internal Note" />
-          </DataTable>
-        </div>
-      }*/}
-
         <form onSubmit={handleSearch} className="p-inputgroup text-sm px-5 my-1">
           <span className="p-float-label">
             <InputText id="search-input" maxLength={50}
@@ -416,7 +388,6 @@ export default function DonationsDashboard() {
               placeholder="Select Date Range"
           />
         </div>
-        {/*<Button label="Apply Filter" onClick={handleSearch} disabled={!range[0] || !range[1]} />*/}
         <small className="pl-6">
           <strong>Search</strong>&nbsp;donation(s) by it&apos;s donor&apos;s name, phone number, donation amount,
           receipt number, within a date range and/ or within an amount range

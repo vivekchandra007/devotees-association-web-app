@@ -304,23 +304,26 @@ export default function DevoteesDashboard() {
                                     key={devoteeDetails?.id}
                                     blocked={devoteeDetails?.status === STATUSES.deceased}
                                     template={<i className="pi pi-lock" style={{fontSize: '3rem'}}></i>}>
-                                    <Card>
-                                        <h3>{devoteeDetails?.name}</h3>
+                                    <Card
+                                        title={<h3 className={devoteeDetails?.status === 'active'? 'text-general':'text-gray-400'}>{devoteeDetails?.name}</h3>}
+                                    >
                                         <p><strong>Phone:</strong> {devoteeDetails?.phone?.slice(2)}</p>
                                         <p><strong>Email:</strong> {devoteeDetails?.email}</p>
-                                        <p><strong>Status:</strong> {devoteeDetails?.status}</p>
+                                        <p><strong>Status:</strong> <span className={devoteeDetails?.status === 'active'? 'text-hover':''}>{devoteeDetails?.status}</span></p>
                                         <p><strong>Role:</strong> {devoteeDetails?.system_role_id_ref_value?.name}</p>
 
                                         {/* volunteers, leaders and admins can view full details of a devotee as well as their donations */}
                                         <div className="grid grid-cols-2 gap-2 mt-3">
                                             <Button
-                                                outlined
+                                                outlined={devoteeDetails?.status === 'inactive'}
+                                                icon="pi pi-user"
                                                 label="View Profile"
                                                 onClick={() => router.push(`/devotee?devoteeId=${devoteeDetails?.id}`)}
                                                 size="small"
                                             />
                                             <Button
-                                                outlined
+                                                outlined={devoteeDetails?.status === 'inactive'}
+                                                icon="pi pi-indian-rupee"
                                                 label="View Donations"
                                                 onClick={() => router.push(`/user-data?tab=1&phone=${devoteeDetails?.phone}`)}
                                                 size="small"
