@@ -55,6 +55,10 @@ body {
   border-radius: 0;
 }
 
+.without-margin {
+  margin: 0;
+}
+
 .p-tabview-nav-link {
   background-color: rgba(255, 255, 255, 0.7);
   backdrop-filter: saturate(210%) blur(9px);

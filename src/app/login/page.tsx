@@ -67,18 +67,26 @@ export default function LoginPage() {
 
     const title = (
             <>
-                <span className="font-bilbo text-7xl text-text">
-                    {/*|| हरे <span className="text-hover">कृष्ण ||</span>*/}
-                    {/*Hare <span className="text-hover">Krishna</span>*/}
-                </span>
+                {/*<span className="font-bilbo text-7xl text-text">
+                    || हरे <span className="text-hover">कृष्ण ||</span>
+                    Hare <span className="text-hover">Krishna</span>
+                </span>*/}
                 <Image
-                    src="/hero-text5.png"
+                    className="m-auto"
+                    src="/metadata/icon.png"
+                    alt="Hare Krishna"
+                    width="100"
+                    height="100"
+                    priority
+                />
+                <Image
+                    src="/metadata/hero-text.png"
                     alt="Hare Krishna"
                     width="600"
                     height="100"
                     priority
                 />
-                <Divider align="center">
+                <Divider align="center" className="without-margin">
                     <span className="p-tag p-tag-warning">where Your Devotion meets Our Association</span>
                 </Divider>
             </>
@@ -87,6 +95,7 @@ export default function LoginPage() {
 
     const subTitle = (
         <span className="text-sm text-general">
+            <br />
             As per&nbsp;
             <a className="hover:text-hover text-text" href="https://vedabase.io/en/library/cc/adi/3/91/" target="_blank"
                rel="noopener noreferrer">
