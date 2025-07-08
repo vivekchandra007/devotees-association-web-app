@@ -37,7 +37,7 @@ export default function TopNavBar() {
 
     const [dialogueModalContent, setDialogueModalContent] = useState<dialogueModalContentType | null>();
 
-    const guestMode: boolean | null = !devotee;
+    const [guestMode, setGuestMode] = useState<boolean>(false);
     const LOCAL_STORAGE_HIDE_WELCOME_MESSAGE = "hideWelcomeMessage";
     const [showWelcomeDialogue, setShowWelcomeDialogue] = useState<boolean>(false);
 
@@ -128,16 +128,29 @@ export default function TopNavBar() {
         }
     }
 
-    useEffect(() => {
-        // Do something on route change
-        setIsNavigating(false);
+    function showDoNotShowWelcomeDialogue() {
         const stepsDone = Boolean(localStorage.getItem(LOCAL_STORAGE_HIDE_WELCOME_MESSAGE));
-        if (authInProgress || pathname.includes('/login') || !guestMode || stepsDone) {
+        if (window.location.toString().includes('/login') || stepsDone) {
             setShowWelcomeDialogue(false);
         } else {
-            setShowWelcomeDialogue(true);
+            if (guestMode || !stepsDone) {
+                setShowWelcomeDialogue(true);
+                if (guestMode) {
+                    setTimeout( showDoNotShowWelcomeDialogue, 300000);
+                }
+            }
         }
-    }, [pathname, authInProgress, guestMode]);
+    }
+
+    useEffect(() => {
+        setIsNavigating(false);
+        setGuestMode(false);
+        if (!pathname.includes('/login') && searchParams && searchParams.size > 0 && searchParams.get('guest')) {
+            setGuestMode(Boolean(searchParams.get('guest')));
+        }
+        // Do something on route change
+        showDoNotShowWelcomeDialogue();
+    }, [pathname, guestMode]);
 
     const startContent = (
         <span className="flex flex-col items-center space-y-1">
@@ -245,8 +258,15 @@ export default function TopNavBar() {
     );
 
     const title = (
-        <small className="text-text">
-            ॥ हरे कृष्ण ॥
+        <small className="font-bilbo text-text text-xl md:text-2xl lg:text-4xl">
+            Hare Krishna!
+            <br/>
+            {
+                isAuthenticated && devotee &&
+                <span className="text-special">
+                                {devotee?.initiated_name || devotee?.name}{devotee?.gender ? `, ${devotee.spiritual_level_id_ref_value[`title_${devotee?.gender}`]}` : ''} 🙏🏻
+                            </span>
+            }
         </small>
     );
 
@@ -271,66 +291,24 @@ export default function TopNavBar() {
                 header={title} keepInViewport closeOnEscape
                 visible={showWelcomeDialogue}
                 onHide={hideWelcomeMessage}
-                className="shadow-2xl w-full md:w-[75vw] lg:w-[45vw] text-center text-text size-fit m-auto">
+                className="shadow-2xl w-[94vw] md:w-[75vw] lg:w-[45vw] text-center text-text size-fit m-auto">
                 <div className="bg-[url('/chant-and-be-happy3.png')] bg-no-repeat bg-center bg-contain pb-0">
-                    <small className="block text-text mb-4">
-                        Congratulations,
-                        {
-                            isAuthenticated && devotee &&
-                            <span>
-                                {devotee?.initiated_name || devotee?.name}{devotee?.gender ? `, ${devotee.spiritual_level_id_ref_value[`title_${devotee?.gender}`]}` : ''} 🙏🏻
-                            </span>
-                        }
-                        <br/>Thanks to your devotion, we are about to get a new beautiful temple in Baner, Pune
-                    </small>
-                    <div className="text-text">
-                        <strong className="font-bilbo text-xl">Shri Shri <span className="text-special text-4xl">Radha Krishna</span>&nbsp;Temple</strong>
-                    </div>
-                    <small className="text-text">
-                        Your turn now. Let&apos;s begin step by step
-                    </small>
-                    <br /><br />
-                    <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
-                        <div className="col-span-8 md:col-span-10 text-left">
-                            <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
-                            <small className="text-text">A Once-In-A-Lifetime divine chance to help build this temple — Do not miss. Donate Now!</small>
-                        </div>
-                        <div className="col-span-4 md:col-span-2 mr-1">
-                            <Button label="" severity="warning" raised className="float-right"
-                                    icon="pi pi-indian-rupee"
-                                    onClick={() => window.open("https://iskconpunebcec.com/#/newtemple")}>
-                                <Badge severity="warning" value="▸" className="scale-150"></Badge>
-                            </Button>
-                        </div>
-                    </div>
-                    <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
-                        <div className="col-span-8 md:col-span-10 text-left">
-                            <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
-                            <small data-pr-tooltip="Join our Whatsapp group to stay updated with the latest news and events — Do not miss. Connect Now!" className="text-text">
-                                Join our Whatsapp group
-                            </small>
-                        </div>
-                        <div className="col-span-4 md:col-span-2 mr-1">
-                            <Button label="" severity="success" raised size="small" className="float-right"
-                                    icon="pi pi-whatsapp"
-                                    onClick={() => alert('Link to a Whatsapp group')}>
-                                <Badge severity="success" value="▸" className="scale-150"></Badge>
-                            </Button>
-                        </div>
-                    </div>
                     {
                         guestMode ?
                             (
                                 <>
-                                    <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
+                                    <div
+                                        className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
                                         <div className="col-span-8 md:col-span-10 text-left">
                                             <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
-                                            <small className="text-text">Claim your free account. Gifts, Online Prayers, Spiritual YouTube... — Do not miss. Login Now!</small>
+                                            <small className="text-text">Claim your free account. Gifts, Online Prayers,
+                                                Spiritual YouTube... All Free for a limited time — Do not miss. Login Now!</small>
                                         </div>
                                         <div className="col-span-4 md:col-span-2 mr-1">
-                                            <Button label="" severity="danger" raised size="large" className="float-right"
+                                            <Button label="" severity="danger" raised
+                                                    className="float-right"
                                                     icon="pi pi-crown"
-                                                    onClick={() =>  router.push(`/login?${searchParams || ''}`)}>
+                                                    onClick={() => router.push(`/login?${searchParams || ''}`)}>
                                                 <Badge severity="danger" value="▸" className="scale-150"></Badge>
                                             </Button>
                                         </div>
@@ -339,7 +317,46 @@ export default function TopNavBar() {
                             ) :
                             (
                                 <>
-                                    <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
+                                    <small className="text-text">
+                                        Have you completed the following yet?&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                    </small>
+                                    <div
+                                        className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
+                                        <div className="col-span-8 md:col-span-10 text-left">
+                                            <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
+                                            <small className="text-text">A Once-In-A-Lifetime chance to help build a
+                                                temple — Do not
+                                                miss. Donate Now!</small>
+                                        </div>
+                                        <div className="col-span-4 md:col-span-2 mr-1">
+                                            <Button label="" severity="warning" raised className="float-right"
+                                                    icon="pi pi-indian-rupee"
+                                                    onClick={() => window.open("https://iskconpunebcec.com/#/newtemple")}>
+                                                <Badge severity="warning" value="▸" className="scale-150"></Badge>
+                                            </Button>
+                                        </div>
+                                    </div>
+                                    <div
+                                        className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
+                                        <div className="col-span-8 md:col-span-10 text-left">
+                                            <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
+                                            <small
+                                                data-pr-tooltip="Join our Whatsapp group to stay updated with the latest news and events — Do not miss. Connect Now!"
+                                                className="text-text">
+                                                Join our Whatsapp group
+                                            </small>
+                                        </div>
+                                        <div className="col-span-4 md:col-span-2 mr-1">
+                                            <Button label="" severity="success" raised size="small"
+                                                    className="float-right"
+                                                    icon="pi pi-whatsapp"
+                                                    onClick={() => alert('Link to a Whatsapp group')}>
+                                                <Badge severity="success" value="▸" className="scale-150"></Badge>
+                                            </Button>
+                                        </div>
+                                    </div>
+                                    <div
+                                        className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
                                         <div className="col-span-8 md:col-span-10 text-left">
                                             <div className="grid grid-cols-12 items-center">
                                                 <div className="col-span-8 md:col-span-7 text-left">
@@ -347,7 +364,7 @@ export default function TopNavBar() {
                                                     <small className="text-text">Keep profile up to date</small>
                                                 </div>
                                                 <div className="col-span-4 md:col-span-5">
-                                                    <ProfileCompletionMeter devotee={devotee} />
+                                                    <ProfileCompletionMeter devotee={devotee}/>
                                                 </div>
                                             </div>
                                         </div>
@@ -359,17 +376,21 @@ export default function TopNavBar() {
                                             </Button>
                                         </div>
                                     </div>
-                                    <div className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
+                                    <div
+                                        className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
                                         <div className="col-span-8 md:col-span-10 text-left">
                                             <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
-                                            <small data-pr-tooltip="Let's Spread the word. Refer Others and become a spiritual catalyst in their life." className="text-text">
+                                            <small
+                                                data-pr-tooltip="Let's Spread the word. Refer Others and become a spiritual catalyst in their life."
+                                                className="text-text">
                                                 Refer Others, Earn Blessings
                                             </small>
                                         </div>
                                         <div className="col-span-4 md:col-span-2 mr-1">
-                                            <Button label="" severity="secondary" raised size="small" className="float-right"
+                                            <Button label="" severity="secondary" raised size="small"
+                                                    className="float-right"
                                                     icon="pi pi-share-alt"
-                                                    onClick={() => setDialogueModalContent(ReferralsModalContent)} >
+                                                    onClick={() => setDialogueModalContent(ReferralsModalContent)}>
                                                 <Badge severity="secondary" value="▸" className="scale-150"></Badge>
                                             </Button>
                                         </div>
@@ -378,7 +399,8 @@ export default function TopNavBar() {
                             )
                     }
                     <br/>
-                    <Button label="close" severity="secondary" size="small" className="w-full" outlined onClick={hideWelcomeMessage}/>
+                    <Button label={guestMode? 'Take me to Login screen' : 'Close'} severity="danger" size="small" className="w-full" outlined={!guestMode}
+                            onClick={guestMode? () => router.push(`/login?${searchParams || ''}`) : hideWelcomeMessage}/>
                 </div>
             </Dialog>
             {/*<span className={classNames("absolute right-0 md:right-2 z-1", guestMode ? 'top-[12vh] md:top-[11vh]' : 'top-[23vh] md:top-[16vh]')}>
@@ -400,7 +422,8 @@ export default function TopNavBar() {
             {/* Top News Ticker - shown always */}
             {
                 !authInProgress && (devotee || guestMode) && !pathname.includes('/login') &&
-                <div className="bg-hover text-white grid items-center m-auto justify-items-center text-center -z-2 min-h-8">
+                <div
+                    className="bg-hover text-white grid items-center m-auto justify-items-center text-center -z-2 min-h-8">
                     <small className="font-semibold hover:underline cursor-pointer">
                         <a onClick={() => setShowWelcomeDialogue(true)} target="_blank">
                             <i className="pi pi-megaphone mr-2 animate-pulse"></i>
@@ -415,7 +438,12 @@ export default function TopNavBar() {
             {
                 isAuthenticated && devotee &&
                 <>
-                    <Toolbar start={startContent} center={centerContent} end={endContent} className="component-transparent" style={{ padding: '8px', border: 'none ', boxShadow: 'rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px' }} />
+                    <Toolbar start={startContent} center={centerContent} end={endContent}
+                             className="component-transparent" style={{
+                        padding: '8px',
+                        border: 'none ',
+                        boxShadow: 'rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px'
+                    }}/>
                     {
                         isNavigating &&
                         <ProgressBar mode="indeterminate" style={{ height: '4px' }}></ProgressBar>
