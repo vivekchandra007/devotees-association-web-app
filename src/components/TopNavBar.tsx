@@ -29,7 +29,10 @@ export default function TopNavBar() {
     const pathname = usePathname();
     const searchParams = useSearchParams();
 
+    const [guestMode, setGuestMode] = useState<boolean>(false);
     const { devotee, isAuthenticated, authInProgress, systemRole, logout } = useAuth();
+
+    const isGuestWithoutLogin = guestMode && (authInProgress || !isAuthenticated);
 
     const [isNavigating, setIsNavigating] = useState<boolean>(false);
 
@@ -37,7 +40,6 @@ export default function TopNavBar() {
 
     const [dialogueModalContent, setDialogueModalContent] = useState<dialogueModalContentType | null>();
 
-    const [guestMode, setGuestMode] = useState<boolean>(false);
     const LOCAL_STORAGE_HIDE_WELCOME_MESSAGE = "hideWelcomeMessage";
     const [showWelcomeDialogue, setShowWelcomeDialogue] = useState<boolean>(false);
 
@@ -133,9 +135,9 @@ export default function TopNavBar() {
         if (window.location.toString().includes('/login') || stepsDone) {
             setShowWelcomeDialogue(false);
         } else {
-            if (guestMode || !stepsDone) {
+            if (isGuestWithoutLogin || !stepsDone) {
                 setShowWelcomeDialogue(true);
-                if (guestMode) {
+                if (isGuestWithoutLogin) {
                     setTimeout( showDoNotShowWelcomeDialogue, 300000);
                 }
             }
@@ -150,7 +152,7 @@ export default function TopNavBar() {
         }
         // Do something on route change
         showDoNotShowWelcomeDialogue();
-    }, [pathname, guestMode]);
+    }, [pathname]);
 
     const startContent = (
         <span className="flex flex-col items-center space-y-1">
@@ -273,12 +275,8 @@ export default function TopNavBar() {
     function hideWelcomeMessage() {
         if (typeof window !== 'undefined') {
             setShowWelcomeDialogue(false);
-            const prevValueOfHideWelcomeMessage = localStorage.getItem(LOCAL_STORAGE_HIDE_WELCOME_MESSAGE);
-            if (!guestMode) {
+            if (devotee) {
                 localStorage.setItem(LOCAL_STORAGE_HIDE_WELCOME_MESSAGE, "true");
-            }
-            if (!guestMode && !Boolean(prevValueOfHideWelcomeMessage)) {
-                window.location.reload();
             }
             window.scrollTo(0, 0);
         }
@@ -294,7 +292,7 @@ export default function TopNavBar() {
                 className="shadow-2xl w-[94vw] md:w-[75vw] lg:w-[45vw] text-center text-text size-fit m-auto">
                 <div className="bg-[url('/chant-and-be-happy3.png')] bg-no-repeat bg-center bg-contain pb-0">
                     {
-                        guestMode ?
+                        isGuestWithoutLogin?
                             (
                                 <>
                                     <div
@@ -399,11 +397,11 @@ export default function TopNavBar() {
                             )
                     }
                     <br/>
-                    <Button label={guestMode? 'Take me to Login screen' : 'Close'} severity="danger" size="small" className="w-full" outlined={!guestMode}
-                            onClick={guestMode? () => router.push(`/login?${searchParams || ''}`) : hideWelcomeMessage}/>
+                    <Button label={isGuestWithoutLogin? 'Take me to Login screen' : 'Close'} severity="danger" size="small" className="w-full" outlined={!isGuestWithoutLogin}
+                            onClick={isGuestWithoutLogin? () => router.push(`/login?${searchParams || ''}`) : hideWelcomeMessage}/>
                 </div>
             </Dialog>
-            {/*<span className={classNames("absolute right-0 md:right-2 z-1", guestMode ? 'top-[12vh] md:top-[11vh]' : 'top-[23vh] md:top-[16vh]')}>
+            {/*<span className={classNames("absolute right-0 md:right-2 z-1", isGuestWithoutLogin ? 'top-[12vh] md:top-[11vh]' : 'top-[23vh] md:top-[16vh]')}>
                 <Button
                     rounded
                     raised
@@ -421,7 +419,7 @@ export default function TopNavBar() {
             </span>*/}
             {/* Top News Ticker - shown always */}
             {
-                !authInProgress && (devotee || guestMode) && !pathname.includes('/login') &&
+                !authInProgress && !pathname.includes('/login') &&
                 <div
                     className="bg-hover text-white grid items-center m-auto justify-items-center text-center -z-2 min-h-8">
                     <small className="font-semibold hover:underline cursor-pointer">
