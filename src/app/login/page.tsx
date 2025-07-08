@@ -75,15 +75,16 @@ export default function LoginPage() {
                     className="m-auto"
                     src="/metadata/icon.png"
                     alt="Hare Krishna"
-                    width="100"
-                    height="100"
+                    width="75"
+                    height="75"
                     priority
                 />
                 <Image
+                    className="m-auto"
                     src="/metadata/hero-text.png"
                     alt="Hare Krishna"
-                    width="600"
-                    height="100"
+                    width="400"
+                    height="75"
                     priority
                 />
                 <Divider align="center" className="without-margin">
@@ -105,7 +106,7 @@ export default function LoginPage() {
             <br/>
             The devotees of Lord Viṣṇu are godly <span className="text-hover">(dev)</span>
             <br/>
-            and Association of Devotees is one of the most important activity in Bhakti.
+            and Association of Devotees is required in Bhakti.
             <br />
             So, come and get associated with us, <span className="text-hover">dev</span>
         </span>
@@ -158,7 +159,7 @@ export default function LoginPage() {
             {authInProgress && <FullPageSpinner message="Hare Krishna! OTP verifed. Redirecting to Home Page" />}
             <Card title={title}
                 subTitle={subTitle} header={header}
-                className="shadow-2xl w-93 md:w-110 text-center component-transparent">
+                className="shadow-2xl w-93 md:w-100 text-center component-transparent">
                 <div>
                     <Button id="btn-sign-in" label="Login with your Mobile Number" severity="danger" raised
                         icon="pi pi-mobile" loading={authInProgress}
