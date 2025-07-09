@@ -106,7 +106,7 @@ export default function LoginPage() {
             <br/>
             The devotees of Lord Viṣṇu are godly <span className="text-hover">(dev)</span>
             <br/>
-            and Association of Devotees is required in Bhakti.
+            and Association of Devotees is the heart of Bhakti.
             <br />
             So, come and get associated with us, <span className="text-hover">dev</span>
         </span>
