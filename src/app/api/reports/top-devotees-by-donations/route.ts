@@ -62,6 +62,7 @@ export async function GET(req: NextRequest) {
                     amount: 'desc',
                 },
             },
+            take: 10,
             // for ADMIN ( > 3), serve from a SHORTER cache coz they can modify donations data
             // for NON ADMIN ( <= 3), serve from a LONGER cache coz they themselves can't modify donations data
             cacheStrategy: loggedIndevotee.system_role_id <=3 ?
@@ -107,7 +108,7 @@ export async function GET(req: NextRequest) {
             devoteeId: donation.phone? (phoneToDevoteeMap[donation.phone]?.id || null) : null,
         }));
 
-        return NextResponse.json({ success: true, data: enrichedData });
+        return NextResponse.json({ success: true, topDevotees: enrichedData });
     } catch (error) {
         console.error('Error fetching donations:', error);
         return NextResponse.json(

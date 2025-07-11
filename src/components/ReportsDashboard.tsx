@@ -4,6 +4,7 @@ import React, {useState, useEffect} from "react";
 import { Chart } from "primereact/chart";
 import {ProgressBar} from "primereact/progressbar";
 import api from "@/lib/axios";
+import Image from "next/image";
 
 type GroupedDonation = {
     phone?: string | undefined;
@@ -15,27 +16,43 @@ type GroupedDonation = {
 
 export default function ReportsDashboard() {
     const [inProgress, setInProgress] = useState<boolean>(false);
+    const [totalAmount, setTotalAmount] = useState<number | null>(null);
+    const [donationsCount, setDonationsCount] = useState<number | null>(null);
+    const [topDevoteesByDonationAmount, setTopDevoteesByDonationAmount] = useState([]);
 
-    const [donations, setDonations] = useState([]);
+    const fetchDonationsSummary = async () => {
+        setInProgress(true);
+        try {
+            const res = await api.get('/reports/donations-summary');
+            if (res.data.success) {
+                setTotalAmount(res.data.totalAmount.amount);
+                setDonationsCount(res.data.count.id);
+            }
+        } catch (err) {
+            console.error('Failed to load donation data:', err);
+        } finally {
+            setInProgress(false);
+        }
+    };
 
+    const fetchTopDevoteesByDonationAmount = async () => {
+        setInProgress(true);
+        try {
+            const res = await api.get('/reports/top-devotees-by-donations');
+            if (res.data.success) {
+                setTopDevoteesByDonationAmount(res.data.topDevotees);
+            }
+        } catch (err) {
+            console.error('Failed to load donation data:', err);
+        } finally {
+            setInProgress(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchDonations = async () => {
-            if (inProgress) return;
-
-            setInProgress(true);
-            try {
-                const res = await api.get('/reports/donations');
-                if (res.data.success) {
-                    setDonations(res.data.data);
-                }
-            } catch (err) {
-                console.error('Failed to load donation data:', err);
-            } finally {
-                setInProgress(false);
-            }
-        };
-        fetchDonations();
+        fetchDonationsSummary().then(
+            () => fetchTopDevoteesByDonationAmount()
+        );
     }, []);
 
 
@@ -53,20 +70,56 @@ export default function ReportsDashboard() {
                 custom graphs
             </small>
 
+            <br /><br />
+            {/* Total Widget */}
+            <div className="bg-yellow-50 text-yellow-900 border-l-4 border-yellow-500 p-4 rounded-lg shadow flex justify-between items-center max-w-md">
+                <div>
+                    <p className="text-sm">Total <strong>{donationsCount}</strong> Donations amounting to</p>
+                    <p className="text-2xl font-bold">₹ {totalAmount?.toLocaleString("en-IN")}</p>
+                </div>
+                <Image src="/money-bag.png" alt="money" width="70" height="70" />
+            </div>
+
+            {/* 📈 Top 10 Devotees (by donation amount) */}
             {
-                donations && Array.isArray(donations) && donations.length > 0 &&
+                topDevoteesByDonationAmount && Array.isArray(topDevoteesByDonationAmount) && topDevoteesByDonationAmount.length > 0 &&
                 <>
                     <div className="card overflow-x-auto max-w-[90vw] my-4">
-                        <h2 className="font-semibold mb-2">📈 Donations Overview</h2>
+                        <h2 className="font-semibold mb-2">📈 Top 10 Devotees (by donation amount)</h2>
                         <Chart
                             type="bar"
                             data={{
-                                labels: donations.map((d:GroupedDonation) => `${d.name ?? ''} (${d.phone?.slice(-10)}) - ${d.donationCount} donations`),
+                                labels: topDevoteesByDonationAmount.map((d:GroupedDonation) => `${d.name ?? ''} (${d.donationCount ?? ''})`),
                                 datasets: [{
-                                    label: "Total donations made by an individual",
-                                    data: donations.map((d:GroupedDonation) => d.totalAmount),
-                                    backgroundColor: "#4f46e5"
-                                }],
+                                    label: "Total donations",
+                                    data: topDevoteesByDonationAmount.map((d:GroupedDonation) => d.totalAmount),
+                                    indexAxis: 'y',
+                                    backgroundColor: [
+                                        'rgba(255, 159, 64, 1)',
+                                        'rgba(255, 159, 64, 0.9)',
+                                        'rgba(255, 159, 64, 0.8)',
+                                        'rgba(255, 159, 64, 0.7)',
+                                        'rgba(255, 159, 64, 0.6)',
+                                        'rgba(255, 159, 64, 0.5)',
+                                        'rgba(255, 159, 64, 0.4)',
+                                        'rgba(255, 159, 64, 0.3)',
+                                        'rgba(255, 159, 64, 0.2)',
+                                        'rgba(255, 159, 64, 0.1)',
+                                    ],
+                                    borderColor: [
+                                        'rgba(255, 159, 64)',
+                                        'rgba(255, 159, 64)',
+                                        'rgba(255, 159, 64)',
+                                        'rgba(255, 159, 64)',
+                                        'rgba(255, 159, 64)',
+                                        'rgba(255, 159, 64)',
+                                        'rgba(255, 159, 64)',
+                                        'rgba(255, 159, 64)',
+                                        'rgba(255, 159, 64)',
+                                        'rgba(255, 159, 64)',
+                                    ],
+                                    borderWidth: 1
+                                }]
                             }}
                         />
                     </div>
