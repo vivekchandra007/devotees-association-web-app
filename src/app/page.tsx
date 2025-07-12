@@ -136,7 +136,7 @@ export default function Home() {
             <div className="grid grid-cols-12 items-center">
               <div className="col-span-8 md:col-span-10 pt-4 text-justify">
                 <small>
-                  <strong>Note:</strong>&nbsp;Just {devotee?.name? "confirm":"tell"} us your name to get started. Fill in the rest anytime from the My Data menu on top.
+                  <strong>Note:</strong>&nbsp;Just {devotee?.name? "confirm":"tell"} us your name to get started. Fill in the rest anytime from the My Profile menu on top.
                 </small>
               </div>
               <div className="col-span-4 md:col-span-2 mr-1 mt-4">

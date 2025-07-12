@@ -48,14 +48,14 @@ export default function DevoteesPage() {
                         router.push(`/user-data?tab=${e.index}`);
                     }
                 }>
-                <TabPanel header="Devotees" leftIcon="pi pi-users mr-2" className="min-w-[33vw]">
-                    <DevoteesDashboard />
+                <TabPanel header="Reports" leftIcon="pi pi-chart-line mr-2" className="min-w-[33vw]">
+                    <ReportsDashboard />
                 </TabPanel>
                 <TabPanel header="Donations" leftIcon="pi pi-indian-rupee mr-2" className="min-w-[33vw]">
                     <DonationsDashboard />
                 </TabPanel>
-                <TabPanel header="Reports" leftIcon="pi pi-chart-line mr-2" className="min-w-[33vw]">
-                    <ReportsDashboard />
+                <TabPanel header="Devotees" leftIcon="pi pi-users mr-2" className="min-w-[33vw]">
+                    <DevoteesDashboard />
                 </TabPanel>
             </TabView>
         </div>

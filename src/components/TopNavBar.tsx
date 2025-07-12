@@ -180,11 +180,11 @@ export default function TopNavBar() {
                     text
                     raised
                     severity="contrast"
-                    aria-label="Edit Profile"
+                    aria-label="My Profile"
                     size="large"
                     onClick={() => navigateToPage('devotee')}
                 />
-                <span className="text-xs mt-1">My Data</span>
+                <span className="text-xs mt-1">My Profile</span>
             </span>
             {
                 systemRole === SYSTEM_ROLES.member ?
@@ -212,11 +212,11 @@ export default function TopNavBar() {
                                 text
                                 raised
                                 severity="contrast"
-                                aria-label="User Data"
+                                aria-label="Data"
                                 size="large"
                                 onClick={() => navigateToPage('user-data')}
                             />
-                            <span className="text-xs mt-1">User Data</span>
+                            <span className="text-xs mt-1">Data</span>
                         </span>
                     )
             }
