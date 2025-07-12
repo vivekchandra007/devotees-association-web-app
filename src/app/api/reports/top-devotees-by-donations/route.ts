@@ -5,6 +5,7 @@ import {
     GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY,
     SPECIFIC_PRISMA_ACCELERATE_CACHE_STRATEGY_LONGER
 } from "@/data/constants";
+import { startOfWeek, startOfMonth, startOfYear } from "date-fns";
 
 type GroupedDonation = {
     phone?: string | undefined;
@@ -38,6 +39,21 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: 'Forbidden: You do not have view donations reports/ charts' }, { status: 403 });
         }
 
+        const range = req.nextUrl.searchParams.get("range") ?? "all";
+        let startDate: Date | undefined;
+
+        const today = new Date();
+
+        if (range === "week") {
+            startDate = startOfWeek(today, { weekStartsOn: 1 }); // Monday
+        } else if (range === "month") {
+            startDate = startOfMonth(today);
+        } else if (range === "year") {
+            startDate = startOfYear(today);
+        }
+
+        console.log(startDate);
+
         // Step 1: Lookup devotee names by phone numbers
         const donations = await prisma.donations.findMany({
             select: {
@@ -57,6 +73,13 @@ export async function GET(req: NextRequest) {
                 amount: true,
             },
             _count: true,
+            where: startDate
+                ? {
+                    date: {
+                        gte: startDate,
+                    },
+                }
+                : {},
             orderBy: {
                 _sum: {
                     amount: 'desc',

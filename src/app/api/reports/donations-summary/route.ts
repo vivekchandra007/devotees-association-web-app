@@ -5,6 +5,7 @@ import {
     GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY,
     SPECIFIC_PRISMA_ACCELERATE_CACHE_STRATEGY_LONGER
 } from "@/data/constants";
+import { startOfWeek, startOfMonth, startOfYear } from "date-fns";
 
 export async function GET(req: NextRequest) {
     try {
@@ -30,6 +31,21 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: 'Forbidden: You do not have view donations reports/ charts' }, { status: 403 });
         }
 
+        const range = req.nextUrl.searchParams.get("range") ?? "all";
+        let startDate: Date | undefined;
+
+        const today = new Date();
+
+        if (range === "week") {
+            startDate = startOfWeek(today, { weekStartsOn: 1 }); // Monday
+        } else if (range === "month") {
+            startDate = startOfMonth(today);
+        } else if (range === "year") {
+            startDate = startOfYear(today);
+        }
+
+        console.log(startDate);
+
         const total = await prisma.donations.aggregate({
             _sum: {
                 amount: true,
@@ -37,6 +53,13 @@ export async function GET(req: NextRequest) {
             _count: {
                 id: true,
             },
+            where: startDate
+                ? {
+                    date: {
+                        gte: startDate,
+                    },
+                }
+                : {},
             // for ADMIN ( > 3), serve from a SHORTER cache coz they can modify donations data
             // for NON ADMIN ( <= 3), serve from a LONGER cache coz they themselves can't modify donations data
             cacheStrategy: loggedIndevotee.system_role_id <=3 ?

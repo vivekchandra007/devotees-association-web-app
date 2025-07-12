@@ -5,6 +5,7 @@ import {
     GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY,
     SPECIFIC_PRISMA_ACCELERATE_CACHE_STRATEGY_LONGER
 } from "@/data/constants";
+import { startOfWeek, startOfMonth, startOfYear } from "date-fns";
 
 export async function GET(req: NextRequest) {
     try {
@@ -30,11 +31,33 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: 'Forbidden: You do not have view donations reports/ charts' }, { status: 403 });
         }
 
+        const range = req.nextUrl.searchParams.get("range") ?? "all";
+        let startDate: Date | undefined;
+
+        const today = new Date();
+
+        if (range === "week") {
+            startDate = startOfWeek(today, { weekStartsOn: 1 }); // Monday
+        } else if (range === "month") {
+            startDate = startOfMonth(today);
+        } else if (range === "year") {
+            startDate = startOfYear(today);
+        }
+
+        console.log(startDate);
+
         const result = await prisma.donations.groupBy({
             by: ["date"],
             _sum: {
                 amount: true,
             },
+            where: startDate
+                ? {
+                    date: {
+                        gte: startDate,
+                    },
+                }
+                : {},
             orderBy: {
                 date: "asc",
             },

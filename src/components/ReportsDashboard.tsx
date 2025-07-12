@@ -14,8 +14,16 @@ type GroupedDonation = {
     devoteeId?: number | undefined;
 };
 
+const ranges = [
+    { label: "All Time", value: "all" },
+    { label: "Current Week", value: "week" },
+    { label: "Current Month", value: "month" },
+    { label: "Current Year", value: "year" },
+];
+
 export default function ReportsDashboard() {
     const [inProgress, setInProgress] = useState<boolean>(false);
+    const [selectedRange, setSelectedRange] = useState<"all" | "week" | "month" | "year">("all");
     const [totalAmount, setTotalAmount] = useState<number | null>(null);
     const [donationsCount, setDonationsCount] = useState<number | null>(null);
     const [topDevoteesByDonationAmount, setTopDevoteesByDonationAmount] = useState([]);
@@ -24,7 +32,7 @@ export default function ReportsDashboard() {
     const fetchDonationsSummary = async () => {
         setInProgress(true);
         try {
-            const res = await api.get('/reports/donations-summary');
+            const res = await api.get(`/reports/donations-summary?range=${selectedRange}`);
             if (res.data.success) {
                 setTotalAmount(res.data.totalAmount.amount);
                 setDonationsCount(res.data.count.id);
@@ -39,7 +47,7 @@ export default function ReportsDashboard() {
     const fetchTopDevoteesByDonationAmount = async () => {
         setInProgress(true);
         try {
-            const res = await api.get('/reports/top-devotees-by-donations');
+            const res = await api.get(`/reports/top-devotees-by-donations?range=${selectedRange}`);
             if (res.data.success) {
                 setTopDevoteesByDonationAmount(res.data.topDevotees);
             }
@@ -53,7 +61,7 @@ export default function ReportsDashboard() {
     const fetchDonationsLineSummary = async () => {
         setInProgress(true);
         try {
-            const res = await api.get('/reports/donations-line-summary');
+            const res = await api.get(`/reports/donations-line-summary?range=${selectedRange}`);
             if (res.data.success) {
                 setLineChartData(res.data.data);
             }
@@ -70,7 +78,7 @@ export default function ReportsDashboard() {
                 fetchTopDevoteesByDonationAmount().then( () => fetchDonationsLineSummary());
             }
         );
-    }, []);
+    }, [selectedRange]);
 
 
     return (
@@ -83,18 +91,38 @@ export default function ReportsDashboard() {
                     <hr/>
             }
             <small className="text-general">
-                A consolidated place for all the Reports, giving a high level view of everything. You can also create
-                custom graphs
+                A consolidated place for all the Reports, giving a high level view of everything.
             </small>
-
-            <br/><br/>
+            <div className="flex gap-2 my-4">
+                {ranges.map((r) => (
+                    <button
+                        key={r.value}
+                        onClick={() => setSelectedRange(r.value as "all" | "week" | "month" | "year")}
+                        className={`px-3 py-1 w-[24%] text-sm rounded-full border cursor-pointer ${
+                            selectedRange === r.value
+                                ? "bg-hover text-white border-hover"
+                                : "text-gray-600 border-gray-300"
+                        }`}
+                    >
+                        {r.label}
+                    </button>
+                ))}
+            </div>
             {/* Total Widget */}
             <div
                 className="bg-yellow-50 text-yellow-900 border-l-4 border-yellow-500 p-4 rounded-lg shadow flex justify-between items-center max-w-md">
-                <div>
-                    <p className="text-sm">Total <strong>{donationsCount ?? '**'}</strong> Donations amounting to</p>
-                    <p className="text-2xl font-bold">₹ {(totalAmount ?? '****').toLocaleString("en-IN")}</p>
-                </div>
+                {
+                    donationsCount && donationsCount > 0 ?
+                        <div>
+                            <p className="text-sm">Total <strong>{donationsCount ?? '**'}</strong> Donations amounting
+                                to</p>
+                            <p className="text-2xl font-bold">₹ {(totalAmount ?? '****').toLocaleString("en-IN")}</p>
+                        </div>
+                        :
+                        <div>
+                            <p className="text-2xl font-bold">No Donations</p>
+                        </div>
+                }
                 <Image src="/money-bag.png" alt="money" width="70" height="70"/>
             </div>
 
@@ -110,7 +138,7 @@ export default function ReportsDashboard() {
                         data={{
                             labels: topDevoteesByDonationAmount.map((d: GroupedDonation) => `${d.name ?? ''} (${d.donationCount ?? ''})`),
                             datasets: [{
-                                label: "Total donations",
+                                label: "Total donations by a devotee",
                                 data: topDevoteesByDonationAmount.map((d: GroupedDonation) => d.totalAmount),
                                 indexAxis: 'y',
                                 backgroundColor: [
@@ -157,10 +185,11 @@ export default function ReportsDashboard() {
                             labels: lineChartData.map((item) => new Date(item.date).toLocaleDateString("en-IN")),
                             datasets: [
                                 {
-                                    label: "Total Donations",
+                                    label: "Total Donations Collected (day wise)",
                                     data: lineChartData.map((item) => item.amount),
                                     fill: false,
-                                    borderColor: "#4f46e5",
+                                    borderColor: "rgba(255, 159, 64, 1)",
+                                    backgroundColor: "rgba(255, 159, 64, 0.5)",
                                     tension: 0.3,
                                 },
                             ],
