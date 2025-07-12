@@ -6,6 +6,7 @@ import {
     SPECIFIC_PRISMA_ACCELERATE_CACHE_STRATEGY_LONGER
 } from "@/data/constants";
 import { startOfWeek, startOfMonth, startOfYear } from "date-fns";
+import {parseDateFromStringddmmyyyy} from "@/lib/conversions";
 
 type GroupedDonation = {
     phone?: string | undefined;
@@ -41,6 +42,7 @@ export async function GET(req: NextRequest) {
 
         const range = req.nextUrl.searchParams.get("range") ?? "all";
         let startDate: Date | undefined;
+        let endDate: Date | undefined;
 
         const today = new Date();
 
@@ -50,9 +52,11 @@ export async function GET(req: NextRequest) {
             startDate = startOfMonth(today);
         } else if (range === "year") {
             startDate = startOfYear(today);
+        } else if (range.includes('-')) {
+            const rangeDates = range.split('-');
+            startDate = parseDateFromStringddmmyyyy(rangeDates[0])!;
+            endDate = parseDateFromStringddmmyyyy(rangeDates[1])!;
         }
-
-        console.log(startDate);
 
         // Step 1: Lookup devotee names by phone numbers
         const donations = await prisma.donations.findMany({
@@ -73,10 +77,11 @@ export async function GET(req: NextRequest) {
                 amount: true,
             },
             _count: true,
-            where: startDate
+            where: startDate || endDate
                 ? {
                     date: {
-                        gte: startDate,
+                        ...(startDate && { gte: startDate }),
+                        ...(endDate && { lte: endDate }),
                     },
                 }
                 : {},

@@ -23,6 +23,7 @@ import { useSearchParams } from 'next/navigation'
 import jsPDF from "jspdf"
 import autoTable, {RowInput} from "jspdf-autotable";
 import {getCurrentDateDDMMYYYY} from "@/lib/utils";
+import {Nullable} from "primereact/ts-helpers";
 
 type Donation = Prisma.donationsGetPayload<{
   include: {
@@ -41,6 +42,13 @@ type Donation = Prisma.donationsGetPayload<{
   };
 }>;
 
+const ranges = [
+  { label: "All Time", value: "all" },
+  { label: "Current Year", value: "year" },
+  { label: "Current Month", value: "month" },
+  { label: "Current Week", value: "week" },
+];
+
 export default function DonationsDashboard() {
   const { devotee, systemRole } = useAuth();
   const searchParams = useSearchParams();
@@ -49,7 +57,8 @@ export default function DonationsDashboard() {
   const [showBulkUploadDialogue, setShowBulkUploadDialogue] = useState<boolean>(false);
   const [donations, setDonations] = useState<Donation[] | null>([]);
   const [totalRecords, setTotalRecords] = useState(0);
-  const [range, setRange] = useState<[Date | null, Date | null]>([new Date(), new Date(new Date().setDate(new Date().getDate() + 1))]);
+  const [selectedRange, setSelectedRange] = useState<"all" | "week" | "month" | "year">("all");
+  const [customRange, setCustomRange] = useState<Nullable<(Date | null)[]>>(null);
   const toast = useRef<Toast>(null);
   const msgs = useRef<Messages>(null);
 
@@ -61,6 +70,8 @@ export default function DonationsDashboard() {
     filters: {},
     globalFilter: '',
   });
+
+  const rangeValue = customRange && customRange[0] && customRange[1] ? `${formatDateIntoStringddmmyyyy(customRange[0])}-${formatDateIntoStringddmmyyyy(customRange[1])}`: selectedRange;
 
   const fetchAllDonations = async() => {
     if (inProgress) return;
@@ -105,7 +116,7 @@ export default function DonationsDashboard() {
     try {
       setInProgress(true);
       msgs.current?.clear();
-      const res = await api.post('/donations', customParams || lazyParams);
+      const res = await api.post(`/donations?range=${rangeValue}`, customParams || lazyParams);
       if (res && res.status === 200 && res.data && res.data.success && res.data.total > 0) {
         const { data } = res;
         if (customParams) {
@@ -119,7 +130,9 @@ export default function DonationsDashboard() {
       }
     } catch {
       if (lazyParams.globalFilter) {
-        msgs.current?.show({ sticky: true, severity: MessageSeverity.ERROR, content: `No donations found matching "${lazyParams.globalFilter}". Clear search query to see all donations.`, closable: false });
+        msgs.current?.show({ sticky: true, severity: MessageSeverity.ERROR, content: `No donations found matching "${lazyParams.globalFilter}". Clear search query to see all donations. Showing previous result for now.`, closable: false });
+      } else if (selectedRange || (customRange && customRange[0] && customRange[1])) {
+        msgs.current?.show({ sticky: true, severity: MessageSeverity.ERROR, content: `No donations found within range: "${rangeValue}". Choose "All time" or some custom date range. Showing previous result for now.`, closable: false });
       } else {
         msgs.current?.show({ sticky: true, severity: MessageSeverity.ERROR, content: 'No donations exist. Only an admin can bulk upload donations, exported from ERP portal.', closable: true });
       }
@@ -138,11 +151,19 @@ export default function DonationsDashboard() {
   }, []);
 
   useEffect(() => {
-    const [start, end] = range;
-    if (start && end) {
-      console.log(`Searching between ${start} and ${end}`);
+    fetchDonations();
+  }, [selectedRange]);
+
+  useEffect(() => {
+    if (customRange && customRange[0] && customRange[1]) {
+      fetchDonations();
     }
-  }, [range]);
+  }, [customRange]);
+
+  function clearCustomRange() {
+    setCustomRange(null);
+    fetchDonations();
+  }
 
   const handleUpload = async (e: FileUploadFilesEvent) => {
     const file = e.files[0]
@@ -378,14 +399,34 @@ export default function DonationsDashboard() {
                 aria-label="Clear search"
             />
         )}
-        <div className="text-sm px-5 my-1">
+        <div className="grid grid-cols-2 lg:grid-cols-5 items-center gap-2 my-4 text-sm px-5">
+          {ranges.map((r) => (
+              <button
+                  key={r.value}
+                  onClick={() => {
+                    setCustomRange(null);
+                    setSelectedRange(r.value as "all" | "week" | "month" | "year");
+                  }}
+                  className={`w-full px-3 py-1 text-sm rounded-full border cursor-pointer ${
+                      selectedRange === r.value && (!customRange || !customRange[0] || !customRange[1])
+                          ? "bg-hover text-white border-hover"
+                          : "text-gray-600 border-gray-300"
+                  }`}
+              >
+                {r.label}
+              </button>
+          ))}
           <Calendar
-              value={range}
-              onChange={(e) => setRange(e.value as [Date, Date])}
+              value={customRange}
+              onChange={(e) => setCustomRange(e.value)}
+              tooltip={customRange? rangeValue : ''}
               selectionMode="range"
               readOnlyInput
               showIcon
+              showButtonBar
+              hideOnRangeSelection
               placeholder="Select Date Range"
+              onClearButtonClick={clearCustomRange}
           />
         </div>
         <small className="pl-6">
@@ -426,7 +467,8 @@ export default function DonationsDashboard() {
               </DataTable>
               <hr/>
               <small className="text-general">
-                <strong>Note:</strong> By default, find the most recent donation first but you can always sort column as per your wish by clicking them.
+                <strong>Note:</strong> By default, find the most recent donation first but you can always sort column as
+                per your wish by clicking them.
                 Click on a&nbsp;
                 <a href="javascript:void(0);" rel="noopener noreferrer" className="text-hover underline">
                   highlighted
@@ -436,12 +478,12 @@ export default function DonationsDashboard() {
               <br/>
               <br/>
               <small className="text-general">
-              Donations: {totalRecords}
+                Donations: {totalRecords}
                 {devotee && lazyParams.globalFilter === '' && <span
                     className="ml-2"> | Your Donations: {donations?.filter(d => d.phone === devotee.phone).length}</span>}
               </small>
-              <hr />
-              <br />
+              <hr/>
+              <br/>
               <small className="text-general"><strong>Export as:</strong></small>
               <br/>
               <Button icon="pi pi-download"

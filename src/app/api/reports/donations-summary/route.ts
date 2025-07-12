@@ -6,6 +6,7 @@ import {
     SPECIFIC_PRISMA_ACCELERATE_CACHE_STRATEGY_LONGER
 } from "@/data/constants";
 import { startOfWeek, startOfMonth, startOfYear } from "date-fns";
+import {parseDateFromStringddmmyyyy} from "@/lib/conversions";
 
 export async function GET(req: NextRequest) {
     try {
@@ -33,6 +34,7 @@ export async function GET(req: NextRequest) {
 
         const range = req.nextUrl.searchParams.get("range") ?? "all";
         let startDate: Date | undefined;
+        let endDate: Date | undefined;
 
         const today = new Date();
 
@@ -42,9 +44,11 @@ export async function GET(req: NextRequest) {
             startDate = startOfMonth(today);
         } else if (range === "year") {
             startDate = startOfYear(today);
+        } else if (range.includes('-')) {
+            const rangeDates = range.split('-');
+            startDate = parseDateFromStringddmmyyyy(rangeDates[0])!;
+            endDate = parseDateFromStringddmmyyyy(rangeDates[1])!;
         }
-
-        console.log(startDate);
 
         const total = await prisma.donations.aggregate({
             _sum: {
@@ -53,10 +57,11 @@ export async function GET(req: NextRequest) {
             _count: {
                 id: true,
             },
-            where: startDate
+            where: startDate || endDate
                 ? {
                     date: {
-                        gte: startDate,
+                        ...(startDate && { gte: startDate }),
+                        ...(endDate && { lte: endDate }),
                     },
                 }
                 : {},

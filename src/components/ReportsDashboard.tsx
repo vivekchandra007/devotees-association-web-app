@@ -5,6 +5,9 @@ import { Chart } from "primereact/chart";
 import {ProgressBar} from "primereact/progressbar";
 import api from "@/lib/axios";
 import Image from "next/image";
+import {Calendar} from "primereact/calendar";
+import {Nullable} from "primereact/ts-helpers";
+import {formatDateIntoStringddmmyyyy} from "@/lib/conversions";
 
 type GroupedDonation = {
     phone?: string | undefined;
@@ -16,23 +19,26 @@ type GroupedDonation = {
 
 const ranges = [
     { label: "All Time", value: "all" },
-    { label: "Current Week", value: "week" },
-    { label: "Current Month", value: "month" },
     { label: "Current Year", value: "year" },
+    { label: "Current Month", value: "month" },
+    { label: "Current Week", value: "week" },
 ];
 
 export default function ReportsDashboard() {
     const [inProgress, setInProgress] = useState<boolean>(false);
     const [selectedRange, setSelectedRange] = useState<"all" | "week" | "month" | "year">("all");
+    const [customRange, setCustomRange] = useState<Nullable<(Date | null)[]>>(null);
     const [totalAmount, setTotalAmount] = useState<number | null>(null);
     const [donationsCount, setDonationsCount] = useState<number | null>(null);
     const [topDevoteesByDonationAmount, setTopDevoteesByDonationAmount] = useState([]);
     const [lineChartData, setLineChartData] = useState<{ date: string; amount: number }[]>([]);
 
+    const rangeValue = customRange && customRange[0] && customRange[1] ? `${formatDateIntoStringddmmyyyy(customRange[0])}-${formatDateIntoStringddmmyyyy(customRange[1])}`: selectedRange;
+
     const fetchDonationsSummary = async () => {
         setInProgress(true);
         try {
-            const res = await api.get(`/reports/donations-summary?range=${selectedRange}`);
+            const res = await api.get(`/reports/donations-summary?range=${rangeValue}`);
             if (res.data.success) {
                 setTotalAmount(res.data.totalAmount.amount);
                 setDonationsCount(res.data.count.id);
@@ -47,7 +53,7 @@ export default function ReportsDashboard() {
     const fetchTopDevoteesByDonationAmount = async () => {
         setInProgress(true);
         try {
-            const res = await api.get(`/reports/top-devotees-by-donations?range=${selectedRange}`);
+            const res = await api.get(`/reports/top-devotees-by-donations?range=${rangeValue}`);
             if (res.data.success) {
                 setTopDevoteesByDonationAmount(res.data.topDevotees);
             }
@@ -61,7 +67,7 @@ export default function ReportsDashboard() {
     const fetchDonationsLineSummary = async () => {
         setInProgress(true);
         try {
-            const res = await api.get(`/reports/donations-line-summary?range=${selectedRange}`);
+            const res = await api.get(`/reports/donations-line-summary?range=${rangeValue}`);
             if (res.data.success) {
                 setLineChartData(res.data.data);
             }
@@ -72,13 +78,23 @@ export default function ReportsDashboard() {
         }
     };
 
-    useEffect(() => {
+    function fetchReports() {
         fetchDonationsSummary().then(
             () =>  {
                 fetchTopDevoteesByDonationAmount().then( () => fetchDonationsLineSummary());
             }
         );
+    }
+
+    useEffect(() => {
+        fetchReports();
     }, [selectedRange]);
+
+    useEffect(() => {
+        if (customRange && customRange[0] && customRange[1]) {
+            fetchReports();
+        }
+    }, [customRange]);
 
 
     return (
@@ -93,13 +109,16 @@ export default function ReportsDashboard() {
             <small className="text-general">
                 A consolidated place for all the Reports, giving a high level view of everything.
             </small>
-            <div className="flex gap-2 my-4">
+            <div className="grid grid-cols-2 lg:grid-cols-5 items-center gap-2 my-4 text-sm px-5">
                 {ranges.map((r) => (
                     <button
                         key={r.value}
-                        onClick={() => setSelectedRange(r.value as "all" | "week" | "month" | "year")}
-                        className={`px-3 py-1 w-[24%] text-sm rounded-full border cursor-pointer ${
-                            selectedRange === r.value
+                        onClick={() => {
+                            setCustomRange(null);
+                            setSelectedRange(r.value as "all" | "week" | "month" | "year");
+                        }}
+                        className={`px-3 py-1 w-full text-sm rounded-full border cursor-pointer ${
+                            selectedRange === r.value && (!customRange || !customRange[0] || !customRange[1])
                                 ? "bg-hover text-white border-hover"
                                 : "text-gray-600 border-gray-300"
                         }`}
@@ -107,6 +126,18 @@ export default function ReportsDashboard() {
                         {r.label}
                     </button>
                 ))}
+                <Calendar
+                    value={customRange}
+                    onChange={(e) => setCustomRange(e.value)}
+                    tooltip={customRange? rangeValue : ''}
+                    selectionMode="range"
+                    readOnlyInput
+                    showIcon
+                    showButtonBar
+                    hideOnRangeSelection
+                    placeholder="Select Date Range"
+                    onClearButtonClick={fetchReports}
+                />
             </div>
             {/* Total Widget */}
             <div
@@ -114,7 +145,7 @@ export default function ReportsDashboard() {
                 {
                     donationsCount && donationsCount > 0 ?
                         <div>
-                            <p className="text-sm">Total <strong>{donationsCount ?? '**'}</strong> Donations amounting
+                        <p className="text-sm">Total <strong>{donationsCount ?? '**'}</strong> Donations amounting
                                 to</p>
                             <p className="text-2xl font-bold">₹ {(totalAmount ?? '****').toLocaleString("en-IN")}</p>
                         </div>
