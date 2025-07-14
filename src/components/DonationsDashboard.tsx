@@ -24,6 +24,7 @@ import jsPDF from "jspdf"
 import autoTable, {RowInput} from "jspdf-autotable";
 import {getCurrentDateDDMMYYYY} from "@/lib/utils";
 import {Nullable} from "primereact/ts-helpers";
+import {Slider, SliderChangeEvent} from "primereact/slider";
 
 type Donation = Prisma.donationsGetPayload<{
   include: {
@@ -42,11 +43,20 @@ type Donation = Prisma.donationsGetPayload<{
   };
 }>;
 
-const ranges = [
+const dateRanges = [
   { label: "All Time", value: "all" },
   { label: "Current Year", value: "year" },
   { label: "Current Month", value: "month" },
   { label: "Current Week", value: "week" },
+];
+
+const amountRanges = [
+  { label: "All Amounts", value: "all" },
+  { label: "More than ₹5 Lakh", value: "5L" },
+  { label: "₹5 Lakh - ₹1 Lakh", value: "5L-1L" },
+  { label: "₹1 Lakh - ₹50,000", value: "1K-50K" },
+  { label: "₹50,000 - ₹10,000", value: "50K-10K" },
+  { label: "Less than ₹10,000", value: "10K" },
 ];
 
 export default function DonationsDashboard() {
@@ -57,8 +67,10 @@ export default function DonationsDashboard() {
   const [showBulkUploadDialogue, setShowBulkUploadDialogue] = useState<boolean>(false);
   const [donations, setDonations] = useState<Donation[] | null>([]);
   const [totalRecords, setTotalRecords] = useState(0);
-  const [selectedRange, setSelectedRange] = useState<"all" | "week" | "month" | "year">("all");
-  const [customRange, setCustomRange] = useState<Nullable<(Date | null)[]>>(null);
+  const [selectedDateRange, setSelectedDateRange] = useState<"all" | "week" | "month" | "year">("all");
+  const [customDateRange, setCustomDateRange] = useState<Nullable<(Date | null)[]>>(null);
+  const [selectedAmountRange, setSelectedAmountRange] = useState<"all" | "5L" | "5L-1L" | "1K-50K" | "50K-10K" | "10K">("all");
+  const [customAmountRange, setCustomAmountRange] = useState<[number, number] | number | undefined>(undefined);
   const toast = useRef<Toast>(null);
   const msgs = useRef<Messages>(null);
 
@@ -71,7 +83,7 @@ export default function DonationsDashboard() {
     globalFilter: '',
   });
 
-  const rangeValue = customRange && customRange[0] && customRange[1] ? `${formatDateIntoStringddmmyyyy(customRange[0])}-${formatDateIntoStringddmmyyyy(customRange[1])}`: selectedRange;
+  const rangeValue = customDateRange && customDateRange[0] && customDateRange[1] ? `${formatDateIntoStringddmmyyyy(customDateRange[0])}-${formatDateIntoStringddmmyyyy(customDateRange[1])}`: selectedDateRange;
 
   const fetchAllDonations = async() => {
     if (inProgress) return;
@@ -131,7 +143,7 @@ export default function DonationsDashboard() {
     } catch {
       if (lazyParams.globalFilter) {
         msgs.current?.show({ sticky: true, severity: MessageSeverity.ERROR, content: `No donations found matching "${lazyParams.globalFilter}". Clear search query to see all donations. Showing previous result for now.`, closable: false });
-      } else if (selectedRange || (customRange && customRange[0] && customRange[1])) {
+      } else if (selectedDateRange || (customDateRange && customDateRange[0] && customDateRange[1])) {
         msgs.current?.show({ sticky: true, severity: MessageSeverity.ERROR, content: `No donations found within range: "${rangeValue}". Choose "All time" or some custom date range. Showing previous result for now.`, closable: false });
       } else {
         msgs.current?.show({ sticky: true, severity: MessageSeverity.ERROR, content: 'No donations exist. Only an admin can bulk upload donations, exported from ERP portal.', closable: true });
@@ -152,16 +164,16 @@ export default function DonationsDashboard() {
 
   useEffect(() => {
     fetchDonations();
-  }, [selectedRange]);
+  }, [selectedDateRange]);
 
   useEffect(() => {
-    if (customRange && customRange[0] && customRange[1]) {
+    if (customDateRange && customDateRange[0] && customDateRange[1]) {
       fetchDonations();
     }
-  }, [customRange]);
+  }, [customDateRange]);
 
   function clearCustomRange() {
-    setCustomRange(null);
+    setCustomDateRange(null);
     fetchDonations();
   }
 
@@ -378,7 +390,6 @@ export default function DonationsDashboard() {
           </span>
           <Button
               icon="pi pi-search"
-              severity="secondary"
               aria-label="Search"
               size="small"
               type="submit"
@@ -400,16 +411,16 @@ export default function DonationsDashboard() {
             />
         )}
         <div className="grid grid-cols-2 lg:grid-cols-5 items-center gap-2 my-4 text-sm px-5">
-          {ranges.map((r) => (
+          {dateRanges.map((r) => (
               <button
                   key={r.value}
                   onClick={() => {
-                    setCustomRange(null);
-                    setSelectedRange(r.value as "all" | "week" | "month" | "year");
+                    setCustomDateRange(null);
+                    setSelectedDateRange(r.value as "all" | "week" | "month" | "year");
                   }}
                   className={`w-full px-3 py-1 text-sm rounded-full border cursor-pointer ${
-                      selectedRange === r.value && (!customRange || !customRange[0] || !customRange[1])
-                          ? "bg-hover text-white border-hover"
+                      selectedDateRange === r.value && (!customDateRange || !customDateRange[0] || !customDateRange[1])
+                          ? "bg-hover text-white border-hover/3"
                           : "text-gray-600 border-gray-300"
                   }`}
               >
@@ -417,9 +428,10 @@ export default function DonationsDashboard() {
               </button>
           ))}
           <Calendar
-              value={customRange}
-              onChange={(e) => setCustomRange(e.value)}
-              tooltip={customRange? rangeValue : ''}
+              value={customDateRange}
+              onChange={(e) => setCustomDateRange(e.value)}
+              className="[zoom:0.7]"
+              tooltip={customDateRange ? rangeValue : ''}
               selectionMode="range"
               readOnlyInput
               showIcon
@@ -429,10 +441,60 @@ export default function DonationsDashboard() {
               onClearButtonClick={clearCustomRange}
           />
         </div>
-        <small className="pl-6">
-          <strong>Search</strong>&nbsp;donation(s) by it&apos;s donor&apos;s name, phone number, donation amount,
-          receipt number, within a date range and/ or within an amount range
-        </small>
+        <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 items-center my-4 text-sm px-5">
+          {amountRanges.map((r) => (
+              <button
+                  key={r.value}
+                  onClick={() => {
+                    setCustomAmountRange(undefined);
+                    setSelectedAmountRange(r.value as "all" | "5L" | "5L-1L" | "1K-50K" | "50K-10K" | "10K");
+                  }}
+                  className={`w-full px-3 py-1 text-sm rounded-full border cursor-pointer ${
+                      selectedAmountRange === r.value && (!customAmountRange)
+                          ? "bg-hover text-white border-hover"
+                          : "text-gray-600 border-gray-300"
+                  }`}
+              >
+                {r.label}
+              </button>
+          ))}
+        </div>
+        <div className="grid grid-cols-12 gap-14 items-center my-4 text-sm px-8">
+          <div className="col-span-11">
+            <div className="grid grid-rows-2">
+              {
+                (customAmountRange && Array.isArray(customAmountRange)) ?
+                    <small>
+                      ₹{(customAmountRange[0] * 1000).toLocaleString("en-IN")} -
+                      ₹{(customAmountRange[1] * 1000).toLocaleString("en-IN")}
+                    </small>
+                    :
+                    <small>or, select Amount range</small>
+              }
+              <Slider value={customAmountRange} onChange={(e: SliderChangeEvent) => setCustomAmountRange(e.value)}
+                      range className="self-center"/>
+            </div>
+          </div>
+          {
+              customAmountRange && Array.isArray(customAmountRange) &&
+              <Button
+                  icon="pi pi-arrow-right"
+                  className="col-span-1 [zoom:0.7]"
+                  aria-label="go"
+                  size="small"
+                  label="Apply"
+                  type="submit"
+              />
+          }
+        </div>
+        <br/>
+        <p className="pl-6">
+          <hr/>
+          <strong className="underline">Note</strong>:&nbsp;<strong>Search</strong> donation(s) by
+          it&apos;s donor&apos;s <strong className="text-hover">name</strong>, <strong className="text-hover">phone
+          number</strong>, <strong className="text-hover">donation amount</strong>, <strong className="text-hover">receipt number</strong>, within a <strong className="text-hover">date range</strong> and/ or within an <strong className="text-hover">amount range</strong>
+        </p>
+        <br/>
         <Messages ref={msgs}/>
         {
             donations && Array.isArray(donations) && donations.length > 0 &&

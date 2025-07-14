@@ -8,6 +8,8 @@ import Image from "next/image";
 import {Calendar} from "primereact/calendar";
 import {Nullable} from "primereact/ts-helpers";
 import {formatDateIntoStringddmmyyyy} from "@/lib/conversions";
+import {Slider, SliderChangeEvent} from "primereact/slider";
+import {Button} from "primereact/button";
 
 type GroupedDonation = {
     phone?: string | undefined;
@@ -17,17 +19,28 @@ type GroupedDonation = {
     devoteeId?: number | undefined;
 };
 
-const ranges = [
+const dateRanges = [
     { label: "All Time", value: "all" },
     { label: "Current Year", value: "year" },
     { label: "Current Month", value: "month" },
     { label: "Current Week", value: "week" },
 ];
 
+const amountRanges = [
+    { label: "All Amounts", value: "all" },
+    { label: "More than ₹5 Lakh", value: "5L" },
+    { label: "₹5 Lakh - ₹1 Lakh", value: "5L-1L" },
+    { label: "₹1 Lakh - ₹50,000", value: "1K-50K" },
+    { label: "₹50,000 - ₹10,000", value: "50K-10K" },
+    { label: "Less than ₹10,000", value: "10K" },
+];
+
 export default function ReportsDashboard() {
     const [inProgress, setInProgress] = useState<boolean>(false);
     const [selectedRange, setSelectedRange] = useState<"all" | "week" | "month" | "year">("all");
     const [customRange, setCustomRange] = useState<Nullable<(Date | null)[]>>(null);
+    const [selectedAmountRange, setSelectedAmountRange] = useState<"all" | "5L" | "5L-1L" | "1K-50K" | "50K-10K" | "10K">("all");
+    const [customAmountRange, setCustomAmountRange] = useState<[number, number] | number | undefined>(undefined);
     const [totalAmount, setTotalAmount] = useState<number | null>(null);
     const [donationsCount, setDonationsCount] = useState<number | null>(null);
     const [topDevoteesByDonationAmount, setTopDevoteesByDonationAmount] = useState([]);
@@ -108,9 +121,11 @@ export default function ReportsDashboard() {
             }
             <small className="text-general">
                 A consolidated place for all the Reports, giving a high level view of everything.
+                &nbsp;You can apply following <strong>filters</strong> based on <strong className="text-hover">date
+                range</strong> and/ or within an <strong className="text-hover">amount range</strong>
             </small>
             <div className="grid grid-cols-2 lg:grid-cols-5 items-center gap-2 my-4 text-sm px-5">
-                {ranges.map((r) => (
+                {dateRanges.map((r) => (
                     <button
                         key={r.value}
                         onClick={() => {
@@ -129,7 +144,8 @@ export default function ReportsDashboard() {
                 <Calendar
                     value={customRange}
                     onChange={(e) => setCustomRange(e.value)}
-                    tooltip={customRange? rangeValue : ''}
+                    className="[zoom:0.7]"
+                    tooltip={customRange ? rangeValue : ''}
                     selectionMode="range"
                     readOnlyInput
                     showIcon
@@ -139,13 +155,60 @@ export default function ReportsDashboard() {
                     onClearButtonClick={fetchReports}
                 />
             </div>
+            <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 items-center my-4 text-sm px-5">
+                {amountRanges.map((r) => (
+                    <button
+                        key={r.value}
+                        onClick={() => {
+                            setCustomAmountRange(undefined);
+                            setSelectedAmountRange(r.value as "all" | "5L" | "5L-1L" | "1K-50K" | "50K-10K" | "10K");
+                        }}
+                        className={`w-full px-3 py-1 text-sm rounded-full border cursor-pointer ${
+                            selectedAmountRange === r.value && (!customAmountRange)
+                                ? "bg-hover text-white border-hover"
+                                : "text-gray-600 border-gray-300"
+                        }`}
+                    >
+                        {r.label}
+                    </button>
+                ))}
+            </div>
+            <div className="grid grid-cols-12 gap-14 items-center my-4 text-sm px-8">
+                <div className="col-span-11">
+                    <div className="grid grid-rows-2">
+                        {
+                            (customAmountRange && Array.isArray(customAmountRange)) ?
+                                <small>
+                                    ₹{(customAmountRange[0] * 1000).toLocaleString("en-IN")} -
+                                    ₹{(customAmountRange[1] * 1000).toLocaleString("en-IN")}
+                                </small>
+                                :
+                                <small>or, select from Amount range</small>
+                        }
+                        <Slider value={customAmountRange}
+                                onChange={(e: SliderChangeEvent) => setCustomAmountRange(e.value)}
+                                range className="self-center"/>
+                    </div>
+                </div>
+                {
+                    customAmountRange && Array.isArray(customAmountRange) &&
+                    <Button
+                        icon="pi pi-arrow-right"
+                        className="col-span-1 [zoom:0.7]"
+                        aria-label="go"
+                        size="small"
+                        label="Apply"
+                        type="submit"
+                    />
+                }
+            </div>
             {/* Total Widget */}
             <div
                 className="bg-yellow-50 text-yellow-900 border-l-4 border-yellow-500 p-4 rounded-lg shadow flex justify-between items-center max-w-md">
                 {
                     donationsCount && donationsCount > 0 ?
                         <div>
-                        <p className="text-sm">Total <strong>{donationsCount ?? '**'}</strong> Donations amounting
+                            <p className="text-sm">Total <strong>{donationsCount ?? '**'}</strong> Donations amounting
                                 to</p>
                             <p className="text-2xl font-bold">₹ {(totalAmount ?? '****').toLocaleString("en-IN")}</p>
                         </div>
