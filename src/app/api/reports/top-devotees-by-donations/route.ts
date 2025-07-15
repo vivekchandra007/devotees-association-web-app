@@ -40,12 +40,11 @@ export async function GET(req: NextRequest) {
             return NextResponse.json({ error: 'Forbidden: You do not have view donations reports/ charts' }, { status: 403 });
         }
 
-        const range = req.nextUrl.searchParams.get("range") ?? "all";
+        // process Date Range
+        const range = req.nextUrl.searchParams.get("dateRange") ?? "all";
         let startDate: Date | undefined;
         let endDate: Date | undefined;
-
         const today = new Date();
-
         if (range === "week") {
             startDate = startOfWeek(today, { weekStartsOn: 1 }); // Monday
         } else if (range === "month") {
@@ -56,6 +55,29 @@ export async function GET(req: NextRequest) {
             const rangeDates = range.split('-');
             startDate = parseDateFromStringddmmyyyy(rangeDates[0])!;
             endDate = parseDateFromStringddmmyyyy(rangeDates[1])!;
+        }
+
+        // process Amount Range
+        const amountRange = req.nextUrl.searchParams.get("amountRange") ?? "all";
+        let startAmount: number = 0;
+        let endAmount: number = 2147483647;
+        if (amountRange === "≥5L") {
+            startAmount = 500000;
+        } else if (amountRange === "5L-1L") {
+            startAmount = 100000;
+            endAmount = 500000;
+        } else if (amountRange === "1L-50K") {
+            startAmount = 50000;
+            endAmount = 100000;
+        } else if (amountRange === "1L-10K") {
+            startAmount = 10000;
+            endAmount = 100000;
+        } else if (amountRange === "≤10K") {
+            endAmount = 10000;
+        } else if (amountRange.includes('-')) {
+            const amountRanges = amountRange.replaceAll(',','').split('-');
+            startAmount = parseInt(amountRanges[0], 10);
+            endAmount = parseInt(amountRanges[1], 10);
         }
 
         // Step 1: Lookup devotee names by phone numbers
@@ -77,14 +99,20 @@ export async function GET(req: NextRequest) {
                 amount: true,
             },
             _count: true,
-            where: startDate || endDate
-                ? {
-                    date: {
-                        ...(startDate && { gte: startDate }),
-                        ...(endDate && { lte: endDate }),
-                    },
-                }
-                : {},
+            where: {
+                ...(startDate || endDate
+                    ? {
+                        date: {
+                            ...(startDate && { gte: startDate }),
+                            ...(endDate && { lte: endDate }),
+                        },
+                    }
+                    : {}),
+                amount: {
+                    gte: startAmount,
+                    lte: endAmount
+                },
+            },
             orderBy: {
                 _sum: {
                     amount: 'desc',

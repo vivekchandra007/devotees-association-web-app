@@ -10,6 +10,7 @@ import {Nullable} from "primereact/ts-helpers";
 import {formatDateIntoStringddmmyyyy} from "@/lib/conversions";
 import {Slider, SliderChangeEvent} from "primereact/slider";
 import {Button} from "primereact/button";
+import {Fieldset} from "primereact/fieldset";
 
 type GroupedDonation = {
     phone?: string | undefined;
@@ -26,32 +27,34 @@ const dateRanges = [
     { label: "Current Week", value: "week" },
 ];
 
+const AMOUNT_RANGE_SLIDER_MULTIPLE = 5000;
+
 const amountRanges = [
     { label: "All Amounts", value: "all" },
-    { label: "More than ₹5 Lakh", value: "5L" },
+    { label: "More than ₹5 Lakh", value: "≥5L" },
     { label: "₹5 Lakh - ₹1 Lakh", value: "5L-1L" },
-    { label: "₹1 Lakh - ₹50,000", value: "1K-50K" },
-    { label: "₹50,000 - ₹10,000", value: "50K-10K" },
-    { label: "Less than ₹10,000", value: "10K" },
+    { label: "₹1 Lakh - ₹10,000", value: "1L-10K" },
+    { label: "Less than ₹10,000", value: "≤10K" },
 ];
 
 export default function ReportsDashboard() {
     const [inProgress, setInProgress] = useState<boolean>(false);
-    const [selectedRange, setSelectedRange] = useState<"all" | "week" | "month" | "year">("all");
-    const [customRange, setCustomRange] = useState<Nullable<(Date | null)[]>>(null);
-    const [selectedAmountRange, setSelectedAmountRange] = useState<"all" | "5L" | "5L-1L" | "1K-50K" | "50K-10K" | "10K">("all");
+    const [selectedDateRange, setSelectedDateRange] = useState<"all" | "week" | "month" | "year">("all");
+    const [customDateRange, setCustomDateRange] = useState<Nullable<(Date | null)[]>>(null);
+    const [selectedAmountRange, setSelectedAmountRange] = useState<"all" | "5L" | "5L-1L" | "1K-10K" | "10K">("all");
     const [customAmountRange, setCustomAmountRange] = useState<[number, number] | number | undefined>(undefined);
     const [totalAmount, setTotalAmount] = useState<number | null>(null);
     const [donationsCount, setDonationsCount] = useState<number | null>(null);
     const [topDevoteesByDonationAmount, setTopDevoteesByDonationAmount] = useState([]);
     const [lineChartData, setLineChartData] = useState<{ date: string; amount: number }[]>([]);
 
-    const rangeValue = customRange && customRange[0] && customRange[1] ? `${formatDateIntoStringddmmyyyy(customRange[0])}-${formatDateIntoStringddmmyyyy(customRange[1])}`: selectedRange;
+    const dateRangeValue = customDateRange && customDateRange[0] && customDateRange[1] ? `${formatDateIntoStringddmmyyyy(customDateRange[0])}-${formatDateIntoStringddmmyyyy(customDateRange[1])}`: selectedDateRange;
+    const amountRangeValue = customAmountRange && Array.isArray(customAmountRange) ? `${(customAmountRange[0]*AMOUNT_RANGE_SLIDER_MULTIPLE).toLocaleString("en-IN")}-${(customAmountRange[1]*AMOUNT_RANGE_SLIDER_MULTIPLE).toLocaleString("en-IN")}`: selectedAmountRange;
 
     const fetchDonationsSummary = async () => {
         setInProgress(true);
         try {
-            const res = await api.get(`/reports/donations-summary?range=${rangeValue}`);
+            const res = await api.get(`/reports/donations-summary?dateRange=${dateRangeValue}&amountRange=${amountRangeValue}`);
             if (res.data.success) {
                 setTotalAmount(res.data.totalAmount.amount);
                 setDonationsCount(res.data.count.id);
@@ -66,7 +69,7 @@ export default function ReportsDashboard() {
     const fetchTopDevoteesByDonationAmount = async () => {
         setInProgress(true);
         try {
-            const res = await api.get(`/reports/top-devotees-by-donations?range=${rangeValue}`);
+            const res = await api.get(`/reports/top-devotees-by-donations?dateRange=${dateRangeValue}&amountRange=${amountRangeValue}`);
             if (res.data.success) {
                 setTopDevoteesByDonationAmount(res.data.topDevotees);
             }
@@ -80,7 +83,7 @@ export default function ReportsDashboard() {
     const fetchDonationsLineSummary = async () => {
         setInProgress(true);
         try {
-            const res = await api.get(`/reports/donations-line-summary?range=${rangeValue}`);
+            const res = await api.get(`/reports/donations-line-summary?dateRange=${dateRangeValue}&amountRange=${amountRangeValue}`);
             if (res.data.success) {
                 setLineChartData(res.data.data);
             }
@@ -101,13 +104,13 @@ export default function ReportsDashboard() {
 
     useEffect(() => {
         fetchReports();
-    }, [selectedRange]);
+    }, [selectedDateRange, selectedAmountRange]);
 
     useEffect(() => {
-        if (customRange && customRange[0] && customRange[1]) {
+        if (customDateRange && customDateRange[0] && customDateRange[1]) {
             fetchReports();
         }
-    }, [customRange]);
+    }, [customDateRange]);
 
 
     return (
@@ -124,93 +127,107 @@ export default function ReportsDashboard() {
                 &nbsp;You can apply following <strong>filters</strong> based on <strong className="text-hover">date
                 range</strong> and/ or within an <strong className="text-hover">amount range</strong>
             </small>
-            <div className="grid grid-cols-2 lg:grid-cols-5 items-center gap-2 my-4 text-sm px-5">
-                {dateRanges.map((r) => (
-                    <button
-                        key={r.value}
-                        onClick={() => {
-                            setCustomRange(null);
-                            setSelectedRange(r.value as "all" | "week" | "month" | "year");
-                        }}
-                        className={`px-3 py-1 w-full text-sm rounded-full border cursor-pointer ${
-                            selectedRange === r.value && (!customRange || !customRange[0] || !customRange[1])
-                                ? "bg-hover text-white border-hover"
-                                : "text-gray-600 border-gray-300"
-                        }`}
-                    >
-                        {r.label}
-                    </button>
-                ))}
-                <Calendar
-                    value={customRange}
-                    onChange={(e) => setCustomRange(e.value)}
-                    className="[zoom:0.7]"
-                    tooltip={customRange ? rangeValue : ''}
-                    selectionMode="range"
-                    readOnlyInput
-                    showIcon
-                    showButtonBar
-                    hideOnRangeSelection
-                    placeholder="Select Date Range"
-                    onClearButtonClick={fetchReports}
-                />
-            </div>
-            <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 items-center my-4 text-sm px-5">
-                {amountRanges.map((r) => (
-                    <button
-                        key={r.value}
-                        onClick={() => {
-                            setCustomAmountRange(undefined);
-                            setSelectedAmountRange(r.value as "all" | "5L" | "5L-1L" | "1K-50K" | "50K-10K" | "10K");
-                        }}
-                        className={`w-full px-3 py-1 text-sm rounded-full border cursor-pointer ${
-                            selectedAmountRange === r.value && (!customAmountRange)
-                                ? "bg-hover text-white border-hover"
-                                : "text-gray-600 border-gray-300"
-                        }`}
-                    >
-                        {r.label}
-                    </button>
-                ))}
-            </div>
-            <div className="grid grid-cols-12 gap-14 items-center my-4 text-sm px-8">
-                <div className="col-span-11">
-                    <div className="grid grid-rows-2">
-                        {
-                            (customAmountRange && Array.isArray(customAmountRange)) ?
-                                <small>
-                                    ₹{(customAmountRange[0] * 1000).toLocaleString("en-IN")} -
-                                    ₹{(customAmountRange[1] * 1000).toLocaleString("en-IN")}
-                                </small>
-                                :
-                                <small>or, select from Amount range</small>
+            <Fieldset className="my-4"
+                      legend={
+                          <span className="capitalize">
+                        { dateRangeValue === 'all' && amountRangeValue === 'all' ?
+                            'Apply Filters'
+                            :
+                            dateRangeValue === 'all' ? '' : dateRangeValue
                         }
-                        <Slider value={customAmountRange}
-                                onChange={(e: SliderChangeEvent) => setCustomAmountRange(e.value)}
-                                range className="self-center"/>
+                              {
+                                  dateRangeValue !== 'all' && amountRangeValue !== 'all' ? ' & ' : ''
+                              }
+                              { amountRangeValue === 'all' ? '' : `₹ ${amountRangeValue}` }
+                              <i className={`pi ${dateRangeValue === 'all' && amountRangeValue === 'all' ? 'pi-filter' : 'pi-filter-fill'} pl-2`}></i>
+                    </span>}
+                      toggleable collapsed
+            >
+                <div className="grid grid-cols-2 lg:grid-cols-5 items-center gap-2 my-4 text-sm">
+                    {dateRanges.map((r) => (
+                        <button
+                            key={r.value}
+                            onClick={() => {
+                                setCustomDateRange(null);
+                                setSelectedDateRange(r.value as "all" | "week" | "month" | "year");
+                            }}
+                            className={`px-3 py-1 w-full text-sm rounded-full border cursor-pointer ${
+                                selectedDateRange === r.value && (!customDateRange || !customDateRange[0] || !customDateRange[1])
+                                    ? "bg-hover text-white border-hover"
+                                    : "text-gray-600 border-gray-300"
+                            }`}
+                        >
+                            {r.label}
+                        </button>
+                    ))}
+                    <Calendar
+                        value={customDateRange}
+                        onChange={(e) => setCustomDateRange(e.value)}
+                        className="[zoom:0.7]"
+                        tooltip={customDateRange ? dateRangeValue : ''}
+                        selectionMode="range"
+                        readOnlyInput
+                        showIcon
+                        showButtonBar
+                        hideOnRangeSelection
+                        placeholder="Select Date Range"
+                        onClearButtonClick={fetchReports}
+                    />
+                </div>
+                <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 items-center my-4 text-sm">
+                    {amountRanges.map((r) => (
+                        <button
+                            key={r.value}
+                            onClick={() => {
+                                setCustomAmountRange(undefined);
+                                setSelectedAmountRange(r.value as "all" | "5L" | "5L-1L" | "1K-10K" | "10K");
+                            }}
+                            className={`w-full px-3 py-1 text-sm rounded-full border cursor-pointer ${
+                                selectedAmountRange === r.value && (!customAmountRange)
+                                    ? "bg-hover text-white border-hover"
+                                    : "text-gray-600 border-gray-300"
+                            }`}
+                        >
+                            {r.label}
+                        </button>
+                    ))}
+                    <div className="grid grid-cols-12 items-center gap-1">
+                        <div className="col-span-10 grid grid-rows-2">
+                            {
+                                (customAmountRange && Array.isArray(customAmountRange)) ?
+                                    <small>
+                                        ₹{(customAmountRange[0] * 5000).toLocaleString("en-IN")} -
+                                        ₹{(customAmountRange[1] * 5000).toLocaleString("en-IN")}
+                                    </small>
+                                    :
+                                    <small>Select ₹ range & click ➡️<span></span></small>
+                            }
+                            <Slider value={customAmountRange}
+                                    onChange={(e: SliderChangeEvent) => setCustomAmountRange(e.value)}
+                                    range className="self-center"/>
+                        </div>
+                        {
+                            customAmountRange && Array.isArray(customAmountRange) &&
+                            <Button
+                                icon="pi pi-arrow-right animate-pulse"
+                                className="col-span-2 [zoom:0.7]"
+                                aria-label="apply"
+                                size="small"
+                                onClick={() => fetchReports()}
+                            />
+                        }
                     </div>
                 </div>
-                {
-                    customAmountRange && Array.isArray(customAmountRange) &&
-                    <Button
-                        icon="pi pi-arrow-right"
-                        className="col-span-1 [zoom:0.7]"
-                        aria-label="go"
-                        size="small"
-                        label="Apply"
-                        type="submit"
-                    />
-                }
-            </div>
+            </Fieldset>
             {/* Total Widget */}
             <div
                 className="bg-yellow-50 text-yellow-900 border-l-4 border-yellow-500 p-4 rounded-lg shadow flex justify-between items-center max-w-md">
                 {
-                    donationsCount && donationsCount > 0 ?
+                    totalAmount?
                         <div>
-                            <p className="text-sm">Total <strong>{donationsCount ?? '**'}</strong> Donations amounting
+                            <p className="text-sm">Total <strong>{donationsCount && !inProgress? donationsCount : '**'}</strong> Donations amounting
                                 to</p>
-                            <p className="text-2xl font-bold">₹ {(totalAmount ?? '****').toLocaleString("en-IN")}</p>
+                            <p className="text-2xl font-bold">₹ {(totalAmount && !inProgress? totalAmount : '****').toLocaleString("en-IN")}</p>
                         </div>
                         :
                         <div>

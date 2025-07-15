@@ -25,6 +25,7 @@ import autoTable, {RowInput} from "jspdf-autotable";
 import {getCurrentDateDDMMYYYY} from "@/lib/utils";
 import {Nullable} from "primereact/ts-helpers";
 import {Slider, SliderChangeEvent} from "primereact/slider";
+import {Fieldset} from "primereact/fieldset";
 
 type Donation = Prisma.donationsGetPayload<{
   include: {
@@ -50,13 +51,14 @@ const dateRanges = [
   { label: "Current Week", value: "week" },
 ];
 
+const AMOUNT_RANGE_SLIDER_MULTIPLE = 5000;
+
 const amountRanges = [
   { label: "All Amounts", value: "all" },
-  { label: "More than ₹5 Lakh", value: "5L" },
+  { label: "More than ₹5 Lakh", value: "≥5L" },
   { label: "₹5 Lakh - ₹1 Lakh", value: "5L-1L" },
-  { label: "₹1 Lakh - ₹50,000", value: "1K-50K" },
-  { label: "₹50,000 - ₹10,000", value: "50K-10K" },
-  { label: "Less than ₹10,000", value: "10K" },
+  { label: "₹1 Lakh - ₹10,000", value: "1L-10K" },
+  { label: "Less than ₹10,000", value: "≤10K" },
 ];
 
 export default function DonationsDashboard() {
@@ -69,7 +71,7 @@ export default function DonationsDashboard() {
   const [totalRecords, setTotalRecords] = useState(0);
   const [selectedDateRange, setSelectedDateRange] = useState<"all" | "week" | "month" | "year">("all");
   const [customDateRange, setCustomDateRange] = useState<Nullable<(Date | null)[]>>(null);
-  const [selectedAmountRange, setSelectedAmountRange] = useState<"all" | "5L" | "5L-1L" | "1K-50K" | "50K-10K" | "10K">("all");
+  const [selectedAmountRange, setSelectedAmountRange] = useState<"all" | "5L" | "5L-1L" | "1K-10K" | "10K">("all");
   const [customAmountRange, setCustomAmountRange] = useState<[number, number] | number | undefined>(undefined);
   const toast = useRef<Toast>(null);
   const msgs = useRef<Messages>(null);
@@ -83,7 +85,8 @@ export default function DonationsDashboard() {
     globalFilter: '',
   });
 
-  const rangeValue = customDateRange && customDateRange[0] && customDateRange[1] ? `${formatDateIntoStringddmmyyyy(customDateRange[0])}-${formatDateIntoStringddmmyyyy(customDateRange[1])}`: selectedDateRange;
+  const dateRangeValue = customDateRange && customDateRange[0] && customDateRange[1] ? `${formatDateIntoStringddmmyyyy(customDateRange[0])}-${formatDateIntoStringddmmyyyy(customDateRange[1])}`: selectedDateRange;
+  const amountRangeValue = customAmountRange && Array.isArray(customAmountRange) ? `${(customAmountRange[0]*AMOUNT_RANGE_SLIDER_MULTIPLE).toLocaleString("en-IN")}-${(customAmountRange[1]*AMOUNT_RANGE_SLIDER_MULTIPLE).toLocaleString("en-IN")}`: selectedAmountRange;
 
   const fetchAllDonations = async() => {
     if (inProgress) return;
@@ -128,7 +131,7 @@ export default function DonationsDashboard() {
     try {
       setInProgress(true);
       msgs.current?.clear();
-      const res = await api.post(`/donations?range=${rangeValue}`, customParams || lazyParams);
+      const res = await api.post(`/donations?dateRange=${dateRangeValue}&amountRange=${amountRangeValue}`, customParams || lazyParams);
       if (res && res.status === 200 && res.data && res.data.success && res.data.total > 0) {
         const { data } = res;
         if (customParams) {
@@ -143,11 +146,13 @@ export default function DonationsDashboard() {
     } catch {
       if (lazyParams.globalFilter) {
         msgs.current?.show({ sticky: true, severity: MessageSeverity.ERROR, content: `No donations found matching "${lazyParams.globalFilter}". Clear search query to see all donations. Showing previous result for now.`, closable: false });
-      } else if (selectedDateRange || (customDateRange && customDateRange[0] && customDateRange[1])) {
-        msgs.current?.show({ sticky: true, severity: MessageSeverity.ERROR, content: `No donations found within range: "${rangeValue}". Choose "All time" or some custom date range. Showing previous result for now.`, closable: false });
+      } else if (selectedDateRange !== "all" || (customDateRange && customDateRange[0] && customDateRange[1]) || selectedAmountRange !== "all" || customAmountRange) {
+        msgs.current?.show({ sticky: true, severity: MessageSeverity.ERROR, content: `No donations found with filters to be within date range: "${dateRangeValue}" & amount range: "${amountRangeValue}". Change filters or choose "All Time/ Amounts" or some custom Date/ Amount range.`, closable: false });
       } else {
         msgs.current?.show({ sticky: true, severity: MessageSeverity.ERROR, content: 'No donations exist. Only an admin can bulk upload donations, exported from ERP portal.', closable: true });
       }
+      setDonations(null);
+      setTotalRecords(0);
     } finally {
       setInProgress(false);
     }
@@ -164,7 +169,7 @@ export default function DonationsDashboard() {
 
   useEffect(() => {
     fetchDonations();
-  }, [selectedDateRange]);
+  }, [selectedDateRange, selectedAmountRange]);
 
   useEffect(() => {
     if (customDateRange && customDateRange[0] && customDateRange[1]) {
@@ -172,7 +177,7 @@ export default function DonationsDashboard() {
     }
   }, [customDateRange]);
 
-  function clearCustomRange() {
+  function clearCustomDateRange() {
     setCustomDateRange(null);
     fetchDonations();
   }
@@ -373,7 +378,7 @@ export default function DonationsDashboard() {
             <strong className="text-hover">• View</strong> donations data.
           </div>
         </small>
-        <form onSubmit={handleSearch} className="p-inputgroup text-sm px-5 my-1">
+        <form onSubmit={handleSearch} className="p-inputgroup text-sm my-1">
           <span className="p-float-label">
             <InputText id="search-input" maxLength={50}
                        value={lazyParams.globalFilter}
@@ -410,89 +415,103 @@ export default function DonationsDashboard() {
                 aria-label="Clear search"
             />
         )}
-        <div className="grid grid-cols-2 lg:grid-cols-5 items-center gap-2 my-4 text-sm px-5">
-          {dateRanges.map((r) => (
-              <button
-                  key={r.value}
-                  onClick={() => {
-                    setCustomDateRange(null);
-                    setSelectedDateRange(r.value as "all" | "week" | "month" | "year");
-                  }}
-                  className={`w-full px-3 py-1 text-sm rounded-full border cursor-pointer ${
-                      selectedDateRange === r.value && (!customDateRange || !customDateRange[0] || !customDateRange[1])
-                          ? "bg-hover text-white border-hover/3"
-                          : "text-gray-600 border-gray-300"
-                  }`}
-              >
-                {r.label}
-              </button>
-          ))}
-          <Calendar
-              value={customDateRange}
-              onChange={(e) => setCustomDateRange(e.value)}
-              className="[zoom:0.7]"
-              tooltip={customDateRange ? rangeValue : ''}
-              selectionMode="range"
-              readOnlyInput
-              showIcon
-              showButtonBar
-              hideOnRangeSelection
-              placeholder="Select Date Range"
-              onClearButtonClick={clearCustomRange}
-          />
-        </div>
-        <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 items-center my-4 text-sm px-5">
-          {amountRanges.map((r) => (
-              <button
-                  key={r.value}
-                  onClick={() => {
-                    setCustomAmountRange(undefined);
-                    setSelectedAmountRange(r.value as "all" | "5L" | "5L-1L" | "1K-50K" | "50K-10K" | "10K");
-                  }}
-                  className={`w-full px-3 py-1 text-sm rounded-full border cursor-pointer ${
-                      selectedAmountRange === r.value && (!customAmountRange)
-                          ? "bg-hover text-white border-hover"
-                          : "text-gray-600 border-gray-300"
-                  }`}
-              >
-                {r.label}
-              </button>
-          ))}
-        </div>
-        <div className="grid grid-cols-12 gap-14 items-center my-4 text-sm px-8">
-          <div className="col-span-11">
-            <div className="grid grid-rows-2">
+        <Fieldset className="my-4"
+                  legend={
+                    <span className="capitalize">
+                        { dateRangeValue === 'all' && amountRangeValue === 'all' ?
+                            'Apply Filters'
+                            :
+                            dateRangeValue === 'all' ? '' : dateRangeValue
+                        }
+                        {
+                          dateRangeValue !== 'all' && amountRangeValue !== 'all' ? ' & ' : ''
+                        }
+                        { amountRangeValue === 'all' ? '' : `₹ ${amountRangeValue}` }
+                      <i className={`pi ${dateRangeValue === 'all' && amountRangeValue === 'all' ? 'pi-filter' : 'pi-filter-fill'} pl-2`}></i>
+                    </span>}
+                  toggleable collapsed
+        >
+          <div className="grid grid-cols-2 lg:grid-cols-5 items-center gap-2 my-4 text-sm">
+            {dateRanges.map((r) => (
+                <button
+                    key={r.value}
+                    onClick={() => {
+                      setCustomDateRange(null);
+                      setSelectedDateRange(r.value as "all" | "week" | "month" | "year");
+                    }}
+                    className={`w-full px-3 py-1 text-sm rounded-full border cursor-pointer ${
+                        selectedDateRange === r.value && (!customDateRange || !customDateRange[0] || !customDateRange[1])
+                            ? "bg-hover text-white border-hover/3"
+                            : "text-gray-600 border-gray-300"
+                    }`}
+                >
+                  {r.label}
+                </button>
+            ))}
+            <Calendar
+                value={customDateRange}
+                onChange={(e) => setCustomDateRange(e.value)}
+                className="[zoom:0.7]"
+                tooltip={customDateRange ? dateRangeValue : ''}
+                selectionMode="range"
+                readOnlyInput
+                showIcon
+                showButtonBar
+                hideOnRangeSelection
+                placeholder="Select Date Range"
+                onClearButtonClick={clearCustomDateRange}
+            />
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-6 gap-4 items-center my-4 text-sm">
+            {amountRanges.map((r) => (
+                <button
+                    key={r.value}
+                    onClick={() => {
+                      setCustomAmountRange(undefined);
+                      setSelectedAmountRange(r.value as "all" | "5L" | "5L-1L" | "1K-10K" | "10K");
+                    }}
+                    className={`w-full px-3 py-1 text-sm rounded-full border cursor-pointer ${
+                        selectedAmountRange === r.value && (!customAmountRange)
+                            ? "bg-hover text-white border-hover"
+                            : "text-gray-600 border-gray-300"
+                    }`}
+                >
+                  {r.label}
+                </button>
+            ))}
+            <div className="grid grid-cols-12 items-center gap-1">
+              <div className="col-span-10 grid grid-rows-2">
+                {
+                  (customAmountRange && Array.isArray(customAmountRange)) ?
+                      <small>
+                        ₹{(customAmountRange[0] * AMOUNT_RANGE_SLIDER_MULTIPLE).toLocaleString("en-IN")} -
+                        ₹{(customAmountRange[1] * AMOUNT_RANGE_SLIDER_MULTIPLE).toLocaleString("en-IN")}
+                      </small>
+                      :
+                      <small>Select ₹ range & click ➡️<span></span></small>
+                }
+                <Slider value={customAmountRange} onChange={(e: SliderChangeEvent) => setCustomAmountRange(e.value)}
+                        range className="self-center"/>
+              </div>
               {
-                (customAmountRange && Array.isArray(customAmountRange)) ?
-                    <small>
-                      ₹{(customAmountRange[0] * 1000).toLocaleString("en-IN")} -
-                      ₹{(customAmountRange[1] * 1000).toLocaleString("en-IN")}
-                    </small>
-                    :
-                    <small>or, select Amount range</small>
+                  customAmountRange && Array.isArray(customAmountRange) &&
+                  <Button
+                      icon="pi pi-arrow-right animate-pulse"
+                      className="col-span-2 [zoom:0.7]"
+                      aria-label="apply"
+                      size="small"
+                      onClick={() => fetchDonations()}
+                  />
               }
-              <Slider value={customAmountRange} onChange={(e: SliderChangeEvent) => setCustomAmountRange(e.value)}
-                      range className="self-center"/>
             </div>
           </div>
-          {
-              customAmountRange && Array.isArray(customAmountRange) &&
-              <Button
-                  icon="pi pi-arrow-right"
-                  className="col-span-1 [zoom:0.7]"
-                  aria-label="go"
-                  size="small"
-                  label="Apply"
-                  type="submit"
-              />
-          }
-        </div>
-        <br/>
-        <p className="pl-6">
-          <hr/>
-          <strong className="underline">Note</strong>:&nbsp;<strong>Search</strong> donation(s) by
+        </Fieldset>
+        <p className="text-sm">
+          <strong>Note</strong>:&nbsp;Search donation(s) by
           it&apos;s donor&apos;s <strong className="text-hover">name</strong>, <strong className="text-hover">phone
-          number</strong>, <strong className="text-hover">donation amount</strong>, <strong className="text-hover">receipt number</strong>, within a <strong className="text-hover">date range</strong> and/ or within an <strong className="text-hover">amount range</strong>
+          number</strong>, <strong className="text-hover">donation amount</strong>, <strong className="text-hover">receipt
+          number</strong>, with filters within a <strong className="text-hover">date range</strong> and/ or within an <strong
+            className="text-hover">amount range</strong>
         </p>
         <br/>
         <Messages ref={msgs}/>
