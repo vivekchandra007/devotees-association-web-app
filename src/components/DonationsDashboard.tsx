@@ -26,6 +26,7 @@ import {getCurrentDateDDMMYYYY} from "@/lib/utils";
 import {Nullable} from "primereact/ts-helpers";
 import {Slider, SliderChangeEvent} from "primereact/slider";
 import {Fieldset} from "primereact/fieldset";
+import Image from "next/image";
 
 type Donation = Prisma.donationsGetPayload<{
   include: {
@@ -67,6 +68,8 @@ export default function DonationsDashboard() {
 
   const [inProgress, setInProgress] = useState<boolean>(false);
   const [showBulkUploadDialogue, setShowBulkUploadDialogue] = useState<boolean>(false);
+  const [totalDonationsAmount, setTotalDonationsAmount] = useState<number | null>(null);
+  const [donationsCount, setDonationsCount] = useState<number | null>(null);
   const [donations, setDonations] = useState<Donation[] | null>([]);
   const [totalRecords, setTotalRecords] = useState(0);
   const [selectedDateRange, setSelectedDateRange] = useState<"all" | "week" | "month" | "year">("all");
@@ -128,6 +131,8 @@ export default function DonationsDashboard() {
   const fetchDonations = async (customParams?: object) => {
     if (inProgress) return;
 
+    fetchDonationsSummary();
+
     try {
       setInProgress(true);
       msgs.current?.clear();
@@ -153,6 +158,21 @@ export default function DonationsDashboard() {
       }
       setDonations(null);
       setTotalRecords(0);
+    } finally {
+      setInProgress(false);
+    }
+  };
+
+  const fetchDonationsSummary = async () => {
+    setInProgress(true);
+    try {
+      const res = await api.get(`/reports/donations-summary?dateRange=${dateRangeValue}&amountRange=${amountRangeValue}`);
+      if (res.data.success) {
+        setTotalDonationsAmount(res.data.totalAmount.amount);
+        setDonationsCount(res.data.count.id);
+      }
+    } catch (err) {
+      console.error('Failed to load donation data:', err);
     } finally {
       setInProgress(false);
     }
@@ -330,7 +350,28 @@ export default function DonationsDashboard() {
               <hr/>
         }
         <small className="text-general">
-          A consolidated place for all the donations data. At your role level, {devotee?.name}, you have the privileges
+          A consolidated place for all the donations data.
+          {/* Total Widget */}
+          <div
+              className="mt-4 bg-yellow-50 text-yellow-900 border-l-4 border-yellow-500 p-4 rounded-lg shadow flex justify-between items-center max-w-md">
+            {
+              totalDonationsAmount?
+                  <div>
+                    <p className="text-sm">
+                      <i className={`pi ${dateRangeValue === 'all' && amountRangeValue === 'all' ? '' : 'pi-filter-fill pr-2'}`}></i>
+                      Total <strong>{donationsCount && !inProgress ? donationsCount : '**'}</strong> Donations amounting
+                      to</p>
+                    <p className="text-2xl font-bold">₹ {(totalDonationsAmount && !inProgress ? totalDonationsAmount : '****').toLocaleString("en-IN")}</p>
+                  </div>
+                  :
+                  <div>
+                    <p className="text-2xl font-bold">No Donations</p>
+                  </div>
+            }
+            <Image src="/money-bag.png" alt="money" width="70" height="70"/>
+          </div>
+          <br />
+          At your role level, {devotee?.name}, you have the privileges
           to:
           {
               systemRole === SYSTEM_ROLES.admin &&

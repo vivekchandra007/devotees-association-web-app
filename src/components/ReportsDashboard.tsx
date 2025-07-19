@@ -45,6 +45,8 @@ export default function ReportsDashboard() {
     const [customAmountRange, setCustomAmountRange] = useState<[number, number] | number | undefined>(undefined);
     const [totalAmount, setTotalAmount] = useState<number | null>(null);
     const [donationsCount, setDonationsCount] = useState<number | null>(null);
+    const [devoteesTotalCount, setDevoteesTotalCount] = useState<number | null>(null);
+    const [devoteesActiveCount, setDevoteesActiveCount] = useState<number | null>(null);
     const [topDevoteesByDonationAmount, setTopDevoteesByDonationAmount] = useState([]);
     const [lineChartData, setLineChartData] = useState<{ date: string; amount: number }[]>([]);
 
@@ -61,6 +63,21 @@ export default function ReportsDashboard() {
             }
         } catch (err) {
             console.error('Failed to load donation data:', err);
+        } finally {
+            setInProgress(false);
+        }
+    };
+
+    const fetchDevoteesSummary = async () => {
+        setInProgress(true);
+        try {
+            const res = await api.get('/devotees/insights');
+            if (res.data.success) {
+                setDevoteesTotalCount(res.data.total);
+                setDevoteesActiveCount(res.data.active);
+            }
+        } catch (err) {
+            console.error('Failed to load devotees insights data:', err);
         } finally {
             setInProgress(false);
         }
@@ -103,6 +120,7 @@ export default function ReportsDashboard() {
     }
 
     useEffect(() => {
+        fetchDevoteesSummary();
         fetchReports();
     }, [selectedDateRange, selectedAmountRange]);
 
@@ -219,22 +237,34 @@ export default function ReportsDashboard() {
                     </div>
                 </div>
             </Fieldset>
-            {/* Total Widget */}
-            <div
-                className="bg-yellow-50 text-yellow-900 border-l-4 border-yellow-500 p-4 rounded-lg shadow flex justify-between items-center max-w-md">
-                {
-                    totalAmount?
-                        <div>
-                            <p className="text-sm">Total <strong>{donationsCount && !inProgress? donationsCount : '**'}</strong> Donations amounting
-                                to</p>
-                            <p className="text-2xl font-bold">₹ {(totalAmount && !inProgress? totalAmount : '****').toLocaleString("en-IN")}</p>
-                        </div>
-                        :
-                        <div>
-                            <p className="text-2xl font-bold">No Donations</p>
-                        </div>
-                }
-                <Image src="/money-bag.png" alt="money" width="70" height="70"/>
+            <div className="grid grid-cols-1 md:grid-cols-2 items-center text-sm gap-2">
+                {/* Total Devotees Widget */}
+                <div
+                    className="[zoom:0.7] md:[zoom:1] bg-yellow-50 text-yellow-900 border-l-4 border-yellow-500 px-4 rounded-lg shadow flex justify-between items-center max-w-md">
+                    <div>
+                        <p className="text-sm">Total <strong>{devoteesTotalCount && !inProgress ? devoteesTotalCount : '**'}</strong> Devotees</p>
+                        <p className="text-2xl font-bold">Active: {(devoteesActiveCount && !inProgress ? devoteesActiveCount : '****')}</p>
+                    </div>
+                    <Image src="/devotees-icon.png" alt="dev" width="70" height="70"/>
+                </div>
+
+                {/* Total Donations Widget */}
+                <div
+                    className="[zoom:0.7] md:[zoom:1] bg-yellow-50 text-yellow-900 border-l-4 border-yellow-500 p-4 rounded-lg shadow flex justify-between items-center max-w-md">
+                    {
+                        totalAmount?
+                            <div>
+                                <p className="text-sm">Total <strong>{donationsCount && !inProgress? donationsCount : '**'}</strong> Donations amounting
+                                    to</p>
+                                <p className="text-2xl font-bold">₹ {(totalAmount && !inProgress? totalAmount : '****').toLocaleString("en-IN")}</p>
+                            </div>
+                            :
+                            <div>
+                                <p className="text-2xl font-bold">No Donations</p>
+                            </div>
+                    }
+                    <Image src="/money-bag.png" alt="money" width="70" height="70"/>
+                </div>
             </div>
 
             <br/>

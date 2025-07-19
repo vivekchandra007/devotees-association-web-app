@@ -10,7 +10,7 @@ import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
 import { Messages } from "primereact/messages";
 import { ProgressBar } from "primereact/progressbar";
-import { useRef, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {STATUSES, SYSTEM_ROLES} from "@/data/constants";
 import {Dialog} from "primereact/dialog";
 import {FileUpload, FileUploadFilesEvent} from "primereact/fileupload";
@@ -18,9 +18,14 @@ import * as XLSX from "xlsx";
 import {MessageSeverity} from "primereact/api";
 import _ from "lodash";
 import getCountryCallingCode from "@/data/countryCallingCodes";
+import Image from "next/image";
 
 export default function DevoteesDashboard() {
     const { devotee, systemRole } = useAuth();
+    const [devoteesTotalCount, setDevoteesTotalCount] = useState<number | null>(null);
+    const [devoteesActiveCount, setDevoteesActiveCount] = useState<number | null>(null);
+    const [devoteesVolunteersCount, setDevoteesVolunteersCount] = useState<number | null>(null);
+    const [devoteesLeadersCount, setDevoteesLeadersCount] = useState<number | null>(null);
     const [showBulkUploadDialogue, setShowBulkUploadDialogue] = useState<boolean>(false);
     const [inProgress, setInProgress] = useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
@@ -188,6 +193,26 @@ export default function DevoteesDashboard() {
         }
     }
 
+    useEffect(() => {
+        const getInsights = async() => {
+            setInProgress(true);
+            try {
+                const res = await api.get('/devotees/insights');
+                if (res.data.success) {
+                    setDevoteesTotalCount(res.data.total);
+                    setDevoteesActiveCount(res.data.active);
+                    setDevoteesVolunteersCount(res.data.volunteers);
+                    setDevoteesLeadersCount(res.data.leaders);
+                }
+            } catch (err) {
+                console.error('Failed to load devotees insights data:', err);
+            } finally {
+                setInProgress(false);
+            }
+        }
+        getInsights();
+    }, []);
+
     return (
         <div className="p-3 min-h-screen">
             <strong className="text-general">Devotees Dashboard</strong>
@@ -198,7 +223,34 @@ export default function DevoteesDashboard() {
                     <hr/>
             }
             <small className="text-general">
-                A consolidated place for all devotees&apos; data. At your role level, {devotee?.name}, you have the
+                A consolidated place for all devotees&apos; data.
+                {/* Total Widget */}
+                <div
+                    className="mt-4 bg-yellow-50 text-yellow-900 border-l-4 border-yellow-500 p-4 rounded-lg shadow flex justify-between items-center max-w-md">
+                    <div>
+                        <p className="text-sm">Total <strong>{devoteesTotalCount && !inProgress ? devoteesTotalCount : '**'}</strong> Devotees
+                        </p>
+                        <p className="text-2xl font-bold">Active: {(devoteesActiveCount && !inProgress ? devoteesActiveCount : '****')}</p>
+                        <p className="text-2xl font-bold">Volunteers: &nbsp;
+                            {devoteesVolunteersCount ?
+                                (devoteesVolunteersCount && !inProgress ? devoteesVolunteersCount : '****')
+                                :
+                                0
+                            }
+                        </p>
+                        <p className="text-2xl font-bold">Leader: &nbsp;
+                            {devoteesLeadersCount ?
+                                (devoteesLeadersCount && !inProgress ? devoteesLeadersCount : '****')
+                                :
+                                0
+                            }
+                        </p>
+                    </div>
+                    <Image src="/devotees-icon.png" alt="dev" width="70" height="70"/>
+                </div>
+                <br/>
+                At your <strong>role level</strong>, <span className="text-hover font-bold">{devotee?.name}</span>, you
+                have the
                 privileges to:
                 {
                     systemRole === SYSTEM_ROLES.admin &&
@@ -225,7 +277,8 @@ export default function DevoteesDashboard() {
                                 onClick={() => setShowBulkUploadDialogue(true)}
                             />
                         </div>
-                        <strong>Note:</strong>&nbsp;These devotees&apos; status will be &#34;inactive&#34; until they themselves login for the first time.
+                        <strong>Note:</strong>&nbsp;These devotees&apos; status will be &#34;inactive&#34; until they
+                        themselves login for the first time.
                         <Dialog
                             header="Bulk Upload Devotees with their Data" keepInViewport
                             visible={showBulkUploadDialogue}
@@ -247,8 +300,10 @@ export default function DevoteesDashboard() {
                 }
                 <div className="m-5">
                     <strong
-                        className="text-hover">• Search</strong> a devotee registered within this portal. It may be to <strong
-                    className="text-hover">help</strong> them or even <strong className="text-hover">refer</strong> them to
+                        className="text-hover">• Search</strong> a devotee registered within this portal. It may be
+                    to <strong
+                    className="text-hover">help</strong> them or even <strong className="text-hover">refer</strong> them
+                    to
                     this portal, if they are not already registered.
                 </div>
             </small>
@@ -305,11 +360,14 @@ export default function DevoteesDashboard() {
                                     blocked={devoteeDetails?.status === STATUSES.deceased}
                                     template={<i className="pi pi-lock" style={{fontSize: '3rem'}}></i>}>
                                     <Card
-                                        title={<h3 className={devoteeDetails?.status === 'active'? 'text-general':'text-gray-400'}>{devoteeDetails?.name}</h3>}
+                                        title={<h3
+                                            className={devoteeDetails?.status === 'active' ? 'text-general' : 'text-gray-400'}>{devoteeDetails?.name}</h3>}
                                     >
                                         <p><strong>Phone:</strong> {devoteeDetails?.phone?.slice(2)}</p>
                                         <p><strong>Email:</strong> {devoteeDetails?.email}</p>
-                                        <p><strong>Status:</strong> <span className={devoteeDetails?.status === 'active'? 'text-hover':''}>{devoteeDetails?.status}</span></p>
+                                        <p><strong>Status:</strong> <span
+                                            className={devoteeDetails?.status === 'active' ? 'text-hover' : ''}>{devoteeDetails?.status}</span>
+                                        </p>
                                         <p><strong>Role:</strong> {devoteeDetails?.system_role_id_ref_value?.name}</p>
 
                                         {/* volunteers, leaders and admins can view full details of a devotee as well as their donations */}
@@ -337,7 +395,7 @@ export default function DevoteesDashboard() {
                     }
                 </div>
             }
-            <Toast ref={toast} position="bottom-center" />
+            <Toast ref={toast} position="bottom-center"/>
         </div>
     )
 }
