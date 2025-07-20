@@ -3,7 +3,6 @@ import {NextRequest, NextResponse} from "next/server";
 import {verifyAccessToken} from "@/lib/auth";
 import {
     GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY,
-    SPECIFIC_PRISMA_ACCELERATE_CACHE_STRATEGY_LONGER
 } from "@/data/constants";
 
 export async function GET(req: NextRequest) {
