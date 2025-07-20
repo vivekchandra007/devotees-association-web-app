@@ -46,7 +46,7 @@ export default function TopNavBar() {
     const userProfileActionsPanel = useRef<Menu>(null);
 
     const ReferralsModalContent = {
-        header: 'Referrals',
+        header: 'Invite Others & Earn Blessings',
         content: (<Referrals />)
     }
 

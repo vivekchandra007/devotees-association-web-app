@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { InputText } from 'primereact/inputtext'
 import { Button } from 'primereact/button'
 import { useAuth } from '@/hooks/useAuth'
@@ -8,15 +8,58 @@ import { Toast } from "primereact/toast";
 import { MessageSeverity } from "primereact/api";
 import api from '@/lib/axios' // your axios wrapper
 import { QRCodeCanvas } from 'qrcode.react'
-import { Dialog } from 'primereact/dialog'
+import { DataTable } from 'primereact/datatable'
+import {Column} from "primereact/column";
+import {formatDateIntoStringddmmyyyy} from "@/lib/conversions";
+import {Prisma} from "@prisma/client";
+import {Card} from "primereact/card";
+
+type Devotee = Prisma.devoteesGetPayload<{
+    include: {
+        system_role_id_ref_value: {
+            select: {
+                name: true,
+            };
+        },
+        spiritual_level_id_ref_value: {
+            select: {
+                title_male: true,
+                title_female: true,
+                title_other: true
+            };
+        },
+        source_id_ref_value: {
+            select: {
+                name: true,
+                description: true,
+            }
+        },
+        counsellor_id_ref_value: {
+            select: {
+                id: true,
+                name: true
+            }
+        },
+        referred_by_id_ref_value: {
+            select: {
+                id: true,
+                name: true
+            }
+        }
+    };
+}>;
 
 export default function Referrals() {
 
     const { devotee } = useAuth();
     const toast = useRef<Toast>(null);
-    const [referredList, setReferredList] = useState([])
-    const [showQR, setShowQR] = useState(false)
-    const referralLink = `${window.location.origin}/?ref=${generateAppendCode() + devotee?.id}`
+    const [inProgress, setInProgress] = useState(false);
+    const [referredDevotees, setReferredDevotees] = useState([])
+    const referralLink = `${window.location.origin}/?ref=${generateAppendCode() + devotee?.id}`;
+
+    const referralMessage = `Join me on HareKrishna.app — a divine digital home for devotees. 🙏
+Use my referral link to sign up: ${referralLink}
+Chant. Connect. Contribute. 🌸 Hare Krishna!`;
 
     const copyToClipboard = async () => {
         await navigator.clipboard.writeText(referralLink);
@@ -32,55 +75,133 @@ export default function Referrals() {
         return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
     }
 
-    useEffect(() => {
-        if (devotee?.id) {
-            api.get(`devotee/referrals/${devotee.id}`).then((res) => {
-                setReferredList(res.data)
-            })
+    const encodedMsg = encodeURIComponent(referralMessage);
+
+    function shareWhatsApp() {
+        window.open(`https://wa.me/?text=${encodedMsg}`, '_blank');
+    }
+
+    function shareTelegram() {
+        window.open(`https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=${encodedMsg}`, '_blank');
+    }
+
+    function shareEmail() {
+        window.location.href = `mailto:?subject=Join HareKrishna.app&body=${encodedMsg}`;
+    }
+
+    function shareFacebook() {
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(referralLink)}`, '_blank');
+    }
+
+    function shareTwitter() {
+        window.open(`https://twitter.com/intent/tweet?text=${encodedMsg}`, '_blank');
+    }
+
+    function nativeShare() {
+        if (navigator.share) {
+            navigator.share({
+                title: "HareKrishna.app",
+                text: referralMessage,
+                url: referralLink,
+            });
+        } else {
+            alert("Sharing not supported on this browser.");
         }
-    }, [devotee?.id])
+    }
+
+    useEffect(() => {
+        const fetchReferrals = async () => {
+            if (!devotee && inProgress) return;
+
+            try {
+                setInProgress(true);
+                const res = await api.get(`devotee/referrals`);
+                if (res && res.data && res.data.success && res.data.referredDevotees) {
+                    setReferredDevotees(res.data.referredDevotees);
+                }
+            } catch (err) {
+                console.error('Failed to load referrals data:', err);
+            } finally {
+                setInProgress(false);
+            }
+        }
+        fetchReferrals();
+    }, [devotee]);
+
+    const nameWithLink = (rowData: Devotee) => {
+        return (
+            <a href={`/devotee?devoteeId=${rowData.id}`} rel="noopener noreferrer" className="text-hover underline">
+                {rowData.name}
+            </a>
+        );
+    };
+    const dateFormatted = (rowData: Devotee) => {
+        return (
+            <span>{formatDateIntoStringddmmyyyy(new Date(rowData.created_at!))}</span>
+        );
+    };
+    const phoneFormatted = (rowData: Devotee) => {
+        return (
+            <span>{rowData.phone?.slice(-10)}</span>
+        );
+    };
 
     return (
-        <div className="p-4 space-y-4">
-            <h2 className="text-lg font-semibold">Your Personal Referral Link and QR Code</h2>
-            <div className="flex gap-2 items-center">
-                <Button
-                    icon="pi pi-qrcode"
-                    className="p-button-secondary"
-                    onClick={() => setShowQR(true)}
-                    tooltip="Show QR Code"
-                />
-                <InputText value={referralLink} readOnly className="w-full" />
-                <Button icon="pi pi-copy" onClick={copyToClipboard} tooltip="Copy" />
-            </div>
-
-            <Dialog
-                header="Share via QR Code" keepInViewport
-                visible={showQR}
-                onHide={() => setShowQR(false)}
-                modal
-            >
-                <div className="flex justify-center">
-                    <QRCodeCanvas value={referralLink} size={200} />
+        <div className="space-y-4">
+            <h2 className="text-lg font-semibold">1. Shareable personal QR Code and Referral Link</h2>
+            <Card className="shadow-2xl w-93 md:w-150 text-center component-transparent">
+                <div className="flex justify-center mb-6">
+                    <QRCodeCanvas value={referralLink} size={110}/>
                 </div>
-            </Dialog>
+                <div className="flex items-center gap-2">
+                    <InputText value={referralLink} readOnly className="w-full"/>
+                    <Button icon="pi pi-copy" onClick={copyToClipboard} tooltip="Copy" label="Copy" size="small"/>
+                </div>
 
-            <small className="text-general">Note: You can share the above QR code or link with anyone, over any platform and if they login using this link, they will be linked to you and appear in below list. 
-                <br />So, let&apos;s spread the word{devotee?.gender ? `, ${devotee.spiritual_level_id_ref_value[`title_${devotee?.gender}`]}` : '' } 🙏🏻
-            </small>
+                <br />
 
+                <p>One click easy share via:</p>
+                <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                    <Button label="WhatsApp" icon="pi pi-whatsapp" className="p-button-success"
+                            onClick={() => shareWhatsApp()}/>
 
-            <h2 className="text-lg font-semibold mt-4">Referred Devotees</h2>
-            {referredList.length > 0 ? (
-                <ul className="list-disc ml-5">
-                    {/* {referredList.map((ref) => (
-                        <li key={ref.id}>{ref.name || ref.phone}</li>
-                    ))} */}
-                </ul>
-            ) : (
-                <p>No referrals yet.</p>
-            )}
-            <Toast ref={toast} position="bottom-center" />
+                    <Button label="Telegram" icon="pi pi-send" className="p-button-info"
+                            onClick={() => shareTelegram()}/>
+
+                    <Button label="Email" icon="pi pi-envelope" severity="secondary"
+                            onClick={() => shareEmail()}/>
+
+                    <Button label="Facebook" icon="pi pi-facebook" severity="info"
+                            onClick={() => shareFacebook()}/>
+
+                    <Button label="Twitter" icon="pi pi-twitter" severity="contrast"
+                            onClick={() => shareTwitter()}/>
+
+                    <Button label="More..." icon="pi pi-share-alt" severity="danger"
+                            onClick={nativeShare}/>
+                </div>
+                <br/>
+                <small className="text-general">Note: You can share the above QR code or link with anyone, over any
+                    platform
+                    and if they login using this link, they will be linked to you and appear in below list.
+                    <br/>So, let&apos;s spread the
+                    word{devotee?.gender ? `, ${devotee.spiritual_level_id_ref_value[`title_${devotee?.gender}`]}` : ''} 🙏🏻
+                </small>
+            </Card>
+
+            <h2 className="text-lg font-semibold mt-4">2. Your referred devotees</h2>
+            {
+                referredDevotees && Array.isArray(referredDevotees) && referredDevotees.length > 0 ?
+                    <div className="card shadow-2xl overflow-x-auto max-w-[90vw]">
+                        <DataTable value={referredDevotees} className="text-sm">
+                            <Column field="name" header="Name" body={nameWithLink}/>
+                            <Column field="phone" header="Phone" body={phoneFormatted}/>
+                            <Column field="created_at" header="Joined" body={dateFormatted}/>
+                        </DataTable>
+                    </div>
+                    : "No referrals yet."
+            }
+            <Toast ref={toast} position="bottom-center"/>
         </div>
     )
 }
