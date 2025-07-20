@@ -131,9 +131,9 @@ export default function DonationsDashboard() {
   const fetchDonations = async (customParams?: object) => {
     if (inProgress) return;
 
-    fetchDonationsSummary();
-
     try {
+      await fetchDonationsSummary();
+
       setInProgress(true);
       msgs.current?.clear();
       const res = await api.post(`/donations?dateRange=${dateRangeValue}&amountRange=${amountRangeValue}`, customParams || lazyParams);
@@ -149,8 +149,9 @@ export default function DonationsDashboard() {
         throw new Error();
       }
     } catch {
+      msgs.current?.clear();
       if (lazyParams.globalFilter) {
-        msgs.current?.show({ sticky: true, severity: MessageSeverity.ERROR, content: `No donations found matching "${lazyParams.globalFilter}". Clear search query to see all donations. Showing previous result for now.`, closable: false });
+        msgs.current?.show({ sticky: true, severity: MessageSeverity.ERROR, content: `No donations found matching "${lazyParams.globalFilter}". Clear search query and remove filters (if any) to see all donations.`, closable: false });
       } else if (selectedDateRange !== "all" || (customDateRange && customDateRange[0] && customDateRange[1]) || selectedAmountRange !== "all" || customAmountRange) {
         msgs.current?.show({ sticky: true, severity: MessageSeverity.ERROR, content: `No donations found with filters to be within date range: "${dateRangeValue}" & amount range: "${amountRangeValue}". Change filters or choose "All Time/ Amounts" or some custom Date/ Amount range.`, closable: false });
       } else {
@@ -164,8 +165,10 @@ export default function DonationsDashboard() {
   };
 
   const fetchDonationsSummary = async () => {
-    setInProgress(true);
+    if (inProgress) return;
+
     try {
+      setInProgress(true);
       const res = await api.get(`/reports/donations-summary?dateRange=${dateRangeValue}&amountRange=${amountRangeValue}`);
       if (res.data.success) {
         setTotalDonationsAmount(res.data.totalAmount.amount);

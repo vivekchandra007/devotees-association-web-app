@@ -19,6 +19,7 @@ import {MessageSeverity} from "primereact/api";
 import _ from "lodash";
 import getCountryCallingCode from "@/data/countryCallingCodes";
 import Image from "next/image";
+import {Tag} from "primereact/tag";
 
 export default function DevoteesDashboard() {
     const { devotee, systemRole } = useAuth();
@@ -226,25 +227,30 @@ export default function DevoteesDashboard() {
                 A consolidated place for all devotees&apos; data.
                 {/* Total Widget */}
                 <div
-                    className="mt-4 bg-yellow-50 text-yellow-900 border-l-4 border-yellow-500 p-4 rounded-lg shadow flex justify-between items-center max-w-md">
+                    className="mt-4 text-sm bg-yellow-50 text-yellow-900 border-l-4 border-yellow-500 p-4 rounded-lg shadow flex justify-between items-center max-w-md">
                     <div>
-                        <p className="text-sm">Total <strong>{devoteesTotalCount && !inProgress ? devoteesTotalCount : '**'}</strong> Devotees
+                        <p>Total <strong>{devoteesTotalCount && !inProgress ? devoteesTotalCount : '**'}</strong>
+                            &nbsp;<strong className="text-hover">Dev</strong>otees
                         </p>
-                        <p className="text-2xl font-bold">Active: {(devoteesActiveCount && !inProgress ? devoteesActiveCount : '****')}</p>
-                        <p className="text-2xl font-bold">Volunteers: &nbsp;
+                        &#8226; Active: <span className="text-base font-bold">{(devoteesActiveCount && !inProgress ? devoteesActiveCount : '****')}</span>
+                        <br />
+                        &#8226; Volunteers: &nbsp;
+                        <span className="text-base font-bold">
                             {devoteesVolunteersCount ?
                                 (devoteesVolunteersCount && !inProgress ? devoteesVolunteersCount : '****')
                                 :
                                 0
                             }
-                        </p>
-                        <p className="text-2xl font-bold">Leader: &nbsp;
+                        </span>
+                        <br />
+                        &#8226; Leaders: &nbsp;
+                        <span className="text-base font-bold">
                             {devoteesLeadersCount ?
                                 (devoteesLeadersCount && !inProgress ? devoteesLeadersCount : '****')
                                 :
                                 0
                             }
-                        </p>
+                        </span>
                     </div>
                     <Image src="/devotees-icon.png" alt="dev" width="70" height="70"/>
                 </div>
@@ -363,26 +369,38 @@ export default function DevoteesDashboard() {
                                         title={<h3
                                             className={devoteeDetails?.status === 'active' ? 'text-general' : 'text-gray-400'}>{devoteeDetails?.name}</h3>}
                                     >
-                                        <p><strong>Phone:</strong> {devoteeDetails?.phone?.slice(2)}</p>
-                                        <p><strong>Email:</strong> {devoteeDetails?.email}</p>
-                                        <p><strong>Status:</strong> <span
-                                            className={devoteeDetails?.status === 'active' ? 'text-hover' : ''}>{devoteeDetails?.status}</span>
-                                        </p>
-                                        <p><strong>Role:</strong> {devoteeDetails?.system_role_id_ref_value?.name}</p>
+                                        <div className="grid grid-cols-12 gap-1">
+                                            <div className="col-span-9">
+                                                <p><strong>Phone:</strong> {devoteeDetails?.phone?.slice(2)}</p>
+                                                <p><strong>Email:</strong> {devoteeDetails?.email}</p>
+                                            </div>
+                                            <div className="col-span-3">
+                                                {
+                                                    devoteeDetails?.system_role_id && devoteeDetails?.system_role_id > 1 &&
+                                                    <Tag className="mr-1"
+                                                        severity={devoteeDetails?.system_role_id >= 4? 'danger':'info'}
+                                                        value={devoteeDetails?.system_role_id_ref_value?.name}></Tag>
+                                                }
+                                                {
+                                                    devoteeDetails?.status === 'active' &&
+                                                    <Tag severity="success" value="active"></Tag>
+                                                }
+                                            </div>
+                                        </div>
 
                                         {/* volunteers, leaders and admins can view full details of a devotee as well as their donations */}
                                         <div className="grid grid-cols-2 gap-2 mt-3">
                                             <Button
                                                 outlined={devoteeDetails?.status === 'inactive'}
                                                 icon="pi pi-user"
-                                                label="View Profile"
+                                                label="Profile"
                                                 onClick={() => router.push(`/devotee?devoteeId=${devoteeDetails?.id}`)}
                                                 size="small"
                                             />
                                             <Button
                                                 outlined={devoteeDetails?.status === 'inactive'}
                                                 icon="pi pi-indian-rupee"
-                                                label="View Donations"
+                                                label="Donations"
                                                 onClick={() => router.push(`/user-data?tab=1&phone=${devoteeDetails?.phone}`)}
                                                 size="small"
                                                 severity="warning"
