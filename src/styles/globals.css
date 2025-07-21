@@ -92,8 +92,7 @@ body {
 }
 
 .home-page-tabs .p-tabview-nav .p-unselectable-text {
-  max-width: 33.33%;
-  min-width: 25%;
+  min-width: 20%;
 }
 
 .p-tabview-nav-link {
@@ -170,5 +169,8 @@ body {
 @media screen and (max-width: 750px) {
   .p-tabview-nav .p-tabview-title {
     font-size: 12px;
+  }
+  .home-page-tabs .p-tabview-nav .p-unselectable-text {
+    width: 20px;
   }
 }

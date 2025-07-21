@@ -47,7 +47,7 @@ export default function Home() {
       const initialTabIndex: string | null = searchParams.get('tab');
       if (initialTabIndex) {
         const index = parseInt(initialTabIndex, 10);
-        if (!isNaN(index) && index >= 0 && index < 4) {
+        if (!isNaN(index) && index >= 0 && index < 5) {
           setActiveIndex(index);
         }
       }
@@ -75,6 +75,11 @@ export default function Home() {
             router.push(`/?tab=${e.index}&${newQueryParams || ''}`)
           }
         }>
+        <TabPanel leftIcon="pi pi-bolt mr-2">
+          <div className="min-h-screen">
+            <Home />
+          </div>
+        </TabPanel>
         <TabPanel header="Prernā" leftIcon="pi pi-youtube mr-2">
           <div className='p-3'>
             <strong className="text-general">Prernā Sindhu</strong>
