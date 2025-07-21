@@ -50,16 +50,17 @@ type Devotee = Prisma.devoteesGetPayload<{
 }>;
 
 export default function Referrals() {
-
     const { devotee } = useAuth();
     const toast = useRef<Toast>(null);
     const [inProgress, setInProgress] = useState(false);
     const [referredDevotees, setReferredDevotees] = useState([])
     const referralLink = `${window.location.origin}/?ref=${generateAppendCode() + devotee?.id}`;
 
-    const referralMessage = `Join me on HareKrishna.app — a divine digital home for devotees. 🙏
-Use my referral link to sign up: ${referralLink}
-Chant. Connect. Contribute. 🌸 Hare Krishna!`;
+    const referralMessage = `🛑 Stop the endless scroll — Reels, Shorts, and random online junk are toxic.
+🌟 Finally, we have an app that’s actually worth your time — a Spiritual Network for Devotees. 🙏
+Join me on HareKrishna.app using my personal link: ${referralLink}
+⏳ Don’t miss out — we’re connecting and growing every single day!
+🌸 HareKrishna.app — where Your Devotion meets Our Association.`;
 
     const copyToClipboard = async () => {
         await navigator.clipboard.writeText(referralLink);
@@ -154,8 +155,8 @@ Chant. Connect. Contribute. 🌸 Hare Krishna!`;
                     <QRCodeCanvas value={referralLink} size={110}/>
                 </div>
                 <div className="flex items-center gap-2">
-                    <InputText value={referralLink} readOnly className="w-full"/>
-                    <Button icon="pi pi-copy" onClick={copyToClipboard} tooltip="Copy" label="Copy" size="small"/>
+                    <InputText value={referralLink} readOnly className="w-[75%]"/>
+                    <Button icon="pi pi-copy" onClick={copyToClipboard} tooltip="Copy" label="Copy" size="small" className="w-[23%]"/>
                 </div>
 
                 <br />
@@ -177,8 +178,12 @@ Chant. Connect. Contribute. 🌸 Hare Krishna!`;
                     <Button label="Twitter" icon="pi pi-twitter" severity="contrast"
                             onClick={() => shareTwitter()}/>
 
-                    <Button label="More..." icon="pi pi-share-alt" severity="danger"
-                            onClick={nativeShare}/>
+                    {
+                        /* @ts-expect-error "it works well to not show this share option for unsupported browsers, like firefox" */
+                        navigator.share &&
+                        <Button label="More..." icon="pi pi-share-alt" severity="danger"
+                                onClick={nativeShare}/>
+                    }
                 </div>
                 <br/>
                 <small className="text-general">Note: You can share the above QR code or link with anyone, over any
@@ -192,13 +197,13 @@ Chant. Connect. Contribute. 🌸 Hare Krishna!`;
             <h2 className="text-lg font-semibold mt-4">2. Your referred devotees</h2>
             {
                 referredDevotees && Array.isArray(referredDevotees) && referredDevotees.length > 0 ?
-                    <div className="card shadow-2xl overflow-x-auto max-w-[90vw]">
+                    <Card className="shadow-2xl w-93 md:w-150 text-center component-transparent">
                         <DataTable value={referredDevotees} className="text-sm">
                             <Column field="name" header="Name" body={nameWithLink}/>
                             <Column field="phone" header="Phone" body={phoneFormatted}/>
                             <Column field="created_at" header="Joined" body={dateFormatted}/>
                         </DataTable>
-                    </div>
+                    </Card>
                     : "No referrals yet."
             }
             <Toast ref={toast} position="bottom-center"/>
