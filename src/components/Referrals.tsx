@@ -155,8 +155,8 @@ Join me on HareKrishna.app using my personal link: ${referralLink}
                     <QRCodeCanvas value={referralLink} size={110}/>
                 </div>
                 <div className="flex items-center gap-2">
-                    <InputText value={referralLink} readOnly className="w-[75%]"/>
-                    <Button icon="pi pi-copy" onClick={copyToClipboard} tooltip="Copy" label="Copy" size="small" className="w-[23%]"/>
+                    <InputText value={referralLink} readOnly className="w-[59vw] sm:w-[79vw]"/>
+                    <Button icon="pi pi-copy" onClick={copyToClipboard} tooltip="Copy" label="Copy" size="small" className="w-[40vw] sm:w-[20vw]"/>
                 </div>
 
                 <br />
