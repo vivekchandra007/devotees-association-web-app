@@ -15,7 +15,7 @@ type VideoItem = {
   type: string;
 };
 
-export default function Home() {
+export default function Feed() {
   const [selectedVideo, setSelectedVideo] = useState<VideoItem | null>(null);
   const [spotlightVideo, setSpotlightVideo] = useState<VideoItem | null>(null);
 

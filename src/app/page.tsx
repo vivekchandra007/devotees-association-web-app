@@ -11,6 +11,7 @@ import api from "@/lib/axios";              // our Custom Axios Wrapper which au
 import YouTubeMosaic from '@/components/YouTubeMosaic';
 import { TabView, TabPanel } from 'primereact/tabview';
 import Kripa from '@/components/kripa';
+import Feed from '@/components/Feed';
 import {STATUSES} from "@/data/constants";
 
 export default function Home() {
@@ -77,7 +78,7 @@ export default function Home() {
         }>
         <TabPanel leftIcon="pi pi-bolt mr-2">
           <div className="min-h-screen">
-            <Home />
+            <Feed />
           </div>
         </TabPanel>
         <TabPanel header="Prernā" leftIcon="pi pi-youtube mr-2">
