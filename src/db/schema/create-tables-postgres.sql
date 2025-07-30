@@ -202,6 +202,33 @@ BEFORE UPDATE ON donations
 FOR EACH ROW
 EXECUTE FUNCTION update_updated_at_column();
 
+/*
+  TABLE #6: feed_messages
+*/
+CREATE TABLE IF NOT EXISTS feed_messages (
+   id BIGSERIAL PRIMARY KEY,                      -- local ID
+   message_id BIGINT NOT NULL,                    -- Telegram message_id (channel)
+   chat_id BIGINT NOT NULL,                       -- Telegram chat_id (channel id or group_id)
+   text TEXT,                                     -- optional message text
+   media_type TEXT,                               -- optional: 'photo', 'video', 'animation', etc
+   media_file_id TEXT,                            -- Telegram File ID to fetch later via Bot API
+   tags TEXT[],                                   -- array of tags parsed from message text
+   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+   UNIQUE(chat_id, message_id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_feed_messages_tags_gin ON feed_messages USING GIN (tags);
+
+-- Drop trigger for updated_at, if already exists (prevent redefinition errors)
+DROP TRIGGER IF EXISTS set_updated_at_feed_messages ON feed_messages;
+
+-- Create trigger binding for updated_at column
+CREATE TRIGGER set_updated_at_feed_messages
+BEFORE UPDATE ON feed_messages
+FOR EACH ROW
+EXECUTE FUNCTION update_updated_at_column();
+
 /* 
   Pending Alter of Tables which refer to devotees table for storing `created_by` and `updated_by`
 */
@@ -217,5 +244,10 @@ ADD COLUMN updated_by INTEGER REFERENCES devotees(id) DEFAULT NULL
 
 -- donations
 ALTER TABLE donations
+ADD COLUMN created_by INTEGER REFERENCES devotees(id) DEFAULT NULL,
+ADD COLUMN updated_by INTEGER REFERENCES devotees(id) DEFAULT NULL
+
+-- feed_messages
+ALTER TABLE feed_messages
 ADD COLUMN created_by INTEGER REFERENCES devotees(id) DEFAULT NULL,
 ADD COLUMN updated_by INTEGER REFERENCES devotees(id) DEFAULT NULL

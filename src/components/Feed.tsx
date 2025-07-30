@@ -6,6 +6,8 @@ import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import api from "@/lib/axios";
 import {ProgressBar} from "primereact/progressbar";
+import {formatDateIntoStringddmmyyyy} from "@/lib/conversions";
+import {Prisma} from "@prisma/client";
 
 type VideoItem = {
   id: string;
@@ -17,12 +19,25 @@ type VideoItem = {
   type: string;
 };
 
+type Message = Prisma.feed_messagesGetPayload<{
+  include: {
+    updated_by_ref_value: {
+      select: {
+        name: true,
+      };
+    }
+    url: string
+  };
+}>;
+
 export default function Feed() {
   const [inProgress, setInProgress] = useState<boolean>(false);
   const [selectedVideo, setSelectedVideo] = useState<VideoItem | null>(null);
   const [spotlightVideo, setSpotlightVideo] = useState<VideoItem | null>(null);
   const [postText, setPostText] = useState('');
   //const [postImage, setPostImage] = useState<File | null>(null);
+  const [postMedia, setPostMedia] = useState<File | null>(null);
+  const [postMediaPreview, setPostMediaPreview] = useState<string | null>(null);
   const [postIsAnonymous, setPostIsAnonymous] = useState(false);
   const [posts, setPosts] = useState([]);
 
@@ -40,17 +55,47 @@ export default function Feed() {
     }
   }
 
-  async function postPost(text:string) {
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setPostMedia(file);
+    if (file) {
+      const preview = URL.createObjectURL(file);
+      setPostMediaPreview(preview);
+    }
+  };
+
+  async function postPost() {
+    if (!postText && !postMedia) return alert('Message or media required');
     try {
+      const formData = new FormData();
+      formData.append('text', postText);
+      if (postMedia) formData.append('media', postMedia);
       setInProgress(true);
-      const res = await api.post('/feed', {
-        post: {
-          text
-        },
-      });
+      const res = await api.post('/feed', formData);
       if (res.data.success) {
         alert("Success");
-        setTimeout(() => getFeedPosts(), 3000);
+        setPostText('');
+        setPostMedia(null);
+        setPostMediaPreview(null);
+        getFeedPosts();
+      }
+    } catch (err) {
+      console.error('Failed to post message to our Feed:', err);
+    } finally {
+      setInProgress(false);
+    }
+  }
+
+  async function loadFile(fileId: string) {
+    try {
+      setInProgress(true);
+      const res: {data : { success: boolean, url: string}} = await api.get(`/feed?fileId=${fileId}`);
+      if (res.data.success && res.data.url) {
+        posts.forEach((post: Message) => {
+          if (post.media_file_id && post.media_file_id === fileId) {
+            post.url = res.data.url as never;
+          }
+        });
       }
     } catch (err) {
       console.error('Failed to post message to our Feed:', err);
@@ -121,11 +166,16 @@ export default function Feed() {
               onChange={(e) => setPostText(e.target.value)}
           />
           <div className="flex items-center justify-between mt-2">
-            {/*<input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setPostImage(e.target.files?.[0] || null)}
-            />*/}
+            <input type="file" accept="image/*,video/*,image/gif" onChange={handleFileChange} />
+            {postMediaPreview && (
+                <div className="rounded overflow-hidden">
+                  {postMedia?.type.startsWith('video') ? (
+                      <video src={postMediaPreview} controls className="w-full max-h-64" />
+                  ) : (
+                      <img src={postMediaPreview} className="w-full max-h-64 object-contain" />
+                  )}
+                </div>
+            )}
             <label className="flex items-center gap-1">
               <input
                   type="checkbox"
@@ -136,9 +186,10 @@ export default function Feed() {
             </label>
             <button
                 className="bg-emerald-600 text-white px-4 py-1 rounded hover:bg-emerald-700"
-                onClick={() => postPost(postText)}
+                disabled={inProgress}
+                onClick={() => postPost()}
             >
-              Post
+              {inProgress ? 'Posting...' : 'Post'}
             </button>
           </div>
         </div>
@@ -146,19 +197,33 @@ export default function Feed() {
         {
             posts && Array.isArray(posts) && posts.length > 0 &&
             <div className="space-y-4">
-              {posts.map((post: {id: number, text: string}) => (
+              {posts.map((post: Message) => (
                   <div key={post.id} className="bg-white p-4 rounded-2xl shadow">
-                    {/*<div className="text-sm text-gray-500 mb-1">
-                      🙏 {post.anonymous ? 'Devotee' : post.author} • {post.timeAgo}
-                    </div>*/}
+                    <div className="text-sm text-gray-500 mb-1">
+                      🙏 {post.updated_by_ref_value?.name || 'Devotee'} • {formatDateIntoStringddmmyyyy(new Date(post.updated_at!))}
+                    </div>
                     <div className="text-lg mb-2 whitespace-pre-wrap">{post.text}</div>
-                    {/*{post.imageUrl && (
-                        <img
-                            src={post.imageUrl}
-                            className="rounded-xl max-h-80 object-contain w-full"
-                        />
-                    )}
-                    <div className="flex items-center gap-4 mt-3 text-gray-600 text-sm">
+                    {
+                      post.media_type && post.url? (
+                          post.media_type.startsWith('video') ? (
+                                  <video src={post.url} controls className="w-full max-h-64"/>
+                              )
+                              : (
+                                  <img
+                                      src = {post.url}
+                                      className="rounded-xl max-h-80 object-contain w-full"
+                                  />
+                              )
+                      ): (
+                          <button
+                              className="bg-emerald-600 text-white px-4 py-1 rounded hover:bg-emerald-700"
+                              onClick={() => loadFile(post.media_file_id!)}
+                          >
+                            {inProgress ? 'Loading...' : 'Load Media'}
+                          </button>
+                      )
+                    }
+                    {/*<div className="flex items-center gap-4 mt-3 text-gray-600 text-sm">
                       ❤️ {post.likes} 💬 {post.comments} 🔄 Share
                     </div>*/}
                   </div>
