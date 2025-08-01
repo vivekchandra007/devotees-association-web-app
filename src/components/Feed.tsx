@@ -6,7 +6,7 @@ import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import api from "@/lib/axios";
 import {ProgressBar} from "primereact/progressbar";
-import {formatDateIntoStringddmmyyyy} from "@/lib/conversions";
+import {formatDateTimeIntoReadableString} from "@/lib/conversions";
 import {Prisma} from "@prisma/client";
 
 type VideoItem = {
@@ -45,8 +45,11 @@ export default function Feed() {
     try {
       setInProgress(true);
       const res = await api.get('/feed');
-      if (res.data.success && res.data.messages) {
+      if (res.data.success && res.data.messages && Array.isArray(res.data.messages) && res.data.messages.length > 0) {
         setPosts(res.data.messages);
+        // if (res.data.messages[0].media_file_id) {
+        //   setTimeout(() => loadFile(res.data.messages[0].media_file_id), 2000);
+        // }
       }
     } catch (err) {
       console.error('Failed to post message to our Feed:', err);
@@ -172,7 +175,7 @@ export default function Feed() {
                   {postMedia?.type.startsWith('video') ? (
                       <video src={postMediaPreview} controls className="w-full max-h-64" />
                   ) : (
-                      <img src={postMediaPreview} className="w-full max-h-64 object-contain" />
+                      <img src={postMediaPreview} className="w-full max-h-64 object-contain" alt={postText}/>
                   )}
                 </div>
             )}
@@ -200,7 +203,7 @@ export default function Feed() {
               {posts.map((post: Message) => (
                   <div key={post.id} className="bg-white p-4 rounded-2xl shadow">
                     <div className="text-sm text-gray-500 mb-1">
-                      🙏 {post.updated_by_ref_value?.name || 'Devotee'} • {formatDateIntoStringddmmyyyy(new Date(post.updated_at!))}
+                      🙏 {post.updated_by_ref_value?.name || 'Devotee'} • {formatDateTimeIntoReadableString(new Date(post.updated_at!))}
                     </div>
                     <div className="text-lg mb-2 whitespace-pre-wrap">{post.text}</div>
                     {
@@ -212,11 +215,13 @@ export default function Feed() {
                                   <img
                                       src = {post.url}
                                       className="rounded-xl max-h-80 object-contain w-full"
+                                      alt={post.text!}
                                   />
                               )
                       ): (
                           <button
                               className="bg-emerald-600 text-white px-4 py-1 rounded hover:bg-emerald-700"
+                              disabled={inProgress}
                               onClick={() => loadFile(post.media_file_id!)}
                           >
                             {inProgress ? 'Loading...' : 'Load Media'}

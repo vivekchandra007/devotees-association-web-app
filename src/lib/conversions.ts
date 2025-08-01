@@ -73,3 +73,18 @@ export function formatDateIntoStringddmmyyyy(date: Date): string | null {
 
   return `${day}/${month}/${year}`;
 }
+
+export function formatDateTimeIntoReadableString(date: Date): string | null {
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+
+  const ampm = hours >= 12 ? 'PM' : 'AM';
+  const hh = hours % 12 || 12; // 0 becomes 12
+  const mm = minutes.toString().padStart(2, '0');
+
+  const dd = date.getDate().toString().padStart(2, '0');
+  const mo = (date.getMonth() + 1).toString().padStart(2, '0');
+  const yyyy = date.getFullYear();
+
+  return `${hh}:${mm} ${ampm} ${dd}/${mo}/${yyyy}`;
+}

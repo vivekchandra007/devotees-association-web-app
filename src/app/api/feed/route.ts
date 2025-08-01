@@ -26,6 +26,7 @@ export async function GET(req: NextRequest) {
                 orderBy: {
                     updated_at: 'desc'
                 },
+                take: 21,
                 cacheStrategy: GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY
             });
             return NextResponse.json(
@@ -105,7 +106,7 @@ export async function POST(req: NextRequest) {
                     chat_id: result.chat.id,
                     text: text,
                     media_type: file?.type, // fill in if you used sendPhoto/sendVideo
-                    media_file_id: result.photo ? result.photo[result.photo.length - 1].file_id : result.video[result.video - 1].file_id, // fill in if applicable
+                    media_file_id: result.photo ? result.photo[result.photo.length - 1].file_id : result.video.file_id, // fill in if applicable
                     tags: result.text ? extractTags(result.text) : [],
                     created_by: payload ?? null, //payload contains token, which when decrypted reveals logged in user's devotee ID
                     updated_by: payload ?? null, //payload contains token, which when decrypted reveals logged in user's devotee ID
