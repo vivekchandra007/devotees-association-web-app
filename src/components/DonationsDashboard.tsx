@@ -344,7 +344,7 @@ export default function DonationsDashboard() {
   };
 
   return (
-      <div className="p-3 mih-h-screen">
+      <div className="p-2 min-h-screen max-w-screen">
         <strong className="text-general">Donations Dashboard</strong>
         {
           inProgress ?

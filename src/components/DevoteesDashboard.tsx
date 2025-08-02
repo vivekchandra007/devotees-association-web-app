@@ -215,7 +215,7 @@ export default function DevoteesDashboard() {
     }, []);
 
     return (
-        <div className="p-3 min-h-screen">
+        <div className="p-2 min-h-screen max-w-screen">
             <strong className="text-general">Devotees Dashboard</strong>
             {
                 inProgress ?

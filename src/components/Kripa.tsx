@@ -66,42 +66,56 @@ export default function Kripa() {
     }
 
     return (
-        <div className="text-center mt-7">
-            {inProgress && <FullPageSpinner message="Take a deep breathe and think of Shri Shri Rādhā Krishna from your heart. Today's message is on it's way." />}
-            {
-                !kripaOfTheDayChapter || !kripaOfTheDayShloka ?
-                    <Button
-                        label="Reveal my Kripā - Shloka of the day"
-                        icon="pi pi-sparkles"
-                        onClick={() => revealKripaShlokaOfTheDay()}
-                        className=""
-                        size="small"
-                        severity="warning"
-                    />
-                    :
-                    <div className="h-[93vh]">
-                        <h2 className="text-center font-semibold m-2 text-text">Your Kripā Shloka of the day to guide you is</h2>
-                        <strong className="text-hover">from Chapter: {kripaOfTheDayChapter}, Shloka: {kripaOfTheDayShloka}</strong>
-                        <br />
-                        <iframe
-                            src={`https://vedabase.io/en/library/bg/${kripaOfTheDayChapter}/${kripaOfTheDayShloka}/`}
-                            width="99%"
-                            height="100%"
-                            className="rounded-lg block"
+        <div className="min-h-screen max-w-screen">
+            <div className='p-3'>
+                <strong className="text-general">Kripā Sindhu (I&apos;m feeling Kripā)</strong>
+                <hr/>
+                <small className="text-general">
+                    Once you get inspired, <strong className="text-hover">Kripā</strong> (divine blessing) will start
+                    showing. Let&apos;s see what <strong className="text-hover">Shloka</strong> from <strong
+                    className="text-hover">Shrimad Bhagwad Gita</strong> brings a hidden inspiration for you, today.
+                </small>
+            </div>
+            {inProgress && <FullPageSpinner
+                message="Take a deep breathe and think of Shri Shri Rādhā Krishna from your heart. Today's message is on it's way."/>}
+            <div className="m-2 sm:m-6">
+                {
+                    !kripaOfTheDayChapter || !kripaOfTheDayShloka ?
+                        <Button
+                            label="Reveal my Kripā - Shloka of the day"
+                            icon="pi pi-sparkles"
+                            onClick={() => revealKripaShlokaOfTheDay()}
+                            className="w-full"
+                            size="small"
+                            severity="warning"
                         />
-                        <br />
-                        <div>
-                            <Button
-                                label="Share Now"
-                                icon="pi pi-share-alt"
-                                onClick={() => alert('aa')}
-                                className="m-2"
-                                size="small"
-                                severity="secondary"
+                        :
+                        <div className="h-[70vh] text-center">
+                            <span className="text-center font-semibold m-2 text-text">Your <strong className="text-hover">Kripā
+                                Shloka of the day</strong> to guide you is from</span>
+                            <strong className="text-hover">Chapter: {kripaOfTheDayChapter},
+                                Shloka: {kripaOfTheDayShloka}</strong>
+                            <br/> <br/>
+                            <iframe
+                                src={`https://vedabase.io/en/library/bg/${kripaOfTheDayChapter}/${kripaOfTheDayShloka}/`}
+                                width="99%"
+                                height="100%"
+                                className="rounded-lg block"
                             />
+                            <br/>
+                            <div>
+                                <Button
+                                    label="Share Now With Others"
+                                    icon="pi pi-share-alt"
+                                    onClick={() => alert('aa')}
+                                    className="m-2"
+                                    size="small"
+                                    severity="warning"
+                                />
+                            </div>
                         </div>
-                    </div>
-            }
+                }
+            </div>
         </div>
     );
 }

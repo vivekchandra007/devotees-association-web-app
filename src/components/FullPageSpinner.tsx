@@ -20,7 +20,7 @@ export default function FullPageSpinner({ message = 'Loading...' }: { message?: 
     }
   }, 1000);
   return (
-    <div className="fixed inset-0 z-5 flex flex-col items-center pt-[20vh] bg-black/85 backdrop-blur-sm text-white">
+    <div className="p-2 h-screen max-w-screen fixed inset-0 z-5 flex flex-col items-center pt-[20vh] bg-black/85 backdrop-blur-sm text-white">
       <div className="relative inline-block">
         {/* Spinner ring */}
         <div className="absolute inset-0 rounded-full border-2 border-t-yellow-500 border-r-transparent border-b-transparent border-l-transparent animate-spin"></div>
@@ -29,8 +29,8 @@ export default function FullPageSpinner({ message = 'Loading...' }: { message?: 
           className="animate-pulse animation-duration-1000 rounded-full"
           src="/app-image2.jpg"
           alt="Devotees' Association"
-          width={240}
-          height={240}
+          width={180}
+          height={180}
           priority
         />
       </div>

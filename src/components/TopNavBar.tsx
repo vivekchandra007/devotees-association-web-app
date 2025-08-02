@@ -289,7 +289,7 @@ export default function TopNavBar() {
                 header={title} keepInViewport closeOnEscape
                 visible={showWelcomeDialogue}
                 onHide={hideWelcomeMessage}
-                className="shadow-2xl w-[94vw] md:w-[75vw] lg:w-[45vw] text-center text-text size-fit m-auto">
+                className="shadow-2xl max-w-[90%] text-center text-text size-fit m-auto">
                 <div className="bg-[url('/chant-and-be-happy3.png')] bg-no-repeat bg-center bg-contain pb-0">
                     {
                         isGuestWithoutLogin?

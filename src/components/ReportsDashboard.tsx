@@ -132,7 +132,7 @@ export default function ReportsDashboard() {
 
 
     return (
-        <div className="p-3 mih-h-screen">
+        <div className="p-2 min-h-screen max-w-screen">
             <strong className="text-general">Reports Dashboard</strong>
             {
                 inProgress ?

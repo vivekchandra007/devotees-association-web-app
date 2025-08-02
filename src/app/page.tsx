@@ -10,7 +10,7 @@ import { InputText } from 'primereact/inputtext';
 import api from "@/lib/axios";              // our Custom Axios Wrapper which automatically adds access token in header
 import YouTubeMosaic from '@/components/YouTubeMosaic';
 import { TabView, TabPanel } from 'primereact/tabview';
-import Kripa from '@/components/kripa';
+import Kripa from '@/components/Kripa';
 import Feed from '@/components/Feed';
 import {STATUSES} from "@/data/constants";
 
@@ -77,33 +77,13 @@ export default function Home() {
           }
         }>
         <TabPanel leftIcon="pi pi-bolt mr-2">
-          <div className="min-h-screen">
-            <Feed />
-          </div>
+          <Feed />
         </TabPanel>
         <TabPanel header="Prernā" leftIcon="pi pi-youtube mr-2">
-          <div className='p-3'>
-            <strong className="text-general">Prernā Sindhu</strong>
-            <hr />
-            <small className="text-general">
-              Start your spiritual journey by taking <strong className="text-hover">Holy Dip</strong> in this Sāgar of <strong className="text-hover">Bhakti</strong> videos, which will <strong className="text-hover">inspire</strong> you to the <strong className="text-hover">soul</strong>. Touch, 3D Touch, Click or Hover on any thumbnail to play. Press Escape, Click x button or just Click outside the video to close player.
-            </small>
-          </div>
-          <div className="min-h-screen">
-            <YouTubeMosaic />
-          </div>
+          <YouTubeMosaic />
         </TabPanel>
         <TabPanel header="Kripā" leftIcon="pi pi-sun mr-2">
-          <div className='p-3'>
-            <strong className="text-general">Kripā Sindhu (I&apos;m feeling Kripā)</strong>
-            <hr />
-            <small className="text-general">
-              Once you get inspired, <strong className="text-hover">Kripā</strong> (divine blessing) will start showing. Let&apos;s see what <strong className="text-hover">Shloka</strong> from <strong className="text-hover">Shrimad Bhagwad Gita</strong> brings a hidden inspiration for you, today.
-            </small>
-            <div className="min-h-screen">
-              <Kripa />
-            </div>
-          </div>
+          <Kripa />
         </TabPanel>
         <TabPanel header="Gyān" leftIcon="pi pi-book mr-2">
           <div className='p-3'>
