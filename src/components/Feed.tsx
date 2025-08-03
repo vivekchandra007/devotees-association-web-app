@@ -115,28 +115,33 @@ export default function Feed() {
   }, []);
 
   return (
-      <div className="min-h-screen max-w-screen">
-        <div className='p-3'>
-          <strong className="text-general">Hare Krishna!</strong>
-          {
-            inProgress ?
-                <ProgressBar mode="indeterminate" style={{height: '2px'}} className="pt-1"></ProgressBar>
-                :
-                <hr/>
-          }
-        </div>
-        <div className="m-2 sm:m-6">
-          <div className="p-4 bg-primary/10 border border-primary rounded-xl shadow-md cursor-pointer">
-            <textarea
-                placeholder="What's on your mind, dear Devotee?"
-                className="w-full p-2 rounded border focus:outline-none"
-                rows={3}
-                value={postText}
-                onChange={(e) => setPostText(e.target.value)}
-            />
-            <br/><br/>
-            <input className="text-wrap" type="file" accept="image/*,video/*,image/gif"
-                   onChange={handleFileChange}/>
+      <div className="min-h-screen max-w-screen m-auto">
+        {
+          inProgress ?
+              <>
+              <ProgressBar mode="indeterminate" style={{height: '2px'}}></ProgressBar>
+                <br/>
+              </>
+              :
+              <br/>
+        }
+        <div className="mx-1 sm:mx-6">
+          <div className={`${postText ? 'p-2 rounded-xl bg-primary/10 border border-primary' : ''}`}>
+            <div className="w-full grid grid-cols-12 gap-1">
+              <textarea
+                  placeholder="What's on your mind, dear Devotee?"
+                  className={`col-span-10 sm:col-span-11 p-4 focus:outline-none border-primary rounded-xl transform ${!postText ? 'bg-primary/10 border shadow-md':''}`}
+                  rows={1}
+                  value={postText}
+                  onChange={(e) => setPostText(e.target.value)}
+              />
+              <label htmlFor="fileUpload"
+                     className="justify-self-start sm:justify-self-end p-button cursor-pointer m-auto text-hover text-center">
+                <i className="pi pi-images"></i>
+                <input id="fileUpload" type="file" className="hidden text-wrap" accept="image/*,video/*,image/gif"
+                       onChange={handleFileChange}/>
+              </label>
+            </div>
             {postMediaPreview && (
                 <div className="rounded overflow-hidden">
                   {postMedia?.type.startsWith('video') ? (
@@ -155,24 +160,30 @@ export default function Feed() {
                   )}
                 </div>
             )}
-            <br/><br/>
-            <div className="grid grid-cols-12">
-              <label className="col-span-9 sm:col-span-11 flex items-center gap-1">
-                <input
-                    type="checkbox"
-                    checked={postIsAnonymous}
-                    onChange={() => setPostIsAnonymous(!postIsAnonymous)}
-                />
-                <span className="text-sm">Post Anonymously</span>
-              </label>
-              <Button
-                  className="col-span-3 sm:col-span-1"
-                  disabled={inProgress || !postText}
-                  onClick={() => postPost()}
-              >
-                {inProgress ? 'Posting...' : 'Post'}
-              </Button>
-            </div>
+            {
+              postText &&
+                <>
+                  <br/><br/>
+                  <div className="grid grid-cols-12">
+                    <label className="col-span-8 flex items-center gap-1 my-2">
+                      <input
+                          type="checkbox"
+                          checked={postIsAnonymous}
+                          onChange={() => setPostIsAnonymous(!postIsAnonymous)}
+                      />
+                      <span className="text-sm">Anonymously</span>
+                    </label>
+                  </div>
+                  <Button
+                      className="col-span-3"
+                      severity="danger"
+                      disabled={inProgress || !postText}
+                      onClick={() => postPost()}
+                  >
+                    {inProgress ? 'Posting...' : 'Post'}
+                  </Button>
+                </>
+            }
           </div>
 
           {/* Spotlight Section */}
@@ -189,7 +200,7 @@ export default function Feed() {
                       className="rounded-lg"
                   />
                   <div>
-                    <h3 title={spotlightVideo.title}
+                  <h3 title={spotlightVideo.title}
                         className="text-lg font-bold line-clamp-2 overflow-hidden text-ellipsis">
                       {spotlightVideo.title}
                     </h3>

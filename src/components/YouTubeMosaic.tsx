@@ -48,7 +48,7 @@ export default function YouTubeMosaic() {
   }, [searchQuery, videos]);
 
   return (
-      <div className="min-h-screen max-w-screen">
+      <div className="min-h-screen max-w-screen m-auto">
           <div className='p-3'>
               <strong className="text-general">Prernā Sindhu</strong>
               <hr/>
@@ -62,7 +62,7 @@ export default function YouTubeMosaic() {
                   video to close player.
               </small>
           </div>
-          <div className="m-2 sm:m-6">
+          <div className="m-1 sm:m-6">
               {/* Spotlight Section */}
               {spotlightVideo && (
                   <div

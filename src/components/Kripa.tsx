@@ -66,7 +66,7 @@ export default function Kripa() {
     }
 
     return (
-        <div className="min-h-screen max-w-screen">
+        <div className="min-h-screen max-w-screen m-auto">
             <div className='p-3'>
                 <strong className="text-general">Kripā Sindhu (I&apos;m feeling Kripā)</strong>
                 <hr/>
@@ -78,7 +78,7 @@ export default function Kripa() {
             </div>
             {inProgress && <FullPageSpinner
                 message="Take a deep breathe and think of Shri Shri Rādhā Krishna from your heart. Today's message is on it's way."/>}
-            <div className="m-2 sm:m-6">
+            <div className="m-1 sm:m-6">
                 {
                     !kripaOfTheDayChapter || !kripaOfTheDayShloka ?
                         <Button

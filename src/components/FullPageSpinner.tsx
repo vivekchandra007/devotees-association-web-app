@@ -5,8 +5,8 @@ import { useState } from 'react';
 
 export default function FullPageSpinner({ message = 'Loading...' }: { message?: string }) {
   const mantra = [
-    "Krishna", "Hare", "Krishna", "Krishna", "Krishna", "Hare", "Hare ||",
-    "|| Hare", "Ram", "Hare", "Ram", "Ram", "Ram", "Hare", "Hare ||",
+    "Krishna", "Hare", "Krishna, ", "Krishna", "Krishna", "Hare", "Hare ||",
+    "|| Hare", "Ram", "Hare", "Ram, ", "Ram", "Ram", "Hare", "Hare ||",
   ]
   const [mantraCounter, setMantraCounter] = useState<number>(1);
   const [messageMantra, setMessageMantra] = useState<string>("|| Hare");
@@ -34,12 +34,12 @@ export default function FullPageSpinner({ message = 'Loading...' }: { message?: 
           priority
         />
       </div>
-      <p className="block m-4 max-w-[320px] text-center text-wrap">
+      <p className="block text-sm sm:text:lg m-4 max-w-screen text-center text-wrap">
         {message}
         <br />
         Let&apos;s Chant till then...
         <br />
-        <span className="font-bilbo text-3xl">{messageMantra}</span>
+        <span className="font-bilbo text-base sm:text:xl">{messageMantra}</span>
       </p>
     </div>
   );
