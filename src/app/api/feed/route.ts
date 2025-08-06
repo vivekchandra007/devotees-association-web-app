@@ -105,8 +105,8 @@ export async function POST(req: NextRequest) {
                     message_id: result.message_id,
                     chat_id: result.chat.id,
                     text: text,
-                    media_type: file?.type, // fill in if you used sendPhoto/sendVideo
-                    media_file_id: result.photo ? result.photo[result.photo.length - 1].file_id : result.video.file_id, // fill in if applicable
+                    media_type: file?.type || null, // fill in if you used sendPhoto/sendVideo
+                    media_file_id: file ? (result.photo ? result.photo[result.photo.length - 1].file_id : result.video.file_id) : null, // fill in if applicable
                     tags: result.text ? extractTags(result.text) : [],
                     created_by: payload ?? null, //payload contains token, which when decrypted reveals logged in user's devotee ID
                     updated_by: payload ?? null, //payload contains token, which when decrypted reveals logged in user's devotee ID

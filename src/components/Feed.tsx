@@ -8,6 +8,7 @@ import api from "@/lib/axios";
 import {ProgressBar} from "primereact/progressbar";
 import {formatDateTimeIntoReadableString} from "@/lib/conversions";
 import {Prisma} from "@prisma/client";
+import {useAuth} from "@/hooks/useAuth";
 
 type VideoItem = {
   id: string;
@@ -31,6 +32,7 @@ type Message = Prisma.feed_messagesGetPayload<{
 }>;
 
 export default function Feed() {
+  const { isAuthenticated} = useAuth();
   const [inProgress, setInProgress] = useState<boolean>(false);
   const [selectedVideo, setSelectedVideo] = useState<VideoItem | null>(null);
   const [spotlightVideo, setSpotlightVideo] = useState<VideoItem | null>(null);
@@ -68,6 +70,9 @@ export default function Feed() {
   };
 
   async function postPost() {
+    if (!isAuthenticated) {
+      alert("You must Log In first. Click on top header message.");
+    }
     if (!postText && !postMedia) return alert('Message or media required');
     try {
       const formData = new FormData();
@@ -80,7 +85,7 @@ export default function Feed() {
         setPostText('');
         setPostMedia(null);
         setPostMediaPreview(null);
-        getFeedPosts();
+        setTimeout(() => getFeedPosts(), 2000);
       }
     } catch (err) {
       console.error('Failed to post message to our Feed:', err);
@@ -125,25 +130,29 @@ export default function Feed() {
               :
               <br/>
         }
-        <div className="mx-1 sm:mx-6">
-          <div className={`${postText ? 'p-2 rounded-xl bg-primary/10 border border-primary' : ''}`}>
+        <div className="mx-1 sm:mx-6 transition-all">
+          <div className={`${postText || postMedia ? 'p-2 rounded-xl bg-primary/10 border border-primary' : ''}`}>
             <div className="w-full grid grid-cols-12 gap-1">
               <textarea
                   placeholder="What's on your mind, dear Devotee?"
-                  className={`col-span-10 sm:col-span-11 p-4 focus:outline-none border-primary rounded-xl transform ${!postText ? 'bg-primary/10 border shadow-md':''}`}
+                  className={`col-span-10 sm:col-span-11 p-2 focus:outline-none border-primary rounded-xl transform ${!postText && !postMedia ? 'bg-primary/10 border shadow-md':''}`}
                   rows={1}
                   value={postText}
                   onChange={(e) => setPostText(e.target.value)}
               />
               <label htmlFor="fileUpload"
-                     className="justify-self-start sm:justify-self-end p-button cursor-pointer m-auto text-hover text-center">
+                     className="justify-self-start sm:justify-self-end p-button rounded-none cursor-pointer">
                 <i className="pi pi-images"></i>
                 <input id="fileUpload" type="file" className="hidden text-wrap" accept="image/*,video/*,image/gif"
                        onChange={handleFileChange}/>
               </label>
             </div>
-            {postMediaPreview && (
-                <div className="rounded overflow-hidden">
+            {postMedia && postMediaPreview && (
+                <div className="overflow-hidden">
+                  <div className="absolute cursor-pointer p-1">
+                    <Button icon="pi pi-times" size="small" rounded raised severity="danger"
+                            onClick={() => setPostMedia(null)}/>
+                  </div>
                   {postMedia?.type.startsWith('video') ? (
                       <video
                           src={postMediaPreview}
@@ -161,9 +170,8 @@ export default function Feed() {
                 </div>
             )}
             {
-              postText &&
+              (postText || postMedia) &&
                 <>
-                  <br/><br/>
                   <div className="grid grid-cols-12">
                     <label className="col-span-8 flex items-center gap-1 my-2">
                       <input
@@ -171,12 +179,12 @@ export default function Feed() {
                           checked={postIsAnonymous}
                           onChange={() => setPostIsAnonymous(!postIsAnonymous)}
                       />
-                      <span className="text-sm">Anonymously</span>
+                      <span className="text-sm">Post Anonymously</span>
                     </label>
                   </div>
                   <Button
                       className="col-span-3"
-                      severity="danger"
+                      severity="warning"
                       disabled={inProgress || !postText}
                       onClick={() => postPost()}
                   >
