@@ -199,7 +199,8 @@ export default function Feed() {
               <div
                   className="my-6 p-4 border border-primary rounded-xl shadow-md cursor-pointer"
                   onClick={() => setSelectedVideo(spotlightVideo)}>
-                <div className="flex flex-col md:flex-row items-center gap-4">
+                <div className="flex flex-col md:flex-row items-center gap-4"
+                     onClick={() => setSelectedVideo(spotlightVideo)}>
                   <iframe
                       src={`https://www.youtube.com/embed/${spotlightVideo.videoId}?autoplay=1&mute=1&controls=0`}
                       width="300"
@@ -208,21 +209,21 @@ export default function Feed() {
                       className="rounded-lg"
                   />
                   <div>
-                  <h3 title={spotlightVideo.title}
-                        className="text-lg font-bold line-clamp-2 overflow-hidden text-ellipsis">
+                  {/*<h3 title={spotlightVideo.title}
+                      className="text-lg font-bold line-clamp-2 overflow-hidden text-ellipsis">
                       {spotlightVideo.title}
-                    </h3>
-                    <small title={spotlightVideo.description} className="line-clamp-2 overflow-hidden text-ellipsis">
-                      {spotlightVideo.description}
-                    </small>
-                    <br/>
-                    <Button
-                        label="Play Now"
-                        icon="pi pi-play"
-                        onClick={() => setSelectedVideo(spotlightVideo)}
-                        className="mt-2"
-                        severity="warning"
-                    />
+                  </h3>
+                  <small title={spotlightVideo.description} className="line-clamp-2 overflow-hidden text-ellipsis">
+                    {spotlightVideo.description}
+                  </small>
+                  <br/>
+                  <Button
+                      label="Play Now"
+                      icon="pi pi-play"
+                      onClick={() => setSelectedVideo(spotlightVideo)}
+                      className="mt-2"
+                      severity="warning"
+                  />*/}
                   </div>
                 </div>
               </div>
@@ -258,6 +259,7 @@ export default function Feed() {
                                     />
                                 )
                         ) : (
+                            post.media_type && post.media_file_id &&
                             <button
                                 className="bg-emerald-600 text-white px-4 py-1 rounded hover:bg-emerald-700"
                                 disabled={inProgress}
