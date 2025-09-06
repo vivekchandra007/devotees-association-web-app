@@ -260,15 +260,17 @@ export default function TopNavBar() {
     );
 
     const title = (
-        <small className="font-bilbo text-text text-xl md:text-2xl lg:text-4xl">
-            Hare Krishna!
+        <small>
+            <span className="text-special text-lg md:text-xl lg:text-2xl">Kṛṣṇe matir astu, 
+                {
+                    isAuthenticated && devotee &&
+                    <span className="text-special">
+                        {devotee?.initiated_name || devotee?.name}{devotee?.gender ? ` ${devotee.spiritual_level_id_ref_value[`title_${devotee?.gender}`]}` : ''}
+                    </span>
+                }
+            </span>
             <br/>
-            {
-                isAuthenticated && devotee &&
-                <span className="text-special">
-                                {devotee?.initiated_name || devotee?.name}{devotee?.gender ? `, ${devotee.spiritual_level_id_ref_value[`title_${devotee?.gender}`]}` : ''} 🙏🏻
-                            </span>
-            }
+            <span className="text-sm md:text-lg lg:text-xl">(May you become Kṛṣṇa 🙏🏻 conscious)</span>
         </small>
     );
 
@@ -316,7 +318,7 @@ export default function TopNavBar() {
                             (
                                 <>
                                     <small className="text-text">
-                                        Have you completed the following yet?&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                        Were you able to complete the following?&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                                     </small>
                                     <div
                                         className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">

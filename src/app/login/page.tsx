@@ -97,19 +97,12 @@ export default function LoginPage() {
     const subTitle = (
         <span className="text-sm text-general">
             <br />
-            As per&nbsp;
-            <a className="hover:text-hover text-text" href="https://vedabase.io/en/library/cc/adi/3/91/" target="_blank"
-               rel="noopener noreferrer">
-                <span className="underline">Śrī Caitanya-Caritāmṛta Ādi 3.91</span>&nbsp;<span
-                className="pi pi-external-link [zoom:0.7]"/>
-            </a>
-            <br/>
-            The devotees of Lord Viṣṇu are godly <span className="text-hover">(dev)</span>
-            <br/>
-            and Association of Devotees is the heart of Bhakti.
-            <br />
-            So, come and get associated with us, <span className="text-hover">dev</span>
+            This is Krishna Social Network — your home to connect, share and grow with fellow devotees.
         </span>
+    );
+
+    const footer = (
+        <Link href="/?guest=true" className="text-sm block mt-2 underline">explore without login</Link>
     );
 
     const configuration = {
@@ -158,17 +151,12 @@ export default function LoginPage() {
         <>
             {authInProgress && <FullPageSpinner message="Hare Krishna! OTP verifed. Redirecting to Home Page" />}
             <Card title={title}
-                subTitle={subTitle} header={header}
+                subTitle={subTitle} header={header} footer={!guestMode && footer}
                 className="shadow-2xl w-93 md:w-100 text-center component-transparent">
                 <div>
                     <Button id="btn-sign-in" label="Login with your Mobile Number" severity="danger" raised
                         icon="pi pi-mobile" loading={authInProgress}
                         onClick={() => initSendOTP(configuration)} />
-                    <br />
-                    {
-                        !guestMode &&
-                        <Link href="/?guest=true" className="text-sm block mt-2 underline">explore logged out</Link>
-                    }
                 </div>
             </Card>
         </>
