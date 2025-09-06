@@ -56,13 +56,11 @@ export default function LoginPage() {
     };
 
     const header = (
-        <Image
-            src="/app-image.jpg"
-            alt="Devotees' Association"
-            width={240}
-            height={240}
-            priority
-        />
+       <img
+        src="/app-image.jpg"
+        alt="Devotees' Association"
+        className="rounded-t-2xl shadow-md"
+      />
     );
 
     const title = (
@@ -75,8 +73,8 @@ export default function LoginPage() {
                     className="m-auto"
                     src="/metadata/icon.png"
                     alt="Hare Krishna"
-                    width="75"
-                    height="75"
+                    width="100"
+                    height="100"
                     priority
                 />
                 <Image
