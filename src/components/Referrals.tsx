@@ -149,20 +149,26 @@ Join me on HareKrishna.app using my personal link: ${referralLink}
 
     return (
         <div className="space-y-4">
-            <h2 className="text-lg font-semibold">1. Shareable personal QR Code and Referral Link</h2>
-            <Card className="shadow-2xl w-93 md:w-150 text-center component-transparent">
+            <h2 className="text-sm lg:text-base font-semibold">1. Shareable personal QR Code and Referral Link</h2>
+            <Card className="shadow-2xl text-center component-transparent m-auto">
                 <div className="flex justify-center mb-6">
                     <QRCodeCanvas value={referralLink} size={110}/>
                 </div>
-                <div className="flex items-center gap-2">
-                    <InputText value={referralLink} readOnly className="w-[59vw] sm:w-[79vw]"/>
-                    <Button icon="pi pi-copy" onClick={copyToClipboard} tooltip="Copy" label="Copy" size="small" className="w-[40vw] sm:w-[20vw]"/>
+                <div className="grid grid-cols-12 items-center justify-center gap-2 md:w-[70%] lg:w-[60%] m-auto">
+                    <InputText value={referralLink} readOnly className="col-span-7"/>
+                    <Button icon="pi pi-copy" onClick={copyToClipboard} tooltip="Copy" label="Copy" size="small" className="col-span-5"/>
                 </div>
 
                 <br />
+                <div className="text-sm lg:text-base text-general">Share this QR or link with others.
+                    <br/>Whoever registers through it will be lovingly connected to you forever, in their path to devotion.
+                    <br/>So, let&apos;s spread the
+                    word{devotee?.gender ? `, ${devotee.spiritual_level_id_ref_value[`title_${devotee?.gender}`]}` : ''} 🙏🏻
+                </div>
+                <br />
 
-                <p>One click easy share via:</p>
-                <div className="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+                <p>Also, one click easy share via:</p>
+                <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-12">
                     <Button label="WhatsApp" icon="pi pi-whatsapp" className="p-button-success"
                             onClick={() => shareWhatsApp()}/>
 
@@ -185,19 +191,12 @@ Join me on HareKrishna.app using my personal link: ${referralLink}
                                 onClick={nativeShare}/>
                     }
                 </div>
-                <br/>
-                <small className="text-general">Note: You can share the above QR code or link with anyone, over any
-                    platform
-                    and if they login using this link, they will be linked to you and appear in below list.
-                    <br/>So, let&apos;s spread the
-                    word{devotee?.gender ? `, ${devotee.spiritual_level_id_ref_value[`title_${devotee?.gender}`]}` : ''} 🙏🏻
-                </small>
             </Card>
 
-            <h2 className="text-lg font-semibold mt-4">2. Your referred devotees</h2>
+            <h2 className="text-sm lg:text-base font-semibold mt-4">2. Your referred devotees</h2>
             {
                 referredDevotees && Array.isArray(referredDevotees) && referredDevotees.length > 0 ?
-                    <Card className="shadow-2xl w-93 md:w-150 text-center component-transparent">
+                    <Card className="shadow-2xl text-center component-transparent m-auto">
                         <DataTable value={referredDevotees} className="text-sm">
                             <Column field="name" header="Name" body={nameWithLink}/>
                             <Column field="phone" header="Phone" body={phoneFormatted}/>

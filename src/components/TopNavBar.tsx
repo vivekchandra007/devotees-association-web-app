@@ -261,16 +261,16 @@ export default function TopNavBar() {
 
     const title = (
         <small>
-            <span className="text-special text-lg md:text-xl lg:text-2xl">Kṛṣṇe matir astu, 
+            <span className="text-hover text-lg md:text-xl lg:text-2xl 2xl:text-4xl">Kṛṣṇe matir astu 
                 {
                     isAuthenticated && devotee &&
-                    <span className="text-special">
-                        {devotee?.initiated_name || devotee?.name}{devotee?.gender ? ` ${devotee.spiritual_level_id_ref_value[`title_${devotee?.gender}`]}` : ''}
+                    <span>
+                        , {devotee?.initiated_name?.split(' ')[0] || devotee?.name?.split(' ')[0]}{devotee?.gender ? ` ${devotee.spiritual_level_id_ref_value[`title_${devotee?.gender}`]}` : ''}
                     </span>
                 }
             </span>
             <br/>
-            <span className="text-sm md:text-lg lg:text-xl">(May you become Kṛṣṇa 🙏🏻 conscious)</span>
+            <span className="text-text text-sm md:text-lg lg:text-xl">(May you become Kṛṣṇa 🙏🏻 conscious)</span>
         </small>
     );
 
@@ -291,18 +291,19 @@ export default function TopNavBar() {
                 header={title} keepInViewport closeOnEscape
                 visible={showWelcomeDialogue}
                 onHide={hideWelcomeMessage}
-                className="shadow-2xl max-w-[90%] text-center text-text size-fit m-auto">
+                className="shadow-2xl text-center text-text size-fit m-auto">
                 <div className="bg-[url('/chant-and-be-happy3.png')] bg-no-repeat bg-center bg-contain pb-0">
                     {
                         isGuestWithoutLogin?
                             (
-                                <>
+                                <div className="sm:p-4 text-text text-sm md:text-base 2xl:text-lg">
                                     <div
                                         className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
                                         <div className="col-span-8 md:col-span-10 text-left">
-                                            <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
-                                            <small className="text-text">Claim your free account. Gifts, Online Prayers,
-                                                Spiritual YouTube... All Free for a limited time — Do not miss. Login Now!</small>
+                                            <Badge severity="warning" className="scale-150 -ml-3 mr-2 sm:mr-4"></Badge>
+                                            <span>Claim your free account. Gifts, Online Prayers,
+                                                Spiritual YouTube... All Free for a limited time — Do not miss. Login Now!
+                                            </span>
                                         </div>
                                         <div className="col-span-4 md:col-span-2 mr-1">
                                             <Button label="" severity="danger" raised
@@ -313,23 +314,24 @@ export default function TopNavBar() {
                                             </Button>
                                         </div>
                                     </div>
-                                </>
+                                </div>
                             ) :
                             (
-                                <>
-                                    <small className="text-text">
+                                <div className="sm:p-4 text-text text-sm md:text-base 2xl:text-lg">
+                                    <div className="mb-4">
                                         Were you able to complete the following?&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                                    </small>
+                                    </div>
                                     <div
                                         className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
                                         <div className="col-span-8 md:col-span-10 text-left">
-                                            <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
-                                            <small className="text-text">A Once-In-A-Lifetime chance to help build a
+                                            <Badge severity="warning" className="scale-150 -ml-3 mr-2 sm:mr-4"></Badge>
+                                            <span>A Once-In-A-Lifetime chance to help build a
                                                 temple — Do not
-                                                miss. Donate Now!</small>
+                                                miss. Donate Now!
+                                            </span>
                                         </div>
                                         <div className="col-span-4 md:col-span-2 mr-1">
-                                            <Button label="" severity="warning" raised className="float-right"
+                                            <Button label="" size="small" severity="warning" raised className="float-right"
                                                     icon="pi pi-indian-rupee"
                                                     onClick={() => window.open("https://iskconpunebcec.com/#/newtemple")}>
                                                 <Badge severity="warning" value="▸" className="scale-150"></Badge>
@@ -339,12 +341,11 @@ export default function TopNavBar() {
                                     <div
                                         className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
                                         <div className="col-span-8 md:col-span-10 text-left">
-                                            <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
-                                            <small
-                                                data-pr-tooltip="Join our Whatsapp group to stay updated with the latest news and events — Do not miss. Connect Now!"
-                                                className="text-text">
+                                            <Badge severity="warning" className="scale-150 -ml-3 mr-2 sm:mr-4"></Badge>
+                                            <span
+                                                data-pr-tooltip="Join our Whatsapp group to stay updated with the latest news and events — Do not miss. Connect Now!">
                                                 Join our Whatsapp group
-                                            </small>
+                                            </span>
                                         </div>
                                         <div className="col-span-4 md:col-span-2 mr-1">
                                             <Button label="" severity="success" raised size="small"
@@ -360,8 +361,8 @@ export default function TopNavBar() {
                                         <div className="col-span-8 md:col-span-10 text-left">
                                             <div className="grid grid-cols-12 items-center">
                                                 <div className="col-span-8 md:col-span-7 text-left">
-                                                    <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
-                                                    <small className="text-text">Keep profile up to date</small>
+                                                    <Badge severity="warning" className="scale-150 -ml-3 mr-2 sm:mr-4"></Badge>
+                                                    <span>Keep profile up to date</span>
                                                 </div>
                                                 <div className="col-span-4 md:col-span-5">
                                                     <ProfileCompletionMeter devotee={devotee}/>
@@ -379,12 +380,11 @@ export default function TopNavBar() {
                                     <div
                                         className="grid grid-cols-12 items-center py-1 border-l-1 border-solid border-hover pl-2">
                                         <div className="col-span-8 md:col-span-10 text-left">
-                                            <Badge severity="warning" className="scale-150 -ml-3 mr-2"></Badge>
-                                            <small
-                                                data-pr-tooltip="Let's Spread the word. Refer Others and become a spiritual catalyst in their life."
-                                                className="text-text">
+                                            <Badge severity="warning" className="scale-150 -ml-3 mr-2 sm:mr-4"></Badge>
+                                            <span
+                                                data-pr-tooltip="Let's Spread the word. Refer Others and become a spiritual catalyst in their life.">
                                                 Refer Others, Earn Blessings
-                                            </small>
+                                            </span>
                                         </div>
                                         <div className="col-span-4 md:col-span-2 mr-1">
                                             <Button label="" severity="secondary" raised size="small"
@@ -395,7 +395,7 @@ export default function TopNavBar() {
                                             </Button>
                                         </div>
                                     </div>
-                                </>
+                                </div>
                             )
                     }
                     <br/>
@@ -423,14 +423,14 @@ export default function TopNavBar() {
             {
                 !authInProgress && !pathname.includes('/login') &&
                 <div
-                    className="bg-hover text-white grid items-center m-auto justify-items-center text-center -z-2 min-h-8">
-                    <small className="font-semibold hover:underline cursor-pointer">
+                    className="bg-[#282d32] text-white grid items-center m-auto justify-items-center text-center -z-2 min-h-8">
+                    <div className="text-sm font-semibold hover:underline cursor-pointer">
                         <a onClick={() => setShowWelcomeDialogue(true)} target="_blank">
                             <i className="pi pi-megaphone mr-2 animate-pulse"></i>
                             Every brick carries a prayer. Let yours be one of them — Support the New Temple now.
                             <span className="underline pl-2">Click here.</span>
                         </a>
-                    </small>
+                    </div>
                 </div>
             }
 
@@ -441,7 +441,8 @@ export default function TopNavBar() {
                     <Toolbar start={startContent} center={centerContent} end={endContent}
                              className="component-transparent" style={{
                         padding: '8px',
-                        border: 'none ',
+                        border: 'none',
+                        borderRadius: '0',
                         boxShadow: 'rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px'
                     }}/>
                     {

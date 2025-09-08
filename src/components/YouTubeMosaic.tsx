@@ -206,7 +206,6 @@ export default function YouTubeMosaic() {
                       onHide={() => setSelectedVideo(null)}
                       header={selectedVideo?.title}
                       dismissableMask
-                      className="w-[90vw] max-w-3xl"
                   >
                       {selectedVideo && (
                           <iframe

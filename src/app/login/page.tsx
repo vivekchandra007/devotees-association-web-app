@@ -147,10 +147,10 @@ export default function LoginPage() {
 
     return (
         <>
-            {authInProgress && <FullPageSpinner message="Hare Krishna! OTP verifed. Redirecting to Home Page" />}
+            {authInProgress && <FullPageSpinner message="Hare Krishna! Redirecting to Home Page" />}
             <Card title={title}
                 subTitle={subTitle} header={header} footer={!guestMode && footer}
-                className="shadow-2xl w-93 md:w-100 text-center component-transparent">
+                className="shadow-2xl w-93 md:w-100 text-center component-transparent rounded-custom">
                 <div>
                     <Button id="btn-sign-in" label="Login with your Mobile Number" severity="danger" raised
                         icon="pi pi-mobile" loading={authInProgress}

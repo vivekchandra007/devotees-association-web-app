@@ -34,12 +34,12 @@ export default function FullPageSpinner({ message = 'Loading...' }: { message?: 
           priority
         />
       </div>
-      <p className="block text-sm sm:text:lg m-4 max-w-screen text-center text-wrap">
+      <p className="block text-sm sm:text-lg m-4 max-w-screen text-center text-wrap">
         {message}
         <br />
         Let&apos;s Chant till then...
         <br />
-        <span className="font-bilbo text-base sm:text:xl">{messageMantra}</span>
+        <span className="font-bilbo text-xl sm:text-3xl">{messageMantra}</span>
       </p>
     </div>
   );
