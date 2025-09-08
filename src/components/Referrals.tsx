@@ -160,7 +160,7 @@ Join me on HareKrishna.app using my personal link: ${referralLink}
                 </div>
 
                 <br />
-                <div className="text-sm lg:text-base text-general">Share this QR or link with others.
+                <div className="text-sm lg:text-base text-general">Share the above QR or Link with others.
                     <br/>Whoever registers through it will be lovingly connected to you forever, in their path to devotion.
                     <br/>So, let&apos;s spread the
                     word{devotee?.gender ? `, ${devotee.spiritual_level_id_ref_value[`title_${devotee?.gender}`]}` : ''} 🙏🏻
@@ -168,7 +168,7 @@ Join me on HareKrishna.app using my personal link: ${referralLink}
                 <br />
 
                 <p>Also, one click easy share via:</p>
-                <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-12">
+                <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                     <Button label="WhatsApp" icon="pi pi-whatsapp" className="p-button-success"
                             onClick={() => shareWhatsApp()}/>
 
