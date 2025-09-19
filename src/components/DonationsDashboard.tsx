@@ -114,6 +114,7 @@ export default function DonationsDashboard() {
           phone: donation.phone?.slice(-10),
           devoteId: donation.phone_ref_value?.id,
           date: formatDateIntoStringddmmyyyy(new Date(donation.date!)),
+          payment_mode: donation.payment_mode,
           campaign: donation.campaign_id_ref_value?.name,
           internal_note: donation.internal_note
         }
