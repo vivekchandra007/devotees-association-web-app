@@ -27,15 +27,13 @@ export async function POST(req: NextRequest) {
         const skippedDonations: string[] = [];
         
         for (let i = donations.length - 1; i >= 0; i--) {
-            let donation = donations[i];
-            const parsed = donationSchema.safeParse(donation);
+            const parsed = donationSchema.safeParse(donations[i]);
             if (!parsed.success) {
-                return NextResponse.json({ error: 'Donation Data Validation failed', details: parsed.error.flatten() }, { status: 400 });
+                return NextResponse.json({ error: `Donation Data Validation failed for ${_.get(donations[i], "phone", '')}`, details: parsed.error.flatten() }, { status: 400 });
             }
-            donation = parsed.data;
-            if (!donation) {
+            if (!parsed.data) {
+                skippedDonations.push(donations[i]["donation_receipt_number"]);
                 donations.splice(i, 1); // ✅ Safe to delete in reverse
-                skippedDonations.push(donation["donation_receipt_number"]);
             } else {
                 _.set(donations[i], "date", parseDateFromStringddmmyyyy(_.get(donations[i], "date")));
             }

@@ -253,14 +253,18 @@ export default function DonationsDashboard() {
       const countryCallingCode = "91";
       phoneFormatted = `${countryCallingCode}${phoneFormatted}`; // → "919999999999"
 
-      const date = _.get(json[i], 'Date');
+      const date: string = _.get(json[i], 'Date', '');
       const amount = _.get(json[i], 'Amount');
+      const paymentMode: string = _.get(json[i], 'Payment Mode', '');
+      const remarks = _.get(json[i], 'Remarks');
       const donation = {
         donation_receipt_number: _.get(json[i], 'Donation Receipt Number'),
         name: _.get(json[i], 'Donor Name', ''),
         phone: phoneFormatted,
         amount: amount ? parseInt(String(amount).replace(/,/g, '').split('.')[0], 10) : null,
-        date: date || formatDateIntoStringddmmyyyy(new Date()),
+        payment_mode: paymentMode.slice(0, 20),
+        date: date?.replace("00:00", "").trim() || formatDateIntoStringddmmyyyy(new Date()),
+        internal_note: remarks || '',
         created_by: devotee?.id,
         updated_by: devotee?.id,
       }
@@ -382,7 +386,7 @@ export default function DonationsDashboard() {
                 <strong className="text-hover">• Insert</strong> donations data in bulk by uploading Excel sheet in
                 specific format:&nbsp;
                 <a
-                    href="/Sample-DONATIONS-Bulk-Data-Upload-Format-For-Madhuram.xlsx"
+                    href="/Sample-DONATIONS-Bulk-Data-Upload-Format-For-HareKrishna.app.xlsx"
                     download
                     className="text-blue-600 underline hover:text-blue-800"
                 >
@@ -407,7 +411,7 @@ export default function DonationsDashboard() {
                       name="excel"
                       mode="advanced"
                       auto
-                      chooseLabel="Upload DONATIONS Excel got from ERP portal"
+                      chooseLabel="Upload Complete DONATIONS Excel file, got from ERP portal"
                       customUpload
                       uploadHandler={handleUpload}
                       onBeforeUpload={() => setInProgress(true)}
@@ -589,6 +593,8 @@ export default function DonationsDashboard() {
                 <Column field="name" header="Donor Name" body={nameWithLink} sortable/>
                 <Column field="phone" header="Phone Number" body={phoneFormatted} sortable/>
                 <Column field="donation_receipt_number" header="Receipt" sortable/>
+                <Column field="payment_mode" header="Payment Mode" sortable/>
+                <Column field="internal_note" header="Note" sortable/>
               </DataTable>
               <hr/>
               <small className="text-general">
