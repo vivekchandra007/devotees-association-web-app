@@ -400,16 +400,18 @@ export default function DevoteesDashboard() {
                                     <Card className="shadow-md rounded-xl overflow-hidden border-none">
                                         {/* Header */}
                                         <div className="flex justify-between items-start mb-4">
-                                            <div>
+                                            <div className="flex items-center gap-2">
                                                 <h3 className={`text-xl font-bold ${devoteeDetails?.status === 'active' ? 'text-gray-800' : 'text-gray-400'}`}>
                                                     {devoteeDetails?.name}
                                                 </h3>
+                                                {devoteeDetails?.status === 'active' && (
+                                                    <i className="pi pi-check-circle text-green-500 text-xl" title="Verified and Active Member"></i>
+                                                )}
                                             </div>
                                             <div className="flex flex-col items-end gap-1">
                                                 {devoteeDetails?.system_role_id && devoteeDetails?.system_role_id > 1 && (
                                                     <Tag className="mr-1" severity={devoteeDetails?.system_role_id >= 4 ? 'danger' : 'info'} value={devoteeDetails?.system_role_id_ref_value?.name}></Tag>
                                                 )}
-                                                {devoteeDetails?.status === 'active' && <Tag severity="success" value="active"></Tag>}
                                             </div>
                                         </div>
 

@@ -7,8 +7,9 @@ I have redesigned the searched devotee card for a cleaner, more modern look and 
 ### 1. UI Redesign
 -   **Card Layout**: Switched to a cleaner card design with no border and a soft shadow.
 -   **Header**:
-    -   Devotee name is now prominent and bold.
-    -   Status and Role tags are neatly aligned to the right.
+    -   Devotee name is prominent and bold.
+    -   **Verified Status**: Replaced the "active" text tag with a blue verified checkmark icon (`pi-check-circle`) next to the name for a cleaner look.
+    -   Role tags are neatly aligned to the right.
 -   **Details Section**:
     -   Replaced text labels with icons for Phone (`pi-phone`) and Email (`pi-envelope`).
     -   Added colorful circular backgrounds for icons to enhance visual appeal.
@@ -30,7 +31,8 @@ I have redesigned the searched devotee card for a cleaner, more modern look and 
 
 ### Manual Verification Steps
 1.  **Search for Devotee**:
-    -   Verify the new card layout matches the design intent (cleaner, icons).
+    -   Verify the new card layout matches the design intent.
+    -   **Checkmark**: Confirm the blue checkmark appears next to the name for active devotees instead of the "active" tag.
     -   Check responsiveness on mobile view.
 2.  **Role Actions**:
     -   Verify buttons appear correctly based on logged-in user role.
