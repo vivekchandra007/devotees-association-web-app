@@ -10,16 +10,17 @@ import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
 import { Messages } from "primereact/messages";
 import { ProgressBar } from "primereact/progressbar";
-import React, {useEffect, useRef, useState} from "react";
-import {STATUSES, SYSTEM_ROLES} from "@/data/constants";
-import {Dialog} from "primereact/dialog";
-import {FileUpload, FileUploadFilesEvent} from "primereact/fileupload";
+import React, { useEffect, useRef, useState } from "react";
+import { STATUSES, SYSTEM_ROLES } from "@/data/constants";
+import { Dialog } from "primereact/dialog";
+import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import { FileUpload, FileUploadFilesEvent } from "primereact/fileupload";
 import * as XLSX from "xlsx";
-import {MessageSeverity} from "primereact/api";
+import { MessageSeverity } from "primereact/api";
 import _ from "lodash";
 import getCountryCallingCode from "@/data/countryCallingCodes";
 import Image from "next/image";
-import {Tag} from "primereact/tag";
+import { Tag } from "primereact/tag";
 
 export default function DevoteesDashboard() {
     const { devotee, systemRole } = useAuth();
@@ -194,8 +195,39 @@ export default function DevoteesDashboard() {
         }
     }
 
+
+    const updateDevoteeRole = async (devoteeId: number, currentName: string, newRoleId: number, newRoleName: string) => {
+        setInProgress(true);
+        try {
+            const res = await api.post('/devotee', { id: devoteeId, system_role_id: newRoleId });
+            if (res.status === 200 && res.data.success) {
+                msgs.current?.show({ severity: 'success', summary: 'Role Updated', detail: `${currentName} is now a ${newRoleName}`, sticky: false, closable: true });
+                // Update local state
+                if (searchResult && Array.isArray(searchResult)) {
+                    const updated = searchResult.map((d: any) => d.id === devoteeId ? { ...d, system_role_id: newRoleId, system_role_id_ref_value: { name: newRoleName.toLowerCase() } } : d);
+                    setSearchResult(updated);
+                }
+            } else {
+                throw new Error(res.data.error || 'Failed');
+            }
+        } catch (e: any) {
+            msgs.current?.show({ severity: 'error', summary: 'Error', detail: e.message || 'Failed to update role', sticky: true, closable: true });
+        } finally {
+            setInProgress(false);
+        }
+    }
+
+    const confirmRoleUpdate = (devoteeDetails: any, newRoleId: number, newRoleName: string) => {
+        confirmDialog({
+            message: `Are you sure you want to promote ${devoteeDetails.name} as a ${newRoleName}?`,
+            header: 'Confirmation',
+            icon: 'pi pi-exclamation-triangle',
+            accept: () => updateDevoteeRole(devoteeDetails.id, devoteeDetails.name, newRoleId, newRoleName)
+        });
+    };
+
     useEffect(() => {
-        const getInsights = async() => {
+        const getInsights = async () => {
             setInProgress(true);
             try {
                 const res = await api.get('/devotees/insights');
@@ -219,9 +251,9 @@ export default function DevoteesDashboard() {
             <strong className="text-general">Devotees Dashboard</strong>
             {
                 inProgress ?
-                    <ProgressBar mode="indeterminate" style={{height: '2px'}} className="pt-1"></ProgressBar>
+                    <ProgressBar mode="indeterminate" style={{ height: '2px' }} className="pt-1"></ProgressBar>
                     :
-                    <hr/>
+                    <hr />
             }
             <small className="text-general">
                 A consolidated place for all devotees&apos; data.
@@ -252,9 +284,9 @@ export default function DevoteesDashboard() {
                             }
                         </span>
                     </div>
-                    <Image src="/devotees-icon.png" alt="dev" width="70" height="70"/>
+                    <Image src="/devotees-icon.png" alt="dev" width="70" height="70" />
                 </div>
-                <br/>
+                <br />
                 At your <strong>role level</strong>, <span className="text-hover font-bold">{devotee?.name}</span>, you
                 have the
                 privileges to:
@@ -272,7 +304,7 @@ export default function DevoteesDashboard() {
                         >
                             download sample sheet
                         </a>
-                        <br/>
+                        <br />
                         <div className="py-3">
                             <Button
                                 icon="pi pi-upload"
@@ -308,24 +340,24 @@ export default function DevoteesDashboard() {
                     <strong
                         className="text-hover">• Search</strong> a devotee registered within this portal. It may be
                     to <strong
-                    className="text-hover">help</strong> them or even <strong className="text-hover">refer</strong> them
+                        className="text-hover">help</strong> them or even <strong className="text-hover">refer</strong> them
                     to
                     this portal, if they are not already registered.
                 </div>
             </small>
             <form onSubmit={handleSearch} className="p-inputgroup text-sm px-5 my-1">
-                    <span className="p-float-label">
-                        <InputText id="search-input" required maxLength={50}
-                                   value={searchQuery}
-                                   onChange={(e) => {
-                                       setSearchQuery(e.target.value);
-                                       msgs.current?.clear();
-                                   }}
-                        />
-                        <label
-                            htmlFor="search-input">Type query and press enter or click 🔍
-                        </label>
-                    </span>
+                <span className="p-float-label">
+                    <InputText id="search-input" required maxLength={50}
+                        value={searchQuery}
+                        onChange={(e) => {
+                            setSearchQuery(e.target.value);
+                            msgs.current?.clear();
+                        }}
+                    />
+                    <label
+                        htmlFor="search-input">Type query and press enter or click 🔍
+                    </label>
+                </span>
                 <Button
                     icon="pi pi-search"
                     severity="secondary"
@@ -353,7 +385,7 @@ export default function DevoteesDashboard() {
             <small className="px-5">
                 <strong>Note:</strong>&nbsp;You can search a devotee by their name, phone number or email.
             </small>
-            <Messages ref={msgs}/>
+            <Messages ref={msgs} />
             {
                 searchQuery && searchResult &&
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-4">
@@ -364,7 +396,7 @@ export default function DevoteesDashboard() {
                                 <BlockUI
                                     key={devoteeDetails?.id}
                                     blocked={devoteeDetails?.status === STATUSES.deceased}
-                                    template={<i className="pi pi-lock" style={{fontSize: '3rem'}}></i>}>
+                                    template={<i className="pi pi-lock" style={{ fontSize: '3rem' }}></i>}>
                                     <Card
                                         title={<h3
                                             className={devoteeDetails?.status === 'active' ? 'text-general' : 'text-gray-400'}>{devoteeDetails?.name}</h3>}
@@ -378,7 +410,7 @@ export default function DevoteesDashboard() {
                                                 {
                                                     devoteeDetails?.system_role_id && devoteeDetails?.system_role_id > 1 &&
                                                     <Tag className="mr-1"
-                                                        severity={devoteeDetails?.system_role_id >= 4? 'danger':'info'}
+                                                        severity={devoteeDetails?.system_role_id >= 4 ? 'danger' : 'info'}
                                                         value={devoteeDetails?.system_role_id_ref_value?.name}></Tag>
                                                 }
                                                 {
@@ -405,6 +437,30 @@ export default function DevoteesDashboard() {
                                                 size="small"
                                                 severity="warning"
                                             />
+                                            {
+                                                (systemRole === SYSTEM_ROLES.admin || systemRole === SYSTEM_ROLES.leader) &&
+                                                (devoteeDetails?.system_role_id || 0) < 2 &&
+                                                <Button
+                                                    icon="pi pi-user-plus"
+                                                    label="Add as Volunteer"
+                                                    onClick={() => confirmRoleUpdate(devoteeDetails, 2, 'Volunteer')}
+                                                    size="small"
+                                                    severity="info"
+                                                    className="col-span-2"
+                                                />
+                                            }
+                                            {
+                                                (systemRole === SYSTEM_ROLES.admin) &&
+                                                (devoteeDetails?.system_role_id || 0) < 3 &&
+                                                <Button
+                                                    icon="pi pi-angle-double-up"
+                                                    label="Promote as Leader"
+                                                    onClick={() => confirmRoleUpdate(devoteeDetails, 3, 'Leader')}
+                                                    size="small"
+                                                    severity="help"
+                                                    className="col-span-2"
+                                                />
+                                            }
                                         </div>
                                     </Card>
                                 </BlockUI>
@@ -413,7 +469,8 @@ export default function DevoteesDashboard() {
                     }
                 </div>
             }
-            <Toast ref={toast} position="bottom-center"/>
+            <ConfirmDialog />
+            <Toast ref={toast} position="bottom-center" />
         </div>
     )
 }
