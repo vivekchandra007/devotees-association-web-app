@@ -1,4 +1,56 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Hare Krishna - Devotees Association Portal
+
+The devotees of Lord Viṣṇu are godly, and the Association of Devotees is one of the most important activities in Bhakti. This portal is a digital initiative designed to facilitate this association and manage the community effectively.
+
+## Project Overview
+
+This application serves as a comprehensive dashboard for managing the Devotees Association. It streamlines the tracking of devotees, their spiritual progress, donations, and various community campaigns.
+
+### Key Features
+
+-   **Devotee Management**:
+    -   Centralized database of devotees with detailed profiles.
+    -   Role-based access control (Member, Volunteer, Leader, Admin).
+    -   Bulk upload capability via Excel for administrative efficiency.
+    -   Search and filter functionality to easily find devotees.
+-   **Donation Tracking**:
+    -   Record and manage donations linked to specific campaigns.
+    -   Generate receipts and track financial contributions.
+-   **Campaign Management**:
+    -   Organize and track specific events or causes (e.g., Janmashtami, New Temple construction).
+-   **Insights & Analytics**:
+    -   Dashboard widgets providing real-time counts of active devotees, volunteers, and leaders.
+-   **Communication**:
+    -   Integration for Telegram feed messages (planned/implemented).
+
+## Technology Stack
+
+This project is built using a modern, robust tech stack ensuring performance, scalability, and type safety.
+
+-   **Framework**: [Next.js 15](https://nextjs.org/) (App Router)
+-   **Language**: [TypeScript](https://www.typescriptlang.org/)
+-   **Database**: PostgreSQL
+-   **ORM**: [Prisma](https://www.prisma.io/) (with Accelerate for caching)
+-   **UI Library**: [PrimeReact](https://primereact.org/) & [Tailwind CSS](https://tailwindcss.com/)
+-   **Authentication**: Custom JWT-based authentication
+-   **Utilities**:
+    -   `axios` for API requests
+    -   `zod` for schema validation
+    -   `xlsx` for Excel processing
+    -   `jspdf` for PDF generation
+
+## Architecture
+
+The application follows a structured architecture using the Next.js App Router:
+
+-   **`src/app`**: Contains the application routes and API endpoints.
+    -   **`/api`**: Backend logic handling data operations and authentication.
+    -   **Pages**: Frontend views for Dashboard, Login, User Profile, etc.
+-   **`src/components`**: Reusable UI components ensuring a consistent design system.
+-   **`src/lib`**: Core utilities including database clients and authentication helpers.
+-   **`src/schema`**: Zod definitions for robust data validation across the app.
+
+---
 
 ## Getting Started
 
@@ -13,24 +65,3 @@ pnpm dev
 # or
 bun dev
 ```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
