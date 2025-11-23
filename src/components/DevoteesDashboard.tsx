@@ -219,7 +219,7 @@ export default function DevoteesDashboard() {
 
     const confirmRoleUpdate = (devoteeDetails: any, newRoleId: number, newRoleName: string) => {
         confirmDialog({
-            message: `Are you sure you want to promote ${devoteeDetails.name} as a ${newRoleName}?`,
+            message: `Are you sure you want to change ${devoteeDetails.name}'s role to a ${newRoleName}?`,
             header: 'Confirmation',
             icon: 'pi pi-exclamation-triangle',
             accept: () => updateDevoteeRole(devoteeDetails.id, devoteeDetails.name, newRoleId, newRoleName)
@@ -410,7 +410,7 @@ export default function DevoteesDashboard() {
                                             </div>
                                             <div className="flex flex-col items-end gap-1">
                                                 {devoteeDetails?.system_role_id && devoteeDetails?.system_role_id > 1 && (
-                                                    <Tag className="mr-1" severity={devoteeDetails?.system_role_id >= 4 ? 'danger' : 'info'} value={devoteeDetails?.system_role_id_ref_value?.name}></Tag>
+                                                    <Tag className="mr-1" severity={devoteeDetails?.system_role_id >= 4 ? 'danger' : devoteeDetails?.system_role_id >= 3 ? 'secondary' : 'info'} value={devoteeDetails?.system_role_id_ref_value?.name}></Tag>
                                                 )}
                                             </div>
                                         </div>
@@ -470,6 +470,27 @@ export default function DevoteesDashboard() {
                                                     onClick={() => confirmRoleUpdate(devoteeDetails, 3, 'Leader')}
                                                     size="small"
                                                     severity="help"
+                                                    className="w-full mt-1"
+                                                />
+                                            )}
+                                            {/* Demotion Actions */}
+                                            {(systemRole === SYSTEM_ROLES.admin || systemRole === SYSTEM_ROLES.leader) && (devoteeDetails?.system_role_id === 2) && (
+                                                <Button
+                                                    icon="pi pi-user-minus"
+                                                    label="Remove from Volunteer"
+                                                    onClick={() => confirmRoleUpdate(devoteeDetails, 1, 'Member')}
+                                                    size="small"
+                                                    severity="danger"
+                                                    className="w-full mt-1"
+                                                />
+                                            )}
+                                            {systemRole === SYSTEM_ROLES.admin && (devoteeDetails?.system_role_id === 3) && (
+                                                <Button
+                                                    icon="pi pi-angle-double-down"
+                                                    label="Demote from Leader"
+                                                    onClick={() => confirmRoleUpdate(devoteeDetails, 2, 'Volunteer')}
+                                                    size="small"
+                                                    severity="danger"
                                                     className="w-full mt-1"
                                                 />
                                             )}
