@@ -1,35 +1,37 @@
-# Walkthrough - Role Management Actions
+# Walkthrough - Devotee Card Redesign & Role Management
 
-I have implemented the "Promote as Leader" and "Add as Volunteer" actions in the Devotees Dashboard, enabling authorized users to manage devotee roles directly from the search results.
+I have redesigned the searched devotee card for a cleaner, more modern look and implemented role management actions.
 
 ## Changes
 
-### 1. UI Implementation
--   **Modified** `src/components/DevoteesDashboard.tsx`:
-    -   Added `updateDevoteeRole` function to handle API calls for role updates.
-    -   Added `confirmRoleUpdate` function to trigger a confirmation dialog before action.
-    -   **"Add as Volunteer" Button**:
-        -   Visible to **Admins** and **Leaders**.
-        -   Target: Devotees with role ID < 2 (Members).
-        -   Action: Updates role to **Volunteer** (ID: 2).
-    -   **"Promote as Leader" Button**:
-        -   Visible to **Admins** only.
-        -   Target: Devotees with role ID < 3 (Members or Volunteers).
-        -   Action: Updates role to **Leader** (ID: 3).
+### 1. UI Redesign
+-   **Card Layout**: Switched to a cleaner card design with no border and a soft shadow.
+-   **Header**:
+    -   Devotee name is now prominent and bold.
+    -   Status and Role tags are neatly aligned to the right.
+-   **Details Section**:
+    -   Replaced text labels with icons for Phone (`pi-phone`) and Email (`pi-envelope`).
+    -   Added colorful circular backgrounds for icons to enhance visual appeal.
+-   **Actions Footer**:
+    -   Organized buttons into a responsive flex layout.
+    -   Primary actions (Profile, Donations) share the top row.
+    -   Admin actions (Promote, Add Volunteer) take the full width below for clear separation.
 
-### 2. Logic & Safety
--   **Confirmation Dialog**: Added `ConfirmDialog` to prevent accidental role changes.
--   **Optimistic Updates**: The UI immediately reflects the new role upon successful API response, providing instant feedback.
--   **Error Handling**: Displays error messages if the API call fails or permission is denied.
+### 2. Role Management Features
+-   **"Add as Volunteer" Button**:
+    -   Visible to **Admins** and **Leaders**.
+    -   Updates role to **Volunteer** (ID: 2).
+-   **"Promote as Leader" Button**:
+    -   Visible to **Admins** only.
+    -   Updates role to **Leader** (ID: 3).
+-   **Safety**: Added confirmation dialogs for all role changes.
 
 ## Verification Results
 
 ### Manual Verification Steps
-1.  **Login as Admin**:
-    -   Search for a Member -> Verify both buttons appear.
-    -   Search for a Volunteer -> Verify only "Promote as Leader" appears.
-    -   Search for a Leader -> Verify no buttons appear.
-    -   Test both actions -> Confirm success message and role update.
-2.  **Login as Leader**:
-    -   Search for a Member -> Verify only "Add as Volunteer" appears.
-    -   Test action -> Confirm success.
+1.  **Search for Devotee**:
+    -   Verify the new card layout matches the design intent (cleaner, icons).
+    -   Check responsiveness on mobile view.
+2.  **Role Actions**:
+    -   Verify buttons appear correctly based on logged-in user role.
+    -   Test role updates and confirm the UI reflects changes immediately.
