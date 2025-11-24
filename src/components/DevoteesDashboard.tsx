@@ -19,6 +19,7 @@ import * as XLSX from "xlsx";
 import { MessageSeverity } from "primereact/api";
 import _ from "lodash";
 import getCountryCallingCode from "@/data/countryCallingCodes";
+import { Devotee } from "@/lib/conversions";
 import Image from "next/image";
 import { Tag } from "primereact/tag";
 
@@ -204,25 +205,26 @@ export default function DevoteesDashboard() {
                 msgs.current?.show({ severity: 'success', summary: 'Role Updated', detail: `${currentName} is now a ${newRoleName}`, sticky: false, closable: true });
                 // Update local state
                 if (searchResult && Array.isArray(searchResult)) {
-                    const updated = searchResult.map((d: any) => d.id === devoteeId ? { ...d, system_role_id: newRoleId, system_role_id_ref_value: { name: newRoleName.toLowerCase() } } : d);
+                    const updated = searchResult.map((d: Devotee) => d.id === devoteeId ? { ...d, system_role_id: newRoleId, system_role_id_ref_value: { name: newRoleName.toLowerCase() } } : d);
                     setSearchResult(updated);
                 }
             } else {
                 throw new Error(res.data.error || 'Failed');
             }
-        } catch (e: any) {
-            msgs.current?.show({ severity: 'error', summary: 'Error', detail: e.message || 'Failed to update role', sticky: true, closable: true });
+        } catch (e: unknown) {
+            const errorMessage = e instanceof Error ? e.message : 'Failed to update role';
+            msgs.current?.show({ severity: 'error', summary: 'Error', detail: errorMessage, sticky: true, closable: true });
         } finally {
             setInProgress(false);
         }
     }
 
-    const confirmRoleUpdate = (devoteeDetails: any, newRoleId: number, newRoleName: string) => {
+    const confirmRoleUpdate = (devoteeDetails: Devotee, newRoleId: number, newRoleName: string) => {
         confirmDialog({
             message: `Are you sure you want to change ${devoteeDetails.name}'s role to a ${newRoleName}?`,
             header: 'Confirmation',
             icon: 'pi pi-exclamation-triangle',
-            accept: () => updateDevoteeRole(devoteeDetails.id, devoteeDetails.name, newRoleId, newRoleName)
+            accept: () => updateDevoteeRole(devoteeDetails.id, devoteeDetails.name || '', newRoleId, newRoleName)
         });
     };
 
@@ -457,7 +459,7 @@ export default function DevoteesDashboard() {
                                                 <Button
                                                     icon="pi pi-user-plus"
                                                     label="Add as Volunteer"
-                                                    onClick={() => confirmRoleUpdate(devoteeDetails, 2, 'Volunteer')}
+                                                    onClick={() => devoteeDetails && confirmRoleUpdate(devoteeDetails, 2, 'Volunteer')}
                                                     size="small"
                                                     severity="info"
                                                     className="w-full mt-1"
@@ -467,7 +469,7 @@ export default function DevoteesDashboard() {
                                                 <Button
                                                     icon="pi pi-angle-double-up"
                                                     label="Promote as Leader"
-                                                    onClick={() => confirmRoleUpdate(devoteeDetails, 3, 'Leader')}
+                                                    onClick={() => devoteeDetails && confirmRoleUpdate(devoteeDetails, 3, 'Leader')}
                                                     size="small"
                                                     severity="help"
                                                     className="w-full mt-1"
@@ -478,7 +480,7 @@ export default function DevoteesDashboard() {
                                                 <Button
                                                     icon="pi pi-user-minus"
                                                     label="Remove from Volunteer"
-                                                    onClick={() => confirmRoleUpdate(devoteeDetails, 1, 'Member')}
+                                                    onClick={() => devoteeDetails && confirmRoleUpdate(devoteeDetails, 1, 'Member')}
                                                     size="small"
                                                     severity="danger"
                                                     className="w-full mt-1"
@@ -488,7 +490,7 @@ export default function DevoteesDashboard() {
                                                 <Button
                                                     icon="pi pi-angle-double-down"
                                                     label="Demote from Leader"
-                                                    onClick={() => confirmRoleUpdate(devoteeDetails, 2, 'Volunteer')}
+                                                    onClick={() => devoteeDetails && confirmRoleUpdate(devoteeDetails, 2, 'Volunteer')}
                                                     size="small"
                                                     severity="danger"
                                                     className="w-full mt-1"
