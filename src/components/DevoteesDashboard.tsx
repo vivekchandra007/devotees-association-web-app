@@ -399,11 +399,11 @@ export default function DevoteesDashboard() {
                                     key={devoteeDetails?.id}
                                     blocked={devoteeDetails?.status === STATUSES.deceased}
                                     template={<i className="pi pi-lock" style={{ fontSize: '3rem' }}></i>}>
-                                    <Card className="shadow-md rounded-xl overflow-hidden border-none">
+                                    <div className={`md:ml-4 ${devoteeDetails?.status === 'active' && 'bg-yellow-50'} text-yellow-900 border-t-4 border-yellow-500 p-4 rounded-lg shadow justify-between items-center`}>
                                         {/* Header */}
                                         <div className="flex justify-between items-start mb-4">
                                             <div className="flex items-center gap-2">
-                                                <h3 className={`text-xl font-bold ${devoteeDetails?.status === 'active' ? 'text-gray-800' : 'text-gray-400'}`}>
+                                                <h3 className="text-xl font-bold">
                                                     {devoteeDetails?.name}
                                                 </h3>
                                                 {devoteeDetails?.status === 'active' && (
@@ -436,7 +436,7 @@ export default function DevoteesDashboard() {
                                         </div>
 
                                         {/* Footer / Actions */}
-                                        <div className="flex flex-wrap gap-2 pt-4 border-t border-gray-100">
+                                        <div className="flex flex-wrap gap-2">
                                             <Button
                                                 outlined={devoteeDetails?.status === 'inactive'}
                                                 icon="pi pi-user"
@@ -471,7 +471,7 @@ export default function DevoteesDashboard() {
                                                     label="Promote as Leader"
                                                     onClick={() => devoteeDetails && confirmRoleUpdate(devoteeDetails, 3, 'Leader')}
                                                     size="small"
-                                                    severity="help"
+                                                    severity="success"
                                                     className="w-full mt-1"
                                                 />
                                             )}
@@ -497,7 +497,7 @@ export default function DevoteesDashboard() {
                                                 />
                                             )}
                                         </div>
-                                    </Card>
+                                    </div>
                                 </BlockUI>
                             ))
                         )
