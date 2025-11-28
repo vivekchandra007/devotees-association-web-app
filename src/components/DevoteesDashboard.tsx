@@ -2,7 +2,6 @@
 
 import { useAuth } from "@/hooks/useAuth";
 import api from "@/lib/axios";      // our Custom Axios Wrapper which automatically adds access token in header
-import { useRouter } from 'next/navigation';
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
