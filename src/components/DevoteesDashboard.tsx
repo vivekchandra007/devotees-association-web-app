@@ -417,7 +417,7 @@ export default function DevoteesDashboard() {
                                         </div>
 
                                         {/* Body */}
-                                        <div className="flex flex-col gap-3 mb-4 text-gray-600">
+                                        <div className="flex flex-wrap gap-3 mb-4 text-gray-600 justify-between">
                                             <div className="flex items-center gap-3">
                                                 <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center">
                                                     <i className="pi pi-phone text-blue-500 text-sm"></i>
