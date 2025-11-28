@@ -3,14 +3,13 @@
 import { useAuth } from "@/hooks/useAuth";
 import api from "@/lib/axios";      // our Custom Axios Wrapper which automatically adds access token in header
 import { useRouter } from 'next/navigation';
-import { BlockUI } from "primereact/blockui";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Toast } from "primereact/toast";
 import { Messages } from "primereact/messages";
 import { ProgressBar } from "primereact/progressbar";
 import React, { useEffect, useRef, useState } from "react";
-import { STATUSES, SYSTEM_ROLES } from "@/data/constants";
+import { SYSTEM_ROLES } from "@/data/constants";
 import { Dialog } from "primereact/dialog";
 import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
 import { FileUpload, FileUploadFilesEvent } from "primereact/fileupload";
@@ -20,7 +19,6 @@ import _ from "lodash";
 import getCountryCallingCode from "@/data/countryCallingCodes";
 import { Devotee } from "@/lib/conversions";
 import Image from "next/image";
-import { Tag } from "primereact/tag";
 import { DevoteeCard } from "./DevoteeCard";
 
 export default function DevoteesDashboard() {
@@ -33,7 +31,6 @@ export default function DevoteesDashboard() {
     const [inProgress, setInProgress] = useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [searchResult, setSearchResult] = useState<object | null>(null);
-    const router = useRouter();
 
     const toast = useRef<Toast>(null);
     const msgs = useRef<Messages>(null);
