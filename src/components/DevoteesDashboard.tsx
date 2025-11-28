@@ -21,6 +21,7 @@ import getCountryCallingCode from "@/data/countryCallingCodes";
 import { Devotee } from "@/lib/conversions";
 import Image from "next/image";
 import { Tag } from "primereact/tag";
+import { DevoteeCard } from "./DevoteeCard";
 
 export default function DevoteesDashboard() {
     const { devotee, systemRole } = useAuth();
@@ -393,111 +394,13 @@ export default function DevoteesDashboard() {
                     {
                         Array.isArray(searchResult) && searchResult.length > 0 &&
                         (
-                            searchResult.map((devoteeDetails: typeof devotee) => (
-                                <BlockUI
+                            searchResult.map((devoteeDetails: Devotee) => (
+                                <DevoteeCard
                                     key={devoteeDetails?.id}
-                                    blocked={devoteeDetails?.status === STATUSES.deceased}
-                                    template={<i className="pi pi-lock" style={{ fontSize: '3rem' }}></i>}>
-                                    <div className={`md:ml-4 ${devoteeDetails?.status === 'active' && 'bg-yellow-50'} text-yellow-900 border-t-4 border-yellow-500 p-4 rounded-lg shadow justify-between items-center`}>
-                                        {/* Header */}
-                                        <div className="flex justify-between items-start mb-4">
-                                            <div className="flex items-center gap-2">
-                                                <h3 className="text-xl font-bold">
-                                                    {devoteeDetails?.name}
-                                                </h3>
-                                                {devoteeDetails?.status === 'active' && (
-                                                    <i className="pi pi-check-circle text-green-500 text-xl" title="Verified and Active Member"></i>
-                                                )}
-                                            </div>
-                                            <div className="flex flex-col items-end gap-1">
-                                                {devoteeDetails?.system_role_id && devoteeDetails?.system_role_id > 1 && (
-                                                    <Tag className="mr-1" severity={devoteeDetails?.system_role_id >= 4 ? 'danger' : devoteeDetails?.system_role_id >= 3 ? 'secondary' : 'info'} value={devoteeDetails?.system_role_id_ref_value?.name}></Tag>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        {/* Body */}
-                                        <div className="flex flex-wrap gap-3 mb-4 text-gray-600 justify-between">
-                                            <div className="flex items-center gap-3">
-                                                <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center">
-                                                    <i className="pi pi-phone text-blue-500 text-sm"></i>
-                                                </div>
-                                                <span className="font-medium">{devoteeDetails?.phone?.slice(2)}</span>
-                                            </div>
-                                            {devoteeDetails?.email && (
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 rounded-full bg-purple-50 flex items-center justify-center">
-                                                        <i className="pi pi-envelope text-purple-500 text-sm"></i>
-                                                    </div>
-                                                    <span className="truncate max-w-[400px] text-sm" title={devoteeDetails.email}>{devoteeDetails.email}</span>
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        {/* Footer / Actions */}
-                                        <div className="flex flex-wrap gap-2">
-                                            <Button
-                                                outlined={devoteeDetails?.status === 'inactive'}
-                                                icon="pi pi-user"
-                                                label="Profile"
-                                                onClick={() => router.push(`/devotee?devoteeId=${devoteeDetails?.id}`)}
-                                                size="small"
-                                                className="flex-1"
-                                            />
-                                            <Button
-                                                outlined={devoteeDetails?.status === 'inactive'}
-                                                icon="pi pi-indian-rupee"
-                                                label="Donations"
-                                                onClick={() => router.push(`/user-data?tab=1&phone=${devoteeDetails?.phone}`)}
-                                                size="small"
-                                                severity="warning"
-                                                className="flex-1"
-                                            />
-                                            {/* Admin Actions - Full Width */}
-                                            {(systemRole === SYSTEM_ROLES.admin || systemRole === SYSTEM_ROLES.leader) && (devoteeDetails?.system_role_id || 0) < 2 && (
-                                                <Button
-                                                    icon="pi pi-user-plus"
-                                                    label="Add as Volunteer"
-                                                    onClick={() => devoteeDetails && confirmRoleUpdate(devoteeDetails, 2, 'Volunteer')}
-                                                    size="small"
-                                                    severity="info"
-                                                    className="w-full mt-1"
-                                                />
-                                            )}
-                                            {systemRole === SYSTEM_ROLES.admin && (devoteeDetails?.system_role_id || 0) < 3 && (
-                                                <Button
-                                                    icon="pi pi-angle-double-up"
-                                                    label="Promote as Leader"
-                                                    onClick={() => devoteeDetails && confirmRoleUpdate(devoteeDetails, 3, 'Leader')}
-                                                    size="small"
-                                                    severity="success"
-                                                    className="w-full mt-1"
-                                                />
-                                            )}
-                                            {/* Demotion Actions */}
-                                            {(systemRole === SYSTEM_ROLES.admin || systemRole === SYSTEM_ROLES.leader) && (devoteeDetails?.system_role_id === 2) && (
-                                                <Button
-                                                    icon="pi pi-user-minus"
-                                                    label="Remove from Volunteer"
-                                                    onClick={() => devoteeDetails && confirmRoleUpdate(devoteeDetails, 1, 'Member')}
-                                                    size="small"
-                                                    severity="danger"
-                                                    className="w-full mt-1"
-                                                />
-                                            )}
-                                            {systemRole === SYSTEM_ROLES.admin && (devoteeDetails?.system_role_id === 3) && (
-                                                <Button
-                                                    icon="pi pi-angle-double-down"
-                                                    label="Demote from Leader"
-                                                    onClick={() => devoteeDetails && confirmRoleUpdate(devoteeDetails, 2, 'Volunteer')}
-                                                    size="small"
-                                                    severity="danger"
-                                                    className="w-full mt-1"
-                                                />
-                                            )}
-                                        </div>
-                                    </div>
-                                </BlockUI>
+                                    devotee={devoteeDetails}
+                                    systemRole={systemRole || undefined}
+                                    onRoleUpdate={confirmRoleUpdate}
+                                />
                             ))
                         )
                     }
