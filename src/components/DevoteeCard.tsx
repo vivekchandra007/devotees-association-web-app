@@ -85,19 +85,19 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({ devotee, systemRole, o
                         />
                         <div>
                             <div className="flex items-center gap-2">
-                                <h3 className="text-lg font-bold text-gray-800 line-clamp-1" title={devotee.name || ''}>
-                                    {devotee.name}
+                                <h3 className="capitalize text-lg font-bold text-gray-800 line-clamp-1" title={devotee.name || ''}>
+                                    {devotee.name?.toLocaleLowerCase()}
                                 </h3>
                                 {devotee.status === 'active' && (
                                     <i className="pi pi-check-circle text-green-500 text-sm" title="Verified and Active Member"></i>
                                 )}
                             </div>
-                            <div className="flex gap-2 mt-1">
+                            <div className="[zoom:0.9]">
                                 {devotee.system_role_id && devotee.system_role_id > 1 && (
                                     <Tag
-                                        severity={devotee.system_role_id >= 4 ? 'danger' : devotee.system_role_id >= 3 ? 'warning' : 'info'}
+                                        icon={`pi pi-user`}
+                                        severity={devotee.system_role_id >= 4 ? 'danger' : devotee.system_role_id >= 3 ? 'info' : 'contrast'}
                                         value={devotee.system_role_id_ref_value?.name}
-                                        className="text-xs px-2 py-0.5"
                                     />
                                 )}
                             </div>
@@ -122,7 +122,7 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({ devotee, systemRole, o
                 </div>
 
                 {/* Contact Info */}
-                <div className="space-y-3 mb-5">
+                <div className="flex flex-wrap gap-3 justify-between mb-5">
                     <div className="flex items-center gap-3 text-gray-600 group cursor-pointer" onClick={() => window.open(`tel:${devotee.phone}`)}>
                         <div className="w-8 h-8 rounded-full bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors">
                             <i className="pi pi-phone text-blue-500 text-sm"></i>
@@ -152,7 +152,7 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({ devotee, systemRole, o
                     />
                     <Button
                         outlined
-                        icon="pi pi-heart"
+                        icon="pi pi-indian-rupee"
                         label="Donations"
                         onClick={() => router.push(`/user-data?tab=1&phone=${devotee.phone}`)}
                         size="small"
