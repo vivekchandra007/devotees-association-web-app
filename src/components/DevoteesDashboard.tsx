@@ -215,6 +215,39 @@ export default function DevoteesDashboard() {
         }
     }
 
+    const updateDevoteeLeader = async (devoteeId: number, currentName: string, newLeaderId: number | null) => {
+        setInProgress(true);
+        try {
+            const res = await api.post('/devotee', { id: devoteeId, leader_id: newLeaderId });
+            if (res.status === 200 && res.data.success) {
+                const action = newLeaderId ? 'Assigned under you' : 'Removed from your leadership';
+                msgs.current?.show({ severity: 'success', summary: 'Leader Updated', detail: `${currentName} has been ${action}`, sticky: false, closable: true });
+
+                // Update local state
+                if (searchResult && Array.isArray(searchResult)) {
+                    const updated = searchResult.map((d: Devotee) => {
+                        if (d.id === devoteeId) {
+                            return {
+                                ...d,
+                                leader_id: newLeaderId,
+                                leader_id_ref_value: newLeaderId ? { id: devotee?.id, name: devotee?.name } : null
+                            };
+                        }
+                        return d;
+                    });
+                    setSearchResult(updated);
+                }
+            } else {
+                throw new Error(res.data.error || 'Failed');
+            }
+        } catch (e: unknown) {
+            const errorMessage = e instanceof Error ? e.message : 'Failed to update leader';
+            msgs.current?.show({ severity: 'error', summary: 'Error', detail: errorMessage, sticky: true, closable: true });
+        } finally {
+            setInProgress(false);
+        }
+    }
+
     const confirmRoleUpdate = (devoteeDetails: Devotee, newRoleId: number, newRoleName: string) => {
         confirmDialog({
             message: `Are you sure you want to change ${devoteeDetails.name}'s role to a ${newRoleName}?`,
@@ -396,6 +429,8 @@ export default function DevoteesDashboard() {
                                     devotee={devoteeDetails}
                                     systemRole={systemRole || undefined}
                                     onRoleUpdate={confirmRoleUpdate}
+                                    currentDevoteeId={devotee?.id}
+                                    onLeaderUpdate={updateDevoteeLeader}
                                 />
                             ))
                         )

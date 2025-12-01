@@ -24,3 +24,8 @@ export const SPECIFIC_PRISMA_ACCELERATE_CACHE_STRATEGY_SHORTER = {
     ttl: 60, // cache for 60 seconds
     swr: 60  // stale-while-revalidate for 60 seconds
 }
+
+export const NO_PRISMA_ACCELERATE_CACHE_STRATEGY = {
+    ttl: 0, // cache for 0 seconds
+    swr: 0  // stale-while-revalidate for 0 seconds
+}
