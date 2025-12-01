@@ -19,6 +19,7 @@ import getCountryCallingCode from "@/data/countryCallingCodes";
 import { Devotee } from "@/lib/conversions";
 import Image from "next/image";
 import { DevoteeCard } from "./DevoteeCard";
+import OrganizationView from "./OrganizationView";
 
 export default function DevoteesDashboard() {
     const { devotee, systemRole } = useAuth();
@@ -386,7 +387,7 @@ export default function DevoteesDashboard() {
                         }}
                     />
                     <label
-                        htmlFor="search-input">Type query and press enter or click 🔍
+                        htmlFor="search-input">Search any devotee... 🔍
                     </label>
                 </span>
                 <Button
@@ -437,6 +438,7 @@ export default function DevoteesDashboard() {
                     }
                 </div>
             }
+            <OrganizationView />
             <ConfirmDialog />
             <Toast ref={toast} position="bottom-center" />
         </div>
