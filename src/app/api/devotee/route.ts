@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
       }
     }
     // cast out "id" from data so that no one can update the id through this query
-    const {id, ...dataWithoutId} = parsed.data;
+    const { id, ...dataWithoutId } = parsed.data;
     if (dataWithoutId && id) {
       const updatedDevotee = await prisma.devotees.update({
         where: { id },
@@ -93,6 +93,12 @@ export async function GET(req: NextRequest) {
           }
         },
         counsellor_id_ref_value: {
+          select: {
+            id: true,
+            name: true
+          }
+        },
+        leader_id_ref_value: {
           select: {
             id: true,
             name: true

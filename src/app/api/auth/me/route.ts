@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     const token = auth.split(' ')[1];
     const devoteeId = verifyAccessToken(token);
 
-    const devotee = await prisma.devotees.findUnique({ 
+    const devotee = await prisma.devotees.findUnique({
       where: { id: devoteeId },
       include: {
         system_role_id_ref_value: {
@@ -36,6 +36,12 @@ export async function GET(req: NextRequest) {
           }
         },
         counsellor_id_ref_value: {
+          select: {
+            id: true,
+            name: true
+          }
+        },
+        leader_id_ref_value: {
           select: {
             id: true,
             name: true

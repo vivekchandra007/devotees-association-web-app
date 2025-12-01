@@ -30,6 +30,12 @@ export type Devotee = Prisma.devoteesGetPayload<{
         name: true
       }
     },
+    leader_id_ref_value: {
+      select: {
+        id: true,
+        name: true
+      }
+    },
     referred_by_id_ref_value: {
       select: {
         id: true,

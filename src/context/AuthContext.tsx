@@ -44,6 +44,12 @@ type Devotee = Prisma.devoteesGetPayload<{
         name: true
       }
     },
+    leader_id_ref_value: {
+      select: {
+        id: true,
+        name: true
+      }
+    },
     referred_by_id_ref_value: {
       select: {
         id: true,
@@ -83,7 +89,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     await fetchMe();
     const params = new URLSearchParams(searchParams.toString())
     if (params.has('guest')) {
-        params.delete('guest');
+      params.delete('guest');
     }
     const newQueryParams = params.toString();
     router.push(`/?${newQueryParams || ''}`); // Redirect to home page, using existing query params, except "guest" so that user goes back to where he/ she was
@@ -94,20 +100,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     await axios.post('/api/auth/logout'); // NOTE: use raw axios, not the wrapped one
     setDevotee(null);
     const guestMode = !!searchParams.get('guest');
-    if(!guestMode) {
+    if (!guestMode) {
       router.push(`/login`);
     }
   };
 
   useEffect(() => {
-    if(!authInProgress) {
+    if (!authInProgress) {
       const token = localStorage.getItem('access_token');
-      if (token) { 
+      if (token) {
         if (!devotee) {
           fetchMe();
         }
       } else {
-          logout();
+        logout();
       }
     }
   });

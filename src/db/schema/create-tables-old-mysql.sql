@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS devotees (
   source VARCHAR(100) NOT NULL,
   referred_by INT UNSIGNED NULL,
   counsellor_id INT UNSIGNED NULL,
+  leader_id INT UNSIGNED NULL,
   gender ENUM('male', 'female', 'other') NULL,
   dob DATE NULL,
   occupation VARCHAR(21) NULL,
@@ -85,6 +86,12 @@ CREATE TABLE IF NOT EXISTS devotees (
 ALTER TABLE devotees
 ADD CONSTRAINT fk_counsellor
   FOREIGN KEY (counsellor_id) REFERENCES devotees(id)
+  ON DELETE SET NULL
+  ON UPDATE CASCADE;
+
+ALTER TABLE devotees
+ADD CONSTRAINT fk_leader
+  FOREIGN KEY (leader_id) REFERENCES devotees(id)
   ON DELETE SET NULL
   ON UPDATE CASCADE;
 

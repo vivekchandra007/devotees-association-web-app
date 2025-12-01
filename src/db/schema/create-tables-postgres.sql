@@ -104,8 +104,9 @@ CREATE TABLE IF NOT EXISTS devotees (
   system_role_id SMALLINT NOT NULL DEFAULT 1,         --FK from "systems_roles" tables. Default in "member"
   spiritual_level_id SMALLINT NOT NULL DEFAULT 1,     --FK from "spiritual_levels" tables. Default is "dev/ devi"
   source_id INTEGER NOT NULL DEFAULT 1,               --FK from "campaigns" tables. Default is "Self Registration"
-  referred_by_id INTEGER DEFAULT NULL,                --Self Referential FK
-  counsellor_id INTEGER DEFAULT NULL,                 --Self Referential FK
+  referred_by_id INTEGER DEFAULT NULL,                --Self Referential FK for referred_by
+  counsellor_id INTEGER DEFAULT NULL,                 --Self Referential FK for counsellor
+  leader_id INTEGER DEFAULT NULL,                     --Self Referential FK for leader
   gender devotees_gender_enum,
   dob DATE,
   occupation VARCHAR(21),
@@ -155,6 +156,13 @@ CREATE TABLE IF NOT EXISTS devotees (
 ALTER TABLE devotees
 ADD CONSTRAINT fk_counsellor
   FOREIGN KEY (counsellor_id) REFERENCES devotees(id)
+  ON DELETE SET NULL
+  ON UPDATE CASCADE;
+
+-- Self Referential Foreign Key for leader_id
+ALTER TABLE devotees
+ADD CONSTRAINT fk_leader
+  FOREIGN KEY (leader_id) REFERENCES devotees(id)
   ON DELETE SET NULL
   ON UPDATE CASCADE;
 

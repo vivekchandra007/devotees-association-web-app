@@ -33,7 +33,7 @@ export default function DevoteePage() {
     const router = useRouter();
     const toast = useRef<Toast>(null);
     const { devotee, isAuthenticated, systemRole } = useAuth();
-    const otherDevoteeId = Number.parseInt(searchParams.get('devoteeId')!) !== devotee?.id? Number.parseInt(searchParams.get('devoteeId')!) : null;
+    const otherDevoteeId = Number.parseInt(searchParams.get('devoteeId')!) !== devotee?.id ? Number.parseInt(searchParams.get('devoteeId')!) : null;
 
     const [readOnly, setReadOnly] = useState<boolean>();
     const [inProgress, setInProgress] = useState<boolean>(false);
@@ -70,7 +70,7 @@ export default function DevoteePage() {
                 }
                 editedValues = convertDateObjectIntoDateString(editedValues!);
 
-                await api.post(otherDevoteeId? `/devotee?devoteeId=${otherDevoteeId}`:'/devotee', editedValues); // automatically sends token
+                await api.post(otherDevoteeId ? `/devotee?devoteeId=${otherDevoteeId}` : '/devotee', editedValues); // automatically sends token
                 toast.current?.show({
                     severity: MessageSeverity.SUCCESS,
                     summary: `Profile`,
@@ -199,7 +199,7 @@ export default function DevoteePage() {
             {!isAuthenticated && devotee && <FullPageSpinner message="Hare Krishna! Fetching details..." />}
 
             {
-                inProgress && <ProgressBar mode="indeterminate" style={{height: '2px'}} className="pt-1"></ProgressBar>
+                inProgress && <ProgressBar mode="indeterminate" style={{ height: '2px' }} className="pt-1"></ProgressBar>
             }
 
             {formik.isSubmitting && <FullPageSpinner message="Saving Changes" />}
@@ -914,6 +914,9 @@ export default function DevoteePage() {
                         <div className="grid md:grid-cols-2 gap-4">
                             <div>
                                 Counsellor: {formik.values?.counsellor_id_ref_value?.name}
+                            </div>
+                            <div>
+                                Leader: {formik.values?.leader_id_ref_value?.name}
                             </div>
                             <div className="capitalize">
                                 Referred By: {formik.values?.referred_by_id_ref_value?.name}

@@ -9,10 +9,10 @@ import { MessageSeverity } from "primereact/api";
 import api from '@/lib/axios' // your axios wrapper
 import { QRCodeCanvas } from 'qrcode.react'
 import { DataTable } from 'primereact/datatable'
-import {Column} from "primereact/column";
-import {formatDateIntoStringddmmyyyy} from "@/lib/conversions";
-import {Prisma} from "@prisma/client";
-import {Card} from "primereact/card";
+import { Column } from "primereact/column";
+import { formatDateIntoStringddmmyyyy } from "@/lib/conversions";
+import { Prisma } from "@prisma/client";
+import { Card } from "primereact/card";
 
 type Devotee = Prisma.devoteesGetPayload<{
     include: {
@@ -35,6 +35,12 @@ type Devotee = Prisma.devoteesGetPayload<{
             }
         },
         counsellor_id_ref_value: {
+            select: {
+                id: true,
+                name: true
+            }
+        },
+        leader_id_ref_value: {
             select: {
                 id: true,
                 name: true
@@ -152,17 +158,17 @@ Join me on HareKrishna.app using my personal link: ${referralLink}
             <h2 className="text-sm lg:text-base font-semibold">1. Shareable personal QR Code and Referral Link</h2>
             <Card className="shadow-2xl text-center component-transparent m-auto">
                 <div className="flex justify-center mb-6">
-                    <QRCodeCanvas value={referralLink} size={110}/>
+                    <QRCodeCanvas value={referralLink} size={110} />
                 </div>
                 <div className="grid grid-cols-12 items-center justify-center gap-2 md:w-[70%] lg:w-[60%] m-auto">
-                    <InputText value={referralLink} readOnly className="col-span-7"/>
-                    <Button icon="pi pi-copy" onClick={copyToClipboard} tooltip="Copy" label="Copy" size="small" className="col-span-5"/>
+                    <InputText value={referralLink} readOnly className="col-span-7" />
+                    <Button icon="pi pi-copy" onClick={copyToClipboard} tooltip="Copy" label="Copy" size="small" className="col-span-5" />
                 </div>
 
                 <br />
                 <div className="text-sm lg:text-base text-general">Share the above QR or Link with others.
-                    <br/>Whoever registers through it will be lovingly connected to you forever, in their path to devotion.
-                    <br/>So, let&apos;s spread the
+                    <br />Whoever registers through it will be lovingly connected to you forever, in their path to devotion.
+                    <br />So, let&apos;s spread the
                     word{devotee?.gender ? `, ${devotee.spiritual_level_id_ref_value[`title_${devotee?.gender}`]}` : ''} 🙏🏻
                 </div>
                 <br />
@@ -170,25 +176,25 @@ Join me on HareKrishna.app using my personal link: ${referralLink}
                 <p>Also, one click easy share via:</p>
                 <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
                     <Button label="WhatsApp" icon="pi pi-whatsapp" className="p-button-success"
-                            onClick={() => shareWhatsApp()}/>
+                        onClick={() => shareWhatsApp()} />
 
                     <Button label="Telegram" icon="pi pi-send" className="p-button-info"
-                            onClick={() => shareTelegram()}/>
+                        onClick={() => shareTelegram()} />
 
                     <Button label="Email" icon="pi pi-envelope" severity="secondary"
-                            onClick={() => shareEmail()}/>
+                        onClick={() => shareEmail()} />
 
                     <Button label="Facebook" icon="pi pi-facebook" severity="info"
-                            onClick={() => shareFacebook()}/>
+                        onClick={() => shareFacebook()} />
 
                     <Button label="Twitter" icon="pi pi-twitter" severity="contrast"
-                            onClick={() => shareTwitter()}/>
+                        onClick={() => shareTwitter()} />
 
                     {
                         /* @ts-expect-error "it works well to not show this share option for unsupported browsers, like firefox" */
                         navigator.share &&
                         <Button label="More..." icon="pi pi-share-alt" severity="danger"
-                                onClick={nativeShare}/>
+                            onClick={nativeShare} />
                     }
                 </div>
             </Card>
@@ -198,14 +204,14 @@ Join me on HareKrishna.app using my personal link: ${referralLink}
                 referredDevotees && Array.isArray(referredDevotees) && referredDevotees.length > 0 ?
                     <Card className="shadow-2xl text-center component-transparent m-auto">
                         <DataTable value={referredDevotees} className="text-sm">
-                            <Column field="name" header="Name" body={nameWithLink}/>
-                            <Column field="phone" header="Phone" body={phoneFormatted}/>
-                            <Column field="created_at" header="Joined" body={dateFormatted}/>
+                            <Column field="name" header="Name" body={nameWithLink} />
+                            <Column field="phone" header="Phone" body={phoneFormatted} />
+                            <Column field="created_at" header="Joined" body={dateFormatted} />
                         </DataTable>
                     </Card>
                     : "No referrals yet."
             }
-            <Toast ref={toast} position="bottom-center"/>
+            <Toast ref={toast} position="bottom-center" />
         </div>
     )
 }

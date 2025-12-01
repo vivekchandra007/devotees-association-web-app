@@ -24,6 +24,7 @@ model devotees {
   source_id                                        Int                   @default(1)
   referred_by_id                                   Int?
   counsellor_id                                    Int?
+  leader_id                                        Int?
   gender                                           devotees_gender_enum?
   dob                                              DateTime?             @db.Date
   occupation                                       String?               @db.VarChar(21)
@@ -74,7 +75,9 @@ model devotees {
   system_role_id_ref_value                         system_roles          @relation(fields: [system_role_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
   referred_by_id_ref_value                         devotees?             @relation("devotees_referred_by_idTodevotees", fields: [referred_by_id], references: [id], map: "fk_referred_by")
   counsellor_id_ref_value                          devotees?             @relation("devotees_counsellor_idTodevotees", fields: [counsellor_id], references: [id], map: "fk_counsellor")
+  leader_id_ref_value                              devotees?             @relation("devotees_leader_idTodevotees", fields: [leader_id], references: [id], map: "fk_leader")
   other_devotees_devotees_counsellor_idTodevotees  devotees[]            @relation("devotees_counsellor_idTodevotees")
+  other_devotees_devotees_leader_idTodevotees      devotees[]            @relation("devotees_leader_idTodevotees")
   other_devotees_devotees_referred_by_idTodevotees devotees[]            @relation("devotees_referred_by_idTodevotees")
   campaigns_campaigns_created_byTodevotees         campaigns[]           @relation("campaigns_created_byTodevotees")
   campaigns_campaigns_updated_byTodevotees         campaigns[]           @relation("campaigns_updated_byTodevotees")
