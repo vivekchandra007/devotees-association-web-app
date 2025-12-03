@@ -9,6 +9,8 @@ import { Tag } from "primereact/tag";
 import { Dialog } from "primereact/dialog";
 import { confirmDialog } from 'primereact/confirmdialog';
 import { SYSTEM_ROLES, STATUSES } from "@/data/constants";
+import { AutoComplete, AutoCompleteCompleteEvent } from "primereact/autocomplete";
+import api from "@/lib/axios";
 
 interface DevoteeCardProps {
     devotee: Devotee;
@@ -22,8 +24,12 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({ devotee, systemRole, o
     const router = useRouter();
     const menu = useRef<Menu>(null);
     const [showLeaderDialog, setShowLeaderDialog] = useState(false);
+    const [showAssignLeaderDialog, setShowAssignLeaderDialog] = useState(false);
+    const [leaderSuggestions, setLeaderSuggestions] = useState<Devotee[]>([]);
+    const [selectedLeader, setSelectedLeader] = useState<Devotee | null>(null);
 
     const getInitials = (name: string) => {
+        // ... (existing implementation)
         return name
             .split(' ')
             .map((n) => n[0])
@@ -32,7 +38,26 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({ devotee, systemRole, o
             .slice(0, 2);
     };
 
+    const searchLeaders = async (event: AutoCompleteCompleteEvent) => {
+        try {
+            const res = await api.get('/devotees', {
+                params: {
+                    query: event.query,
+                    min_role_id: 3 // Filter for leaders
+                }
+            });
+            if (res.status === 200) {
+                setLeaderSuggestions(res.data);
+            }
+        } catch (error) {
+            console.error("Failed to search leaders", error);
+            setLeaderSuggestions([]);
+        }
+    };
+
     const adminMenuItems: MenuItem[] = [];
+
+    // ... (existing menu items logic)
 
     if (systemRole === SYSTEM_ROLES.admin || systemRole === SYSTEM_ROLES.leader) {
         if ((devotee.system_role_id || 0) < 2) {
@@ -68,23 +93,55 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({ devotee, systemRole, o
                 command: () => onRoleUpdate(devotee, 2, 'Volunteer')
             });
         }
+
+        // Assign/Unassign Leader Logic
+        // Only allow for non-admins (role < 4)
+        if ((devotee.system_role_id || 0) < 4) {
+            if (!devotee.leader_id) {
+                adminMenuItems.push({
+                    label: 'Assign to Leader',
+                    icon: 'pi pi-users',
+                    command: () => {
+                        setSelectedLeader(null);
+                        setShowAssignLeaderDialog(true);
+                    }
+                });
+            } else {
+                adminMenuItems.push({
+                    label: 'Unassign Leader',
+                    icon: 'pi pi-user-minus',
+                    className: 'text-red-500',
+                    command: () => {
+                        confirmDialog({
+                            message: `Are you sure you want to unassign ${devotee.name} from their current leader?`,
+                            header: 'Confirm Unassignment',
+                            icon: 'pi pi-exclamation-triangle',
+                            accept: () => onLeaderUpdate(devotee.id, devotee.name || '', null)
+                        });
+                    }
+                });
+            }
+        }
     }
 
-    if (devotee.id !== currentDevoteeId && (systemRole === SYSTEM_ROLES.admin || systemRole === SYSTEM_ROLES.leader)) {
+    if (devotee.id !== currentDevoteeId && (systemRole === SYSTEM_ROLES.admin || systemRole === SYSTEM_ROLES.leader) && (devotee.system_role_id || 0) < 4) {
         // Case 1: Devotee has no leader assigned
         if (!devotee.leader_id) {
-            adminMenuItems.push({
-                label: 'Assign under me',
-                icon: 'pi pi-user-plus',
-                command: () => {
-                    confirmDialog({
-                        message: `Are you sure you want to take ${devotee.name} under your leadership?`,
-                        header: 'Confirm Assignment',
-                        icon: 'pi pi-exclamation-triangle',
-                        accept: () => onLeaderUpdate(devotee.id, devotee.name || '', currentDevoteeId || null)
-                    });
-                }
-            });
+            // "Assign under me" should not be shown to an admin
+            if (systemRole !== SYSTEM_ROLES.admin) {
+                adminMenuItems.push({
+                    label: 'Assign under me',
+                    icon: 'pi pi-user-plus',
+                    command: () => {
+                        confirmDialog({
+                            message: `Are you sure you want to take ${devotee.name} under your leadership?`,
+                            header: 'Confirm Assignment',
+                            icon: 'pi pi-exclamation-triangle',
+                            accept: () => onLeaderUpdate(devotee.id, devotee.name || '', currentDevoteeId || null)
+                        });
+                    }
+                });
+            }
         }
         // Case 2: Devotee is assigned to current logged in user
         else if (devotee.leader_id === currentDevoteeId) {
@@ -115,6 +172,7 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({ devotee, systemRole, o
     return (
         <>
             <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 overflow-hidden relative">
+                {/* ... (existing card content) ... */}
                 {devotee.status === STATUSES.deceased && (
                     <div className="absolute inset-0 bg-gray-100/80 z-10 flex items-center justify-center">
                         <i className="pi pi-lock text-4xl text-gray-400"></i>
@@ -251,6 +309,69 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({ devotee, systemRole, o
                 ) : (
                     <p className="text-gray-500 italic">No leader information available.</p>
                 )}
+            </Dialog>
+
+            {/* Assign Leader Dialog */}
+            <Dialog
+                header="Assign to Leader"
+                visible={showAssignLeaderDialog}
+                onHide={() => setShowAssignLeaderDialog(false)}
+                className="w-full max-w-md"
+                footer={
+                    <div className="flex justify-end gap-2">
+                        <Button label="Cancel" icon="pi pi-times" text onClick={() => setShowAssignLeaderDialog(false)} />
+                        <Button
+                            label="Assign"
+                            icon="pi pi-check"
+                            disabled={!selectedLeader}
+                            onClick={() => {
+                                if (selectedLeader) {
+                                    onLeaderUpdate(devotee.id, devotee.name || '', selectedLeader.id);
+                                    setShowAssignLeaderDialog(false);
+                                }
+                            }}
+                        />
+                    </div>
+                }
+            >
+                <div className="flex flex-col gap-4">
+                    <p className="text-sm text-gray-600">
+                        Search and select a leader to assign <strong>{devotee.name}</strong> to.
+                    </p>
+                    <div className="flex flex-col gap-2">
+                        <label htmlFor="leader-search" className="font-bold text-sm">Search Leader</label>
+                        <AutoComplete
+                            inputId="leader-search"
+                            value={selectedLeader as any}
+                            suggestions={leaderSuggestions}
+                            completeMethod={searchLeaders}
+                            field="name"
+                            onChange={(e) => setSelectedLeader(e.value)}
+                            placeholder="Type leader name..."
+                            itemTemplate={(item: Devotee) => (
+                                <div className="flex items-center gap-2">
+                                    <Avatar label={getInitials(item.name || '')} shape="circle" size="normal" />
+                                    <div className="flex flex-col">
+                                        <span className="font-medium">{item.name}</span>
+                                        <span className="text-xs text-gray-500">{item.phone}</span>
+                                    </div>
+                                </div>
+                            )}
+                        />
+                    </div>
+                    {selectedLeader && (
+                        <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
+                            <div className="text-xs text-blue-600 font-bold uppercase mb-1">Selected Leader</div>
+                            <div className="flex items-center gap-2">
+                                <Avatar label={getInitials(selectedLeader.name || '')} shape="circle" className="bg-blue-200 text-blue-700" />
+                                <div>
+                                    <div className="font-bold text-sm">{selectedLeader.name}</div>
+                                    <div className="text-xs text-gray-600">{selectedLeader.phone}</div>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </div>
             </Dialog>
         </>
     );

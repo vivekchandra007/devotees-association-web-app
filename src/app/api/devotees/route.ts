@@ -12,6 +12,8 @@ export async function GET(req: NextRequest) {
 
     // Get the search term from query parameters
     const query = searchParams.get('query') || '';
+    const minRoleId = searchParams.get('min_role_id');
+
     if (!query) {
         return Response.json({ error: 'Search Query is required' }, { status: 400 });
     }
@@ -37,6 +39,7 @@ export async function GET(req: NextRequest) {
         if (!loggedIndevotee?.system_role_id || loggedIndevotee?.system_role_id === 1) {
             return Response.json({ error: 'Forbidden: You do not have view donations reports/ charts' }, { status: 403 });
         }
+
         const devotees = await prisma.devotees.findMany({
             where: {
                 OR: [
@@ -58,7 +61,8 @@ export async function GET(req: NextRequest) {
                             mode: 'insensitive' as Prisma.QueryMode
                         }
                     }
-                ]
+                ],
+                ...(minRoleId ? { system_role_id: { gte: Number(minRoleId) } } : {})
             },
             select: {
                 id: true,
