@@ -313,7 +313,7 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({ devotee, systemRole, o
 
             {/* Assign Leader Dialog */}
             <Dialog
-                header="Assign to Leader"
+                header="Assign to a Leader"
                 visible={showAssignLeaderDialog}
                 onHide={() => setShowAssignLeaderDialog(false)}
                 className="w-full max-w-md"
@@ -336,10 +336,9 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({ devotee, systemRole, o
             >
                 <div className="flex flex-col gap-4">
                     <p className="text-sm text-gray-600">
-                        Search and select a leader to assign <strong>{devotee.name}</strong> to.
+                        Search and select a leader to assign <strong>{devotee.name}</strong> to:
                     </p>
                     <div className="flex flex-col gap-2">
-                        <label htmlFor="leader-search" className="font-bold text-sm">Search Leader</label>
                         <AutoComplete
                             inputId="leader-search"
                             value={selectedLeader as any}
@@ -347,13 +346,13 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({ devotee, systemRole, o
                             completeMethod={searchLeaders}
                             field="name"
                             onChange={(e) => setSelectedLeader(e.value)}
-                            placeholder="Type leader name..."
+                            placeholder="Start typing leader name..."
                             itemTemplate={(item: Devotee) => (
                                 <div className="flex items-center gap-2">
                                     <Avatar label={getInitials(item.name || '')} shape="circle" size="normal" />
                                     <div className="flex flex-col">
                                         <span className="font-medium">{item.name}</span>
-                                        <span className="text-xs text-gray-500">{item.phone}</span>
+                                        <span className="text-xs text-gray-500">{item.phone?.slice(2)}</span>
                                     </div>
                                 </div>
                             )}
