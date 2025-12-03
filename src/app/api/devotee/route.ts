@@ -28,8 +28,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Validation failed', details: parsed.error.flatten() }, { status: 400 });
     }
 
-    if (parsed.data.id !== payload) {
-      // If it is not devotee himself then a system_role_id > 2 i.e. a leader or admin who can make changes to some devotee's data
+    if (parsed.data.id !== payload || parsed.data.system_role_id) {
+      // If it is not devotee himself or we are updating system_role_id then a system_role_id > 2 i.e. a leader or admin who can make changes to some devotee's data
       const loggedIndevotee = await prisma.devotees.findUnique({
         where: { id: payload },
         select: {
