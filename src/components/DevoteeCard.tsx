@@ -341,7 +341,7 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({ devotee, systemRole, o
                     <div className="flex flex-col gap-2">
                         <AutoComplete
                             inputId="leader-search"
-                            value={selectedLeader as any}
+                            value={selectedLeader as Devotee}
                             suggestions={leaderSuggestions}
                             completeMethod={searchLeaders}
                             field="name"
