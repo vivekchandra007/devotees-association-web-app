@@ -77,6 +77,11 @@ export async function GET(req: NextRequest) {
                     select: {
                         name: true,
                     },
+                },
+                _count: {
+                    select: {
+                        other_devotees_devotees_leader_idTodevotees: true
+                    }
                 }
             },
             orderBy: {

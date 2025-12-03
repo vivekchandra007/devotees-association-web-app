@@ -250,6 +250,21 @@ export default function DevoteesDashboard() {
     }
 
     const confirmRoleUpdate = (devoteeDetails: Devotee, newRoleId: number, newRoleName: string) => {
+        // Check if we are demoting a leader (role id < 3 is not a leader)
+        // and if they have members assigned to them
+        const devoteeWithCount = devoteeDetails as Devotee & { _count?: { other_devotees_devotees_leader_idTodevotees: number } };
+
+        if (newRoleId < 3 && (devoteeWithCount._count?.other_devotees_devotees_leader_idTodevotees || 0) > 0) {
+            msgs.current?.show({
+                severity: 'error',
+                summary: 'Cannot Demote Leader',
+                detail: `${devoteeDetails.name} has ${devoteeWithCount._count?.other_devotees_devotees_leader_idTodevotees} members assigned. Please reassign members to other leaders before demoting.`,
+                sticky: true,
+                closable: true
+            });
+            return;
+        }
+
         confirmDialog({
             message: `Are you sure you want to change ${devoteeDetails.name}'s role to a ${newRoleName}?`,
             header: 'Confirmation',
