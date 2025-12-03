@@ -43,7 +43,7 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({ devotee, systemRole, o
             const res = await api.get('/devotees', {
                 params: {
                     query: event.query,
-                    min_role_id: 3 // Filter for leaders
+                    role_id: 3 // Filter for leaders only (exclude admins)
                 }
             });
             if (res.status === 200) {

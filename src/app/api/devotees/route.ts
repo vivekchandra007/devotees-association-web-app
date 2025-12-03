@@ -13,6 +13,7 @@ export async function GET(req: NextRequest) {
     // Get the search term from query parameters
     const query = searchParams.get('query') || '';
     const minRoleId = searchParams.get('min_role_id');
+    const roleId = searchParams.get('role_id');
 
     if (!query) {
         return Response.json({ error: 'Search Query is required' }, { status: 400 });
@@ -62,7 +63,8 @@ export async function GET(req: NextRequest) {
                         }
                     }
                 ],
-                ...(minRoleId ? { system_role_id: { gte: Number(minRoleId) } } : {})
+                ...(minRoleId ? { system_role_id: { gte: Number(minRoleId) } } : {}),
+                ...(roleId ? { system_role_id: Number(roleId) } : {})
             },
             select: {
                 id: true,
