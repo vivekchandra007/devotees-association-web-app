@@ -2,9 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma'; // adjust to your prisma client
 import { verifyAccessToken } from '@/lib/auth'; // your JWT verification function
 import _ from "lodash";
-import {parseDateFromStringddmmyyyy} from "@/lib/conversions";
-import {donationSchema} from "@/schema/donationSchema";
-import {GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY} from "@/data/constants";
+import { parseDateFromStringddmmyyyy } from "@/lib/conversions";
+import { donationSchema } from "@/schema/donationSchema";
+import { GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY } from "@/data/constants";
 
 export async function POST(req: NextRequest) {
     try {
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
         }
 
         const skippedDonations: string[] = [];
-        
+
         for (let i = donations.length - 1; i >= 0; i--) {
             const parsed = donationSchema.safeParse(donations[i]);
             if (!parsed.success) {
@@ -55,13 +55,45 @@ export async function POST(req: NextRequest) {
             data: donations,
             skipDuplicates: true // Optional: skips records with duplicate IDs
         });
-        const duplicateMessage = donations.length > result.count? ` ${donations.length - result.count} donations skipped because they already exist (duplicate).`:'';
-        const skippedMessage = skippedDonations.length > 0? ` ${skippedDonations.length} donations skipped because of invalid data in them. Correct them in sheet and re-upload. Their donation receipt numbers are: ${skippedDonations.flat()}`:''
-        console.log(`${result.count} donations bulk inserted by ${loggedIndevotee?.name}.${duplicateMessage} ${skippedMessage}`);
+
+        // Bulk create new devotees from the donation data
+        const uniqueDevoteesMap = new Map();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        for (const donation of (donations as any[])) {
+            if (donation.phone && !uniqueDevoteesMap.has(donation.phone)) {
+                uniqueDevoteesMap.set(donation.phone, {
+                    name: donation.name,
+                    phone: donation.phone,
+                    phone_whatsapp: donation.phone,
+                    status: 'inactive',
+                    source_id: 2,
+                    created_by: payload,
+                    updated_by: payload
+                });
+            }
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const newDevotees = Array.from(uniqueDevoteesMap.values()) as any[];
+        let devoteeResultCount = 0;
+
+        if (newDevotees.length > 0) {
+            const devoteeResult = await prisma.devotees.createMany({
+                data: newDevotees,
+                skipDuplicates: true
+            });
+            devoteeResultCount = devoteeResult.count;
+        }
+
+        const duplicateMessage = donations.length > result.count ? ` ${donations.length - result.count} donations skipped because they already exist (duplicate).` : '';
+        const skippedMessage = skippedDonations.length > 0 ? ` ${skippedDonations.length} donations skipped because of invalid data in them. Correct them in sheet and re-upload. Their donation receipt numbers are: ${skippedDonations.flat()}` : ''
+        const devoteeMessage = devoteeResultCount > 0 ? ` ${devoteeResultCount} new devotees created.` : '';
+
+        console.log(`${result.count} donations bulk inserted by ${loggedIndevotee?.name}.${duplicateMessage} ${skippedMessage}${devoteeMessage}`);
         // Successful insert and success message in response
         return NextResponse.json({
             success: true,
-            message: `${result.count} donations inserted.${duplicateMessage} ${skippedMessage}`
+            message: `${result.count} donations inserted.${duplicateMessage} ${skippedMessage}${devoteeMessage}`
         }, {
             status: 200
         });
