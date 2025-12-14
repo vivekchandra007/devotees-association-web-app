@@ -60,16 +60,23 @@ export async function POST(req: NextRequest) {
         const uniqueDevoteesMap = new Map();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         for (const donation of (donations as any[])) {
-            if (donation.phone && !uniqueDevoteesMap.has(donation.phone)) {
-                uniqueDevoteesMap.set(donation.phone, {
-                    name: donation.name,
-                    phone: donation.phone,
-                    phone_whatsapp: donation.phone,
-                    status: 'inactive',
-                    source_id: 2,
-                    created_by: payload,
-                    updated_by: payload
-                });
+            let phoneFormatted: string = String(donation.phone).replace(/'/g, '');
+            if (phoneFormatted && phoneFormatted !== '' && phoneFormatted.length >= 10) {
+                if (phoneFormatted.length > 10) {
+                    phoneFormatted = phoneFormatted.slice(-10); // gets last 10 characters (just in case, if people already appended country code like 91 to their phone number)
+                }
+                phoneFormatted = `91${phoneFormatted}`; // → "919999999999"
+                if (!uniqueDevoteesMap.has(phoneFormatted)) {
+                    uniqueDevoteesMap.set(phoneFormatted, {
+                        name: donation.name,
+                        phone: phoneFormatted,
+                        phone_whatsapp: phoneFormatted,
+                        status: 'inactive',
+                        source_id: 2,
+                        created_by: payload,
+                        updated_by: payload
+                    });
+                }
             }
         }
 
