@@ -297,12 +297,10 @@ export default function DonationsDashboard() {
   const leaderNameWithLink = (rowData: Donation) => {
     const leader = rowData.phone_ref_value?.leader_id_ref_value;
     return (
-      leader && leader.id ?
-        <a href={`/devotee?devoteeId=${leader.id}`} rel="noopener noreferrer" className="text-hover underline">
-          {leader.name}
-        </a>
-        :
-        <span className="text-grey-400">{'N/A'}</span>
+      leader && leader.id && leader.name &&
+      <a href={`/devotee?devoteeId=${leader.id}`} rel="noopener noreferrer" className="text-hover underline">
+        {leader.name}
+      </a>
     );
   };
 
@@ -612,7 +610,7 @@ export default function DonationsDashboard() {
             <Column field="date" header="Date" body={dateFormatted} sortable />
             <Column field="amount" header="Amount" body={amountFormatted} sortable />
             <Column field="name" header="Donor Name" body={nameWithLink} sortable />
-            <Column field="phone" header="Phone Number" body={phoneFormatted} sortable />
+            <Column field="phone" header="Phone No." body={phoneFormatted} sortable />
             <Column field="leader" header="Leader" body={leaderNameWithLink} />
             <Column field="donation_receipt_number" header="Receipt" sortable />
             <Column field="payment_mode" header="Payment Mode" sortable />
