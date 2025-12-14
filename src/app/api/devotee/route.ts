@@ -109,6 +109,11 @@ export async function GET(req: NextRequest) {
             id: true,
             name: true
           }
+        },
+        _count: {
+          select: {
+            other_devotees_devotees_leader_idTodevotees: true
+          }
         }
       },
       cacheStrategy: SPECIFIC_PRISMA_ACCELERATE_CACHE_STRATEGY_SHORTER

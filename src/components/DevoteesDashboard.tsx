@@ -10,7 +10,7 @@ import { ProgressBar } from "primereact/progressbar";
 import React, { useEffect, useRef, useState } from "react";
 import { SYSTEM_ROLES } from "@/data/constants";
 import { Dialog } from "primereact/dialog";
-import { ConfirmDialog, confirmDialog } from 'primereact/confirmdialog';
+import { ConfirmDialog } from 'primereact/confirmdialog';
 import { FileUpload, FileUploadFilesEvent } from "primereact/fileupload";
 import * as XLSX from "xlsx";
 import { MessageSeverity } from "primereact/api";
@@ -194,84 +194,7 @@ export default function DevoteesDashboard() {
     }
 
 
-    const updateDevoteeRole = async (devoteeId: number, currentName: string, newRoleId: number, newRoleName: string) => {
-        setInProgress(true);
-        try {
-            const res = await api.post('/devotee', { id: devoteeId, system_role_id: newRoleId });
-            if (res.status === 200 && res.data.success) {
-                msgs.current?.show({ severity: 'success', summary: 'Role Updated', detail: `${currentName} is now a ${newRoleName}`, sticky: false, closable: true });
-                // Update local state
-                if (searchResult && Array.isArray(searchResult)) {
-                    const updated = searchResult.map((d: Devotee) => d.id === devoteeId ? { ...d, system_role_id: newRoleId, system_role_id_ref_value: { name: newRoleName.toLowerCase() } } : d);
-                    setSearchResult(updated);
-                }
-            } else {
-                throw new Error(res.data.error || 'Failed');
-            }
-        } catch (e: unknown) {
-            const errorMessage = e instanceof Error ? e.message : 'Failed to update role';
-            msgs.current?.show({ severity: 'error', summary: 'Error', detail: errorMessage, sticky: true, closable: true });
-        } finally {
-            setInProgress(false);
-        }
-    }
-
-    const updateDevoteeLeader = async (devoteeId: number, currentName: string, newLeaderId: number | null) => {
-        setInProgress(true);
-        try {
-            const res = await api.post('/devotee', { id: devoteeId, leader_id: newLeaderId });
-            if (res.status === 200 && res.data.success) {
-                const action = newLeaderId ? 'Assigned under you' : 'Removed from your leadership';
-                msgs.current?.show({ severity: 'success', summary: 'Leader Updated', detail: `${currentName} has been ${action}`, sticky: false, closable: true });
-
-                // Update local state
-                if (searchResult && Array.isArray(searchResult)) {
-                    const updated = searchResult.map((d: Devotee) => {
-                        if (d.id === devoteeId) {
-                            return {
-                                ...d,
-                                leader_id: newLeaderId,
-                                leader_id_ref_value: newLeaderId ? { id: devotee?.id, name: devotee?.name } : null
-                            };
-                        }
-                        return d;
-                    });
-                    setSearchResult(updated);
-                }
-            } else {
-                throw new Error(res.data.error || 'Failed');
-            }
-        } catch (e: unknown) {
-            const errorMessage = e instanceof Error ? e.message : 'Failed to update leader';
-            msgs.current?.show({ severity: 'error', summary: 'Error', detail: errorMessage, sticky: true, closable: true });
-        } finally {
-            setInProgress(false);
-        }
-    }
-
-    const confirmRoleUpdate = (devoteeDetails: Devotee, newRoleId: number, newRoleName: string) => {
-        // Check if we are demoting a leader (role id < 3 is not a leader)
-        // and if they have members assigned to them
-        const devoteeWithCount = devoteeDetails as Devotee & { _count?: { other_devotees_devotees_leader_idTodevotees: number } };
-
-        if (newRoleId < 3 && (devoteeWithCount._count?.other_devotees_devotees_leader_idTodevotees || 0) > 0) {
-            msgs.current?.show({
-                severity: 'error',
-                summary: 'Cannot Demote Leader',
-                detail: `${devoteeDetails.name} has ${devoteeWithCount._count?.other_devotees_devotees_leader_idTodevotees} members assigned. Please reassign members to other leaders before demoting.`,
-                sticky: true,
-                closable: true
-            });
-            return;
-        }
-
-        confirmDialog({
-            message: `Are you sure you want to change ${devoteeDetails.name}'s role to a ${newRoleName}?`,
-            header: 'Confirmation',
-            icon: 'pi pi-exclamation-triangle',
-            accept: () => updateDevoteeRole(devoteeDetails.id, devoteeDetails.name || '', newRoleId, newRoleName)
-        });
-    };
+    // Logic for role updates and leader assignments has been moved to DevoteeCard.tsx
 
     useEffect(() => {
         const getInsights = async () => {
@@ -442,11 +365,16 @@ export default function DevoteesDashboard() {
                             searchResult.map((devoteeDetails: Devotee) => (
                                 <DevoteeCard
                                     key={devoteeDetails?.id}
-                                    devotee={devoteeDetails}
-                                    systemRole={systemRole || undefined}
-                                    onRoleUpdate={confirmRoleUpdate}
-                                    currentDevoteeId={devotee?.id}
-                                    onLeaderUpdate={updateDevoteeLeader}
+                                    devoteeId={devoteeDetails?.id}
+                                    initialData={devoteeDetails}
+                                    onDataChange={(updatedDevotee) => {
+                                        // Update local state to keep search results in sync
+                                        // We can trust the updatedDevotee passed back from the card
+                                        if (searchResult && Array.isArray(searchResult)) {
+                                            const updated = searchResult.map((d: Devotee) => d.id === updatedDevotee.id ? updatedDevotee : d);
+                                            setSearchResult(updated);
+                                        }
+                                    }}
                                 />
                             ))
                         )

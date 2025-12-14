@@ -8,6 +8,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { Suspense } from "react";
 import TopNavBar from "@/components/TopNavBar";
 import { ScrollTop } from "primereact/scrolltop";
+import { Toaster } from 'sonner';
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -105,6 +106,7 @@ export default function RootLayout({
           fill
           priority
         />
+        <Toaster position="bottom-center" />
       </body>
     </html>
   );
