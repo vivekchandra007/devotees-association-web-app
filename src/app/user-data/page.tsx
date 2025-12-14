@@ -39,23 +39,23 @@ export default function DevoteesPage() {
                 !isAuthenticated &&
                 <FullPageSpinner message="Hare Krishna! Fetching details..." />
             }
-            <TabView activeIndex={activeIndex} 
-                onTabChange={(e) => { 
-                        const params = new URLSearchParams(searchParams.toString());
-                        if (params.has('tab')) {
-                            params.delete('tab');
-                        }
-                        router.push(`/user-data?tab=${e.index}`);
+            <TabView activeIndex={activeIndex}
+                onTabChange={(e) => {
+                    const params = new URLSearchParams(searchParams.toString());
+                    if (params.has('tab')) {
+                        params.delete('tab');
                     }
+                    router.push(`/user-data?tab=${e.index}`);
+                }
                 }>
                 <TabPanel header="Reports" leftIcon="pi pi-chart-line mr-2" className="min-w-[33vw]">
                     <ReportsDashboard />
                 </TabPanel>
-                <TabPanel header="Donations" leftIcon="pi pi-indian-rupee mr-2" className="min-w-[33vw]">
-                    <DonationsDashboard />
-                </TabPanel>
                 <TabPanel header="Devotees" leftIcon="pi pi-users mr-2" className="min-w-[33vw]">
                     <DevoteesDashboard />
+                </TabPanel>
+                <TabPanel header="Donations" leftIcon="pi pi-indian-rupee mr-2" className="min-w-[33vw]">
+                    <DonationsDashboard />
                 </TabPanel>
             </TabView>
         </div>
