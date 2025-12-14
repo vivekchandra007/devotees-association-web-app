@@ -33,7 +33,7 @@ interface OrgDevotee {
     directReports?: OrgDevotee[];
 }
 
-export default function OrganizationView() {
+export default function OrganizationView({ refreshTrigger }: { refreshTrigger?: number }) {
     // Store Admins separately
     const [admins, setAdmins] = useState<OrgDevotee[]>([]);
     // Store Leader Trees
@@ -43,7 +43,7 @@ export default function OrganizationView() {
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [refreshTrigger]);
 
     const fetchData = async () => {
         try {

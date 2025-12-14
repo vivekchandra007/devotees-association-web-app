@@ -28,6 +28,7 @@ export default function DevoteesDashboard() {
     const [devoteesVolunteersCount, setDevoteesVolunteersCount] = useState<number | null>(null);
     const [devoteesLeadersCount, setDevoteesLeadersCount] = useState<number | null>(null);
     const [showBulkUploadDialogue, setShowBulkUploadDialogue] = useState<boolean>(false);
+    const [refreshOrgView, setRefreshOrgView] = useState<number>(0);
     const [inProgress, setInProgress] = useState<boolean>(false);
     const [searchQuery, setSearchQuery] = useState<string>('');
     const [searchResult, setSearchResult] = useState<object | null>(null);
@@ -374,6 +375,8 @@ export default function DevoteesDashboard() {
                                             const updated = searchResult.map((d: Devotee) => d.id === updatedDevotee.id ? updatedDevotee : d);
                                             setSearchResult(updated);
                                         }
+                                        // Trigger Organization View Refresh
+                                        setRefreshOrgView(prev => prev + 1);
                                     }}
                                 />
                             ))
@@ -381,7 +384,7 @@ export default function DevoteesDashboard() {
                     }
                 </div>
             }
-            <OrganizationView />
+            <OrganizationView refreshTrigger={refreshOrgView} />
             <ConfirmDialog />
             <Toast ref={toast} position="bottom-center" />
         </div>
