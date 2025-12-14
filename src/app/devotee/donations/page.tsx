@@ -4,14 +4,26 @@ import { useState } from 'react'
 import { DataTable } from 'primereact/datatable'
 import { Column } from 'primereact/column'
 import api from '@/lib/axios'
-import {formatDateIntoStringddmmyyyy} from "@/lib/conversions";
-import {useAuth} from "@/hooks/useAuth";
-import {Prisma} from "@prisma/client";
-import {ProgressBar} from "primereact/progressbar";
+import { formatDateIntoStringddmmyyyy } from "@/lib/conversions";
+import { useAuth } from "@/hooks/useAuth";
+import { Prisma } from "@prisma/client";
+import { ProgressBar } from "primereact/progressbar";
 
 type Donation = Prisma.donationsGetPayload<{
     include: {
         phone_ref_value: {
+            select: {
+                id: true,
+                name: true,
+                leader_id_ref_value: {
+                    select: {
+                        id: true,
+                        name: true
+                    }
+                }
+            }
+        },
+        campaign_id_ref_value: {
             select: {
                 id: true,
                 name: true
@@ -21,7 +33,7 @@ type Donation = Prisma.donationsGetPayload<{
 }>;
 
 export default function DonationsPage() {
-    const { devotee} = useAuth();
+    const { devotee } = useAuth();
     const [myDonations, setMyDonations] = useState<Donation[] | null>([]);
     const [inProgress, setInProgress] = useState<boolean>(false);
 
@@ -66,9 +78,9 @@ export default function DonationsPage() {
         <div className="h-full w-full component-transparent">
             {
                 inProgress ?
-                    <ProgressBar mode="indeterminate" style={{height: '2px'}} className="pt-1"></ProgressBar>
+                    <ProgressBar mode="indeterminate" style={{ height: '2px' }} className="pt-1"></ProgressBar>
                     :
-                    <hr/>
+                    <hr />
             }
             <div className='p-3'>
                 <div className="card overflow-x-auto max-w-[90vw] mt-4">
@@ -79,10 +91,10 @@ export default function DonationsPage() {
                                     phone
                                     number {devotee?.phone?.slice(2)}</h2>
                                 <DataTable value={myDonations!} paginator rows={10} stripedRows size="small">
-                                    <Column header="Date" body={dateFormatted}/>
-                                    <Column field="donation_receipt_number" header="Receipt No."/>
-                                    <Column header="Amount" body={amountFormatted}/>
-                                    <Column field="payment_mode" header="Mode"/>
+                                    <Column header="Date" body={dateFormatted} />
+                                    <Column field="donation_receipt_number" header="Receipt No." />
+                                    <Column header="Amount" body={amountFormatted} />
+                                    <Column field="payment_mode" header="Mode" />
                                 </DataTable>
                             </> :
                             <>

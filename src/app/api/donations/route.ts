@@ -1,12 +1,12 @@
 import prisma from '@/lib/prisma';
-import {NextRequest, NextResponse} from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import {
     GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY,
     SPECIFIC_PRISMA_ACCELERATE_CACHE_STRATEGY_LONGER
 } from "@/data/constants";
-import {verifyAccessToken} from "@/lib/auth";
-import {startOfMonth, startOfWeek, startOfYear} from "date-fns";
-import {parseDateFromStringddmmyyyy} from "@/lib/conversions";
+import { verifyAccessToken } from "@/lib/auth";
+import { startOfMonth, startOfWeek, startOfYear } from "date-fns";
+import { parseDateFromStringddmmyyyy } from "@/lib/conversions";
 
 export async function POST(req: NextRequest) {
     const token = req.headers.get('authorization')?.replace('Bearer ', '');
@@ -66,7 +66,7 @@ export async function POST(req: NextRequest) {
     } else if (amountRange === "≤10K") {
         endAmount = 10000;
     } else if (amountRange.includes('-')) {
-        const amountRanges = amountRange.replaceAll(',','').split('-');
+        const amountRanges = amountRange.replaceAll(',', '').split('-');
         startAmount = parseInt(amountRanges[0], 10);
         endAmount = parseInt(amountRanges[1], 10);
     }
@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
     };
 
     const [records, total] = await Promise.all([
-        rows <= 0?
+        rows <= 0 ?
             (
                 prisma.donations.findMany({
                     where,
@@ -108,7 +108,13 @@ export async function POST(req: NextRequest) {
                         phone_ref_value: {
                             select: {
                                 id: true,
-                                name: true
+                                name: true,
+                                leader_id_ref_value: {
+                                    select: {
+                                        id: true,
+                                        name: true
+                                    }
+                                }
                             },
                         },
                         campaign_id_ref_value: {
@@ -121,41 +127,47 @@ export async function POST(req: NextRequest) {
                     orderBy: { [sortField ?? 'date']: sortOrder === -1 ? 'desc' : 'asc' },
                     // for ADMIN ( > 3), serve from a SHORTER cache coz they can modify donations data
                     // for NON ADMIN ( <= 3), serve from a LONGER cache coz they themselves can't modify donations data
-                    cacheStrategy: loggedIndevotee.system_role_id <=3 ?
-                        SPECIFIC_PRISMA_ACCELERATE_CACHE_STRATEGY_LONGER: GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY
+                    cacheStrategy: loggedIndevotee.system_role_id <= 3 ?
+                        SPECIFIC_PRISMA_ACCELERATE_CACHE_STRATEGY_LONGER : GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY
                 })
-            ):
-                (
-        prisma.donations.findMany({
-            where,
-            include: {
-                phone_ref_value: {
-                    select: {
-                        id: true,
-                        name: true
+            ) :
+            (
+                prisma.donations.findMany({
+                    where,
+                    include: {
+                        phone_ref_value: {
+                            select: {
+                                id: true,
+                                name: true,
+                                leader_id_ref_value: {
+                                    select: {
+                                        id: true,
+                                        name: true
+                                    }
+                                }
+                            },
+                        },
+                        campaign_id_ref_value: {
+                            select: {
+                                id: true,
+                                name: true
+                            }
+                        },
                     },
-                },
-                campaign_id_ref_value: {
-                    select: {
-                        id: true,
-                        name: true
-                    }
-                },
-            },
-            skip: first,
-            take: rows,
-            orderBy: { [sortField ?? 'date']: sortOrder === -1 ? 'desc' : 'asc' },
-            // for ADMIN ( > 3), serve from a SHORTER cache coz they can modify donations data
-            // for NON ADMIN ( <= 3), serve from a LONGER cache coz they themselves can't modify donations data
-            cacheStrategy: loggedIndevotee.system_role_id <=3 ?
-                SPECIFIC_PRISMA_ACCELERATE_CACHE_STRATEGY_LONGER: GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY
-        })),
+                    skip: first,
+                    take: rows,
+                    orderBy: { [sortField ?? 'date']: sortOrder === -1 ? 'desc' : 'asc' },
+                    // for ADMIN ( > 3), serve from a SHORTER cache coz they can modify donations data
+                    // for NON ADMIN ( <= 3), serve from a LONGER cache coz they themselves can't modify donations data
+                    cacheStrategy: loggedIndevotee.system_role_id <= 3 ?
+                        SPECIFIC_PRISMA_ACCELERATE_CACHE_STRATEGY_LONGER : GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY
+                })),
         prisma.donations.count({
             where,
             // for ADMIN ( > 3), serve from a SHORTER cache coz they can modify donations data
             // for NON ADMIN ( <= 3), serve from a LONGER cache coz they themselves can't modify donations data
-            cacheStrategy: loggedIndevotee.system_role_id <=3 ?
-                SPECIFIC_PRISMA_ACCELERATE_CACHE_STRATEGY_LONGER: GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY
+            cacheStrategy: loggedIndevotee.system_role_id <= 3 ?
+                SPECIFIC_PRISMA_ACCELERATE_CACHE_STRATEGY_LONGER : GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY
         }),
     ]);
 

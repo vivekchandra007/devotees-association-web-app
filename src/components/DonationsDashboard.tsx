@@ -33,7 +33,13 @@ type Donation = Prisma.donationsGetPayload<{
     phone_ref_value: {
       select: {
         id: true,
-        name: true
+        name: true,
+        leader_id_ref_value: {
+          select: {
+            id: true,
+            name: true
+          }
+        }
       }
     },
     campaign_id_ref_value: {
@@ -113,6 +119,7 @@ export default function DonationsDashboard() {
           name: donation.name,
           phone: donation.phone?.slice(-10),
           devoteId: donation.phone_ref_value?.id,
+          leader: donation.phone_ref_value?.leader_id_ref_value?.name,
           date: formatDateIntoStringddmmyyyy(new Date(donation.date!)),
           payment_mode: donation.payment_mode,
           campaign: donation.campaign_id_ref_value?.name,
@@ -286,6 +293,19 @@ export default function DonationsDashboard() {
         <span className="text-grey-400">{rowData.name || 'N/A'}</span>
     );
   };
+
+  const leaderNameWithLink = (rowData: Donation) => {
+    const leader = rowData.phone_ref_value?.leader_id_ref_value;
+    return (
+      leader && leader.id ?
+        <a href={`/devotee?devoteeId=${leader.id}`} rel="noopener noreferrer" className="text-hover underline">
+          {leader.name}
+        </a>
+        :
+        <span className="text-grey-400">{'N/A'}</span>
+    );
+  };
+
   const dateFormatted = (rowData: Donation) => {
     return (
       <span>{formatDateIntoStringddmmyyyy(new Date(rowData.date!))}</span>
@@ -593,6 +613,7 @@ export default function DonationsDashboard() {
             <Column field="amount" header="Amount" body={amountFormatted} sortable />
             <Column field="name" header="Donor Name" body={nameWithLink} sortable />
             <Column field="phone" header="Phone Number" body={phoneFormatted} sortable />
+            <Column field="leader" header="Leader" body={leaderNameWithLink} />
             <Column field="donation_receipt_number" header="Receipt" sortable />
             <Column field="payment_mode" header="Payment Mode" sortable />
             <Column field="internal_note" header="Note" sortable />
