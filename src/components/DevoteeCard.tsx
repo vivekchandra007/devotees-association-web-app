@@ -396,7 +396,7 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({
                             outlined
                             icon="pi pi-indian-rupee"
                             label="Donations"
-                            onClick={() => router.push(`/user-data?tab=1&phone=${devotee.phone}`)}
+                            onClick={() => router.push(`/user-data?tab=2&phone=${devotee.phone}`)}
                             size="small"
                             severity="warning"
                             className="w-full !text-sm"

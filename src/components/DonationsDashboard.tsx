@@ -25,8 +25,10 @@ import autoTable, { RowInput } from "jspdf-autotable";
 import { getCurrentDateDDMMYYYY } from "@/lib/utils";
 import { Nullable } from "primereact/ts-helpers";
 import { Slider, SliderChangeEvent } from "primereact/slider";
+import { Devotee } from "@/lib/conversions";
 import { Fieldset } from "primereact/fieldset";
 import Image from "next/image";
+import { DevoteeCard } from "./DevoteeCard";
 
 type Donation = Prisma.donationsGetPayload<{
   include: {
@@ -78,6 +80,13 @@ export default function DonationsDashboard() {
   const [donationsCount, setDonationsCount] = useState<number | null>(null);
   const [donations, setDonations] = useState<Donation[] | null>([]);
   const [totalRecords, setTotalRecords] = useState(0);
+  const [first, setFirst] = useState(0);
+  const [rows, setRows] = useState(10);
+  const [page, setPage] = useState(0);
+
+  // Modal state for DevoteeCard
+  const [selectedDevoteeId, setSelectedDevoteeId] = useState<number | null>(null);
+  const [showDevoteeModal, setShowDevoteeModal] = useState<boolean>(false);
   const [selectedDateRange, setSelectedDateRange] = useState<"all" | "week" | "month" | "year">("all");
   const [customDateRange, setCustomDateRange] = useState<Nullable<(Date | null)[]>>(null);
   const [selectedAmountRange, setSelectedAmountRange] = useState<"all" | "5L" | "5L-1L" | "1K-10K" | "10K">("all");
@@ -283,24 +292,37 @@ export default function DonationsDashboard() {
     return formattedJson;
   }
 
+  const openDevoteeModal = (id: number) => {
+    setSelectedDevoteeId(id);
+    setShowDevoteeModal(true);
+  };
+
   const nameWithLink = (rowData: Donation) => {
     return (
       rowData && rowData.phone_ref_value?.id ?
-        <a href={`/devotee?devoteeId=${rowData.phone_ref_value?.id}`} rel="noopener noreferrer" className="text-hover underline">
+        <span
+          onClick={() => openDevoteeModal(rowData.phone_ref_value!.id)}
+          className="text-hover underline cursor-pointer text-blue-600"
+        >
           {rowData.phone_ref_value?.name}
-        </a>
+        </span>
         :
         <span className="text-grey-400">{rowData.name || 'N/A'}</span>
     );
   };
 
   const leaderNameWithLink = (rowData: Donation) => {
-    const leader = rowData.phone_ref_value?.leader_id_ref_value;
+    const leader = rowData?.phone_ref_value?.leader_id_ref_value;
     return (
-      leader && leader.id && leader.name &&
-      <a href={`/devotee?devoteeId=${leader.id}`} rel="noopener noreferrer" className="text-hover underline">
-        {leader.name}
-      </a>
+      leader && leader.id ?
+        <span
+          onClick={() => openDevoteeModal(leader.id)}
+          className="text-hover underline cursor-pointer text-blue-600"
+        >
+          {leader.name}
+        </span>
+        :
+        <span className="text-grey-400">N/A</span>
     );
   };
 
@@ -484,6 +506,20 @@ export default function DonationsDashboard() {
           aria-label="Clear search"
         />
       )}
+      {/* Devotee Card Modal */}
+      <Dialog
+        header="Devotee Details"
+        visible={showDevoteeModal}
+        onHide={() => setShowDevoteeModal(false)}
+        className="w-full max-w-lg"
+        contentClassName="p-0" // Remove padding to let card fit nicely
+      >
+        {selectedDevoteeId && (
+          <div className="p-3">
+            <DevoteeCard devoteeId={selectedDevoteeId} />
+          </div>
+        )}
+      </Dialog>
       <Fieldset className="my-4"
         legend={
           <span className="capitalize">
