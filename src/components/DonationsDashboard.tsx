@@ -25,7 +25,6 @@ import autoTable, { RowInput } from "jspdf-autotable";
 import { getCurrentDateDDMMYYYY } from "@/lib/utils";
 import { Nullable } from "primereact/ts-helpers";
 import { Slider, SliderChangeEvent } from "primereact/slider";
-import { Devotee } from "@/lib/conversions";
 import { Fieldset } from "primereact/fieldset";
 import Image from "next/image";
 import { DevoteeCard } from "./DevoteeCard";
@@ -80,9 +79,6 @@ export default function DonationsDashboard() {
   const [donationsCount, setDonationsCount] = useState<number | null>(null);
   const [donations, setDonations] = useState<Donation[] | null>([]);
   const [totalRecords, setTotalRecords] = useState(0);
-  const [first, setFirst] = useState(0);
-  const [rows, setRows] = useState(10);
-  const [page, setPage] = useState(0);
 
   // Modal state for DevoteeCard
   const [selectedDevoteeId, setSelectedDevoteeId] = useState<number | null>(null);
