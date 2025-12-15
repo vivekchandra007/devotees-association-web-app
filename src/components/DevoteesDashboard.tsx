@@ -10,7 +10,6 @@ import { ProgressBar } from "primereact/progressbar";
 import React, { useEffect, useRef, useState } from "react";
 import { SYSTEM_ROLES } from "@/data/constants";
 import { Dialog } from "primereact/dialog";
-import { ConfirmDialog } from 'primereact/confirmdialog';
 import { FileUpload, FileUploadFilesEvent } from "primereact/fileupload";
 import * as XLSX from "xlsx";
 import { MessageSeverity } from "primereact/api";
