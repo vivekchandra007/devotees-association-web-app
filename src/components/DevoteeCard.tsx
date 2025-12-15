@@ -13,6 +13,7 @@ import { AutoComplete, AutoCompleteCompleteEvent } from "primereact/autocomplete
 import api from "@/lib/axios";
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
+import { ProgressSpinner } from 'primereact/progressspinner';
 
 interface DevoteeCardProps {
     devoteeId: number;
@@ -95,6 +96,7 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({
         const previousDevotee = { ...devotee };
 
         try {
+            setLoading(true);
             // Optimistic update
             const updatedDevotee = {
                 ...devotee,
@@ -118,6 +120,8 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({
             const errorMessage = e instanceof Error ? e.message : 'Failed to update role';
             toast.error(errorMessage);
             setDevotee(previousDevotee); // Revert
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -126,6 +130,7 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({
         const previousDevotee = { ...devotee };
 
         try {
+            setLoading(true);
             // Optimistic Update
             const updatedDevotee = {
                 ...devotee,
@@ -149,6 +154,8 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({
             const errorMessage = e instanceof Error ? e.message : 'Failed to update leader';
             toast.error(errorMessage);
             setDevotee(previousDevotee); // Revert
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -186,7 +193,14 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({
     };
 
     if (!devotee) {
-        return loading ? <div className="p-4 rounded-xl border border-gray-100 bg-white animate-pulse h-48"></div> : null;
+        return loading ?
+            <div className="p-4 rounded-xl border border-gray-100 bg-white animate-pulse h-48">
+                <div className="flex items-center justify-center h-full">
+                    <ProgressSpinner style={{ width: '50px', height: '50px' }} strokeWidth="8" fill="var(--surface-ground)" animationDuration=".5s" />
+                </div>
+            </div>
+            :
+            null;
     }
 
     const adminMenuItems: MenuItem[] = [];
@@ -300,6 +314,16 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({
         }
     }
 
+    if (loading) {
+        return (
+            <div className="p-4 rounded-xl border border-gray-100 bg-white animate-pulse h-48">
+                <div className="flex items-center justify-center h-full">
+                    <ProgressSpinner style={{ width: '50px', height: '50px' }} strokeWidth="8" fill="var(--surface-ground)" animationDuration=".5s" />
+                </div>
+            </div>
+        );
+    }
+
     return (
         <>
             <div className="bg-white rounded-xl shadow-sm hover:shadow-md transition-shadow duration-200 border border-gray-100 overflow-hidden relative">
@@ -321,7 +345,7 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({
                             />
                             <div>
                                 <div className="flex items-center gap-2">
-                                    <h3 className="capitalize text-lg font-bold text-gray-800 line-clamp-1" title={devotee.name || ''}>
+                                    <h3 className="capitalize text-lg font-bold text-gray-800" title={devotee.name || ''}>
                                         {devotee.name?.toLocaleLowerCase()}
                                     </h3>
                                     {devotee.status === 'active' && (
@@ -405,22 +429,6 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({
                 </div>
             </div>
 
-            {/* We can place ConfirmDialog here or expect parent to have it. 
-                But to be self-sufficient, putting it here is safer if multiple cards don't conflict.
-                However, multiple ConfirmDialogs in DOM can be an issue if they mount portals.
-                PrismaReact <ConfirmDialog /> attaches to window/document events. 
-                Ideally, there should be one global one. 
-                I'll assume the one in Dashboard/Page is enough, or if this is standalone, we might need one.
-                Since the Prompt asked for "self-sufficient", and we want it to work anywhere...
-                I will only embed logic to TRIGGER it. The <ConfirmDialog /> component in layout or page listens.
-                But if I use a raw usage somewhere else without <ConfirmDialog /> in tree, it won't work.
-                Safest: Place one if I can ensure it doesn't duplicate awkwardly. 
-                Actually, PrimeReact recommends one <ConfirmDialog> per application usually.
-                I will SKIP adding <ConfirmDialog /> JSX here and assume the app has provided it, 
-                OR add it but ensure it doesn't conflict. 
-                For now, I'll rely on global/page level presence to avoid 'multiple confirm dialogs found' errors.
-            */}
-
             {/* Leader Info Dialog */}
             <Dialog
                 header="Leader Information"
@@ -482,7 +490,7 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({
             >
                 <div className="flex flex-col gap-4">
                     <p className="text-sm text-gray-600">
-                        Search and select a leader to assign <strong>{devotee.name}</strong> to:
+                        Search and select a leader to assign <strong className="capitalize">{devotee.name?.toLocaleLowerCase()}</strong> to:
                     </p>
                     <div className="flex flex-col gap-2">
                         <AutoComplete
@@ -497,21 +505,21 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({
                                 <div className="flex items-center gap-2">
                                     <Avatar label={getInitials(item.name || '')} shape="circle" size="normal" />
                                     <div className="flex flex-col">
-                                        <span className="font-medium">{item.name}</span>
+                                        <span className="font-medium capitalize">{item.name?.toLocaleLowerCase()}</span>
                                         <span className="text-xs text-gray-500">{item.phone?.slice(2)}</span>
                                     </div>
                                 </div>
                             )}
                         />
                     </div>
-                    {selectedLeader && (
+                    {selectedLeader && selectedLeader?.name && selectedLeader.phone && (
                         <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
-                            <div className="text-xs text-blue-600 font-bold uppercase mb-1">Selected Leader</div>
+                            <div className="text-xs text-red-600 font-bold uppercase mb-1">Selected Leader</div>
                             <div className="flex items-center gap-2">
-                                <Avatar label={getInitials(selectedLeader.name || '')} shape="circle" className="bg-blue-200 text-blue-700" />
+                                <Avatar label={getInitials(selectedLeader.name || '')} shape="circle" className="bg-blue-200 text-red-700" />
                                 <div>
-                                    <div className="font-bold text-sm">{selectedLeader.name}</div>
-                                    <div className="text-xs text-gray-600">{selectedLeader.phone}</div>
+                                    <div className="font-bold text-sm capitalize">{selectedLeader.name.toLowerCase()}</div>
+                                    <div className="text-xs text-gray-600">{selectedLeader.phone?.slice(2)}</div>
                                 </div>
                             </div>
                         </div>

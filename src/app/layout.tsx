@@ -9,6 +9,7 @@ import { Suspense } from "react";
 import TopNavBar from "@/components/TopNavBar";
 import { ScrollTop } from "primereact/scrolltop";
 import { Toaster } from 'sonner';
+import { ConfirmDialog } from "primereact/confirmdialog";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -107,6 +108,7 @@ export default function RootLayout({
           priority
         />
         <Toaster position="bottom-center" />
+        <ConfirmDialog />
       </body>
     </html>
   );

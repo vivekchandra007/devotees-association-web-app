@@ -298,12 +298,12 @@ export default function DonationsDashboard() {
       rowData && rowData.phone_ref_value?.id ?
         <span
           onClick={() => openDevoteeModal(rowData.phone_ref_value!.id)}
-          className="text-hover underline cursor-pointer text-blue-600"
+          className="text-hover underline cursor-pointer text-blue-600 capitalize"
         >
-          {rowData.phone_ref_value?.name}
+          {rowData.phone_ref_value?.name?.toLocaleLowerCase()}
         </span>
         :
-        <span className="text-grey-400">{rowData.name || 'N/A'}</span>
+        <span className="text-grey-400 capitalize">{rowData.name?.toLocaleLowerCase() || 'N/A'}</span>
     );
   };
 
@@ -313,9 +313,9 @@ export default function DonationsDashboard() {
       leader && leader.id ?
         <span
           onClick={() => openDevoteeModal(leader.id)}
-          className="text-hover underline cursor-pointer text-blue-600"
+          className="text-hover underline cursor-pointer text-blue-600 capitalize"
         >
-          {leader.name}
+          {leader.name?.toLocaleLowerCase()}
         </span>
         :
         <span className="text-grey-400">N/A</span>
@@ -477,7 +477,7 @@ export default function DonationsDashboard() {
             }}
           />
           <label
-            htmlFor="search-input">Type and press enter or click 🔍
+            htmlFor="search-input">Search any donation... 🔍
           </label>
         </span>
         <Button

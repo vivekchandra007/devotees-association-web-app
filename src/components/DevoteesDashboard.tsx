@@ -385,7 +385,6 @@ export default function DevoteesDashboard() {
                 </div>
             }
             <OrganizationView refreshTrigger={refreshOrgView} />
-            <ConfirmDialog />
             <Toast ref={toast} position="bottom-center" />
         </div>
     )
