@@ -5,7 +5,6 @@ import { OrganizationChart } from 'primereact/organizationchart';
 import { TreeNode } from 'primereact/treenode';
 import api from '@/lib/axios';
 import { ProgressBar } from 'primereact/progressbar';
-import { useRouter } from 'next/navigation';
 import { Avatar } from 'primereact/avatar';
 import { Button } from 'primereact/button';
 import { Dialog } from 'primereact/dialog';
@@ -43,7 +42,6 @@ export default function OrganizationView({ refreshTrigger }: { refreshTrigger?: 
     const [loading, setLoading] = useState(true);
     const [showDevoteeModal, setShowDevoteeModal] = useState<boolean>(false);
     const [selectedDevoteeId, setSelectedDevoteeId] = useState<number | null>(null);
-    const router = useRouter();
 
     useEffect(() => {
         fetchData();
