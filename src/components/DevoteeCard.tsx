@@ -156,6 +156,7 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({
             } else {
                 throw new Error(res.data.error || "Failed to save note");
             }
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             console.error("Save note error", error);
             toast.error(error.response?.data?.error || 'Failed to save note');
