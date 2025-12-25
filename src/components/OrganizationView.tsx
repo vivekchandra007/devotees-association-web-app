@@ -8,6 +8,8 @@ import { ProgressBar } from 'primereact/progressbar';
 import { useRouter } from 'next/navigation';
 import { Avatar } from 'primereact/avatar';
 import { Button } from 'primereact/button';
+import { Dialog } from 'primereact/dialog';
+import { DevoteeCard } from './DevoteeCard';
 
 // Extend TreeNode to avoid strict type checking issues if standard type is missing properties
 interface CustomTreeNode extends TreeNode {
@@ -39,6 +41,8 @@ export default function OrganizationView({ refreshTrigger }: { refreshTrigger?: 
     // Store Leader Trees
     const [leaderTrees, setLeaderTrees] = useState<CustomTreeNode[][]>([]);
     const [loading, setLoading] = useState(true);
+    const [showDevoteeModal, setShowDevoteeModal] = useState<boolean>(false);
+    const [selectedDevoteeId, setSelectedDevoteeId] = useState<number | null>(null);
     const router = useRouter();
 
     useEffect(() => {
@@ -163,9 +167,14 @@ export default function OrganizationView({ refreshTrigger }: { refreshTrigger?: 
         return trees;
     };
 
+    const openDevoteeModal = (id: number) => {
+        setSelectedDevoteeId(id);
+        setShowDevoteeModal(true);
+    };
+
     const nodeTemplate = (node: CustomTreeNode) => {
         if (node.data.members || node.type === 'members_list') {
-            return <MembersListNode members={node.data.members} />;
+            return <MembersListNode members={node.data.members} onMemberClick={openDevoteeModal} />;
         }
 
         const d = node.data as OrgDevotee;
@@ -185,7 +194,7 @@ export default function OrganizationView({ refreshTrigger }: { refreshTrigger?: 
 
         return (
             <div className="flex flex-col w-48 bg-white rounded-xl shadow-md overflow-hidden transition-transform hover:-translate-y-1 hover:shadow-lg cursor-pointer border border-gray-100"
-                onClick={() => router.push(`/devotee?devoteeId=${d.id}`)}
+                onClick={() => openDevoteeModal(d.id)}
             >
                 <div className={`${headerColor} p-3 flex flex-col items-center justify-center text-white`}>
                     <Avatar
@@ -245,7 +254,7 @@ export default function OrganizationView({ refreshTrigger }: { refreshTrigger?: 
                             {admins.map(admin => (
                                 <div key={admin.id}
                                     className="flex flex-col w-48 bg-white rounded-xl shadow-md overflow-hidden transition-transform hover:-translate-y-1 hover:shadow-lg cursor-pointer border border-gray-100"
-                                    onClick={() => router.push(`/devotee?devoteeId=${admin.id}`)}
+                                    onClick={() => openDevoteeModal(admin.id)}
                                 >
                                     <div className="bg-red-600 p-3 flex flex-col items-center justify-center text-white">
                                         <Avatar
@@ -287,6 +296,21 @@ export default function OrganizationView({ refreshTrigger }: { refreshTrigger?: 
                 </div>
             </div>
 
+            {/* Devotee Card Modal */}
+            <Dialog
+                header="Devotee Details"
+                visible={showDevoteeModal}
+                onHide={() => setShowDevoteeModal(false)}
+                className="w-full max-w-lg"
+                contentClassName="p-0" // Remove padding to let card fit nicely
+            >
+                {selectedDevoteeId && (
+                    <div className="p-3">
+                        <DevoteeCard devoteeId={selectedDevoteeId} />
+                    </div>
+                )}
+            </Dialog>
+
             <style jsx global>{`
                 .p-organizationchart {
                     background: transparent;
@@ -322,9 +346,9 @@ export default function OrganizationView({ refreshTrigger }: { refreshTrigger?: 
 }
 
 // Separate component for Members List to handle internal state (collapse/expand)
-function MembersListNode({ members }: { members: OrgDevotee[] }) {
+function MembersListNode({ members, onMemberClick }: { members: OrgDevotee[], onMemberClick: (id: number) => void }) {
     const [collapsed, setCollapsed] = useState(true);
-    const router = useRouter();
+
 
     return (
         <div className="flex flex-col bg-white rounded-lg border border-gray-200 shadow-sm overflow-hidden min-w-[200px] transition-all">
@@ -345,10 +369,7 @@ function MembersListNode({ members }: { members: OrgDevotee[] }) {
                         <div
                             key={m.id}
                             className="flex items-center gap-2 p-2 hover:bg-gray-50 rounded cursor-pointer transition-colors border-b last:border-b-0 border-gray-100"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                router.push(`/devotee?devoteeId=${m.id}`);
-                            }}
+                            onClick={() => onMemberClick(m.id)}
                         >
                             <Avatar
                                 label={m.name?.charAt(0).toUpperCase()}
