@@ -2,7 +2,7 @@ import prisma from '@/lib/prisma';
 import { NextRequest, NextResponse } from 'next/server';
 import {
     GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY,
-    SPECIFIC_PRISMA_ACCELERATE_CACHE_STRATEGY_LONGER
+    NO_PRISMA_ACCELERATE_CACHE_STRATEGY
 } from "@/data/constants";
 import { verifyAccessToken } from "@/lib/auth";
 import { startOfMonth, startOfWeek, startOfYear } from "date-fns";
@@ -125,10 +125,10 @@ export async function POST(req: NextRequest) {
                         },
                     },
                     orderBy: { [sortField ?? 'date']: sortOrder === -1 ? 'desc' : 'asc' },
-                    // for ADMIN ( > 3), serve from a SHORTER cache coz they can modify donations data
+                    // for ADMIN ( > 3), do not serve from cache coz they can modify donations data
                     // for NON ADMIN ( <= 3), serve from a LONGER cache coz they themselves can't modify donations data
                     cacheStrategy: loggedIndevotee.system_role_id <= 3 ?
-                        SPECIFIC_PRISMA_ACCELERATE_CACHE_STRATEGY_LONGER : GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY
+                        GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY : NO_PRISMA_ACCELERATE_CACHE_STRATEGY
                 })
             ) :
             (
@@ -157,17 +157,17 @@ export async function POST(req: NextRequest) {
                     skip: first,
                     take: rows,
                     orderBy: { [sortField ?? 'date']: sortOrder === -1 ? 'desc' : 'asc' },
-                    // for ADMIN ( > 3), serve from a SHORTER cache coz they can modify donations data
+                    // for ADMIN ( > 3), do not serve from cache coz they can modify donations data
                     // for NON ADMIN ( <= 3), serve from a LONGER cache coz they themselves can't modify donations data
                     cacheStrategy: loggedIndevotee.system_role_id <= 3 ?
-                        SPECIFIC_PRISMA_ACCELERATE_CACHE_STRATEGY_LONGER : GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY
+                        GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY : NO_PRISMA_ACCELERATE_CACHE_STRATEGY
                 })),
         prisma.donations.count({
             where,
-            // for ADMIN ( > 3), serve from a SHORTER cache coz they can modify donations data
+            // for ADMIN ( > 3), do not serve from cache coz they can modify donations data
             // for NON ADMIN ( <= 3), serve from a LONGER cache coz they themselves can't modify donations data
             cacheStrategy: loggedIndevotee.system_role_id <= 3 ?
-                SPECIFIC_PRISMA_ACCELERATE_CACHE_STRATEGY_LONGER : GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY
+                GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY : NO_PRISMA_ACCELERATE_CACHE_STRATEGY
         }),
     ]);
 

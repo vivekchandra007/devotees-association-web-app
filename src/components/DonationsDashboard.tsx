@@ -7,11 +7,10 @@ import { DataTable, SortOrder } from 'primereact/datatable'
 import { Calendar } from 'primereact/calendar';
 import { Column } from 'primereact/column'
 import api from '@/lib/axios'
-import { Toast } from "primereact/toast";
 import { MessageSeverity } from "primereact/api";
 import { Prisma } from '@prisma/client';
 import _ from "lodash";
-import { formatDateIntoStringddmmyyyy } from '@/lib/conversions'
+import { formatDateIntoStringddmmyyyy, parseDateFromStringddmmyyyy } from '@/lib/conversions'
 import { ProgressBar } from 'primereact/progressbar'
 import { useAuth } from '@/hooks/useAuth'
 import { SYSTEM_ROLES } from '@/data/constants'
@@ -22,12 +21,16 @@ import { Dialog } from 'primereact/dialog'
 import { useSearchParams } from 'next/navigation'
 import jsPDF from "jspdf"
 import autoTable, { RowInput } from "jspdf-autotable";
+import { DataTableRowEditCompleteEvent } from 'primereact/datatable';
+import { Dropdown } from 'primereact/dropdown';
+import { InputNumber } from 'primereact/inputnumber';
 import { getCurrentDateDDMMYYYY } from "@/lib/utils";
 import { Nullable } from "primereact/ts-helpers";
 import { Slider, SliderChangeEvent } from "primereact/slider";
 import { Fieldset } from "primereact/fieldset";
 import Image from "next/image";
 import { DevoteeCard } from "./DevoteeCard";
+import { toast } from 'sonner'
 
 type Donation = Prisma.donationsGetPayload<{
   include: {
@@ -87,7 +90,6 @@ export default function DonationsDashboard() {
   const [customDateRange, setCustomDateRange] = useState<Nullable<(Date | null)[]>>(null);
   const [selectedAmountRange, setSelectedAmountRange] = useState<"all" | "5L" | "5L-1L" | "1K-10K" | "10K">("all");
   const [customAmountRange, setCustomAmountRange] = useState<[number, number] | number | undefined>(undefined);
-  const toast = useRef<Toast>(null);
   const msgs = useRef<Messages>(null);
 
   const [lazyParams, setLazyParams] = useState({
@@ -386,6 +388,107 @@ export default function DonationsDashboard() {
     }
   };
 
+  const onRowEditComplete = async (e: DataTableRowEditCompleteEvent) => {
+    const { newData, index } = e;
+
+    if (newData.name && newData.name.length > 100) {
+      toast.error('Name must be less than 100 characters');
+      return;
+    }
+    if (newData.phone && newData.phone.length !== 10) {
+      toast.error('Phone must be exactly 10 digits');
+      return;
+    }
+
+    try {
+      setInProgress(true);
+      let formattedDate = newData.date;
+      // If it's a Date object (from Calendar), convert to ISO string for Backend and consistency
+      if (newData.date instanceof Date) {
+        // Use local time but formatted as ISO or just standard ISO?
+        // If we use toISOString(), it converts to UTC.
+        // If user selected 25th Dec (Local), 25th Dec 00:00.
+        // toISOString might be 24th Dec 18:30 (if IST).
+        // Wait, Calendar returns Date object with Local time?
+        // Yes, usually.
+        // But backend expects what?
+        // Backend uses `new Date(str)`.
+        // If we send ISO, it parses as that absolute time.
+        formattedDate = newData.date.toISOString();
+      }
+
+      const payload = {
+        date: formattedDate,
+        amount: newData.amount,
+        name: newData.name,
+        phone: newData.phone,
+        payment_mode: newData.payment_mode,
+        internal_note: newData.internal_note
+      };
+
+      const res = await api.put(`/donations/${newData.id}`, payload);
+
+      if (res.data.success) {
+        const _donations = [...(donations || [])];
+        // merging to keep other fields
+        _donations[index] = { ..._donations[index], ...newData, date: formattedDate as any };
+        setDonations(_donations);
+        toast.success('Donation updated successfully');
+      } else {
+        throw new Error(res.data.error || "Update failed");
+      }
+
+    } catch (error: any) {
+      console.error("Update error", error);
+      toast.error(error.response?.data?.error || 'Failed to update donation');
+    } finally {
+      setInProgress(false);
+    }
+  };
+
+  const textEditor = (options: any) => {
+    return <InputText type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
+  };
+
+  const phoneEditor = (options: any) => {
+    return <InputText
+      keyfilter="int"
+      maxLength={10}
+      value={options.value}
+      onChange={(e) => options.editorCallback(e.target.value)}
+    />;
+  };
+
+  const amountEditor = (options: any) => {
+    return <InputNumber value={options.value} onValueChange={(e) => options.editorCallback(e.value)} mode="currency" currency="INR" locale="en-IN" />;
+  };
+
+  const paymentModeEditor = (options: any) => {
+    const paymentModes = [
+      { label: 'Cash', value: 'Cash' },
+      { label: 'Transfer', value: 'Transfer' },
+      { label: 'Cheque', value: 'Cheque' },
+      { label: 'Online', value: 'Online' },
+      { label: 'Card', value: 'Card' }
+    ];
+    return <Dropdown value={options.value} options={paymentModes} onChange={(e) => options.editorCallback(e.value)} placeholder="Select Payment Mode" />;
+  };
+
+  const dateEditor = (options: any) => {
+    let dateVal = options.value;
+    if (typeof dateVal === 'string') {
+      // Check if it's DD/MM/YYYY (contains slashes)
+      if (dateVal.includes('/')) {
+        dateVal = parseDateFromStringddmmyyyy(dateVal);
+      } else {
+        // Assume ISO string
+        dateVal = new Date(dateVal);
+      }
+    }
+    return <Calendar value={dateVal} onChange={(e) => options.editorCallback(e.value)} dateFormat="dd-mm-yy" showIcon />;
+  };
+
+
   return (
     <div className="p-2 min-h-screen max-w-screen">
       <strong className="text-general">Donations Dashboard</strong>
@@ -616,9 +719,11 @@ export default function DonationsDashboard() {
       <Messages ref={msgs} />
       {
         donations && Array.isArray(donations) && donations.length > 0 &&
-        <div className="card overflow-x-auto max-w-[90vw] mt-4">
+        <div className="card overflow-x-auto mt-4">
           <DataTable
             value={donations}
+            editMode="row"
+            onRowEditComplete={onRowEditComplete}
             lazy
             paginator
             totalRecords={totalRecords}
@@ -639,14 +744,18 @@ export default function DonationsDashboard() {
             size="small"
             sortField={lazyParams.sortField} sortOrder={lazyParams.sortOrder as SortOrder}
           >
-            <Column field="date" header="Date" body={dateFormatted} sortable />
-            <Column field="amount" header="Amount" body={amountFormatted} sortable />
-            <Column field="name" header="Donor Name" body={nameWithLink} sortable />
-            <Column field="phone" header="Phone No." body={phoneFormatted} sortable />
+            <Column field="date" header="Date" body={dateFormatted} editor={(options) => dateEditor(options)} sortable />
+            <Column field="amount" header="Amount" body={amountFormatted} editor={(options) => amountEditor(options)} sortable />
+            <Column field="name" header="Donor Name" body={nameWithLink} editor={(options) => textEditor(options)} sortable />
+            <Column field="phone" header="Phone No." body={phoneFormatted} editor={(options) => phoneEditor(options)} sortable />
             <Column field="leader" header="Leader" body={leaderNameWithLink} />
             <Column field="donation_receipt_number" header="Receipt" sortable />
-            <Column field="payment_mode" header="Payment Mode" sortable />
+            <Column field="payment_mode" header="Payment Mode" editor={(options) => paymentModeEditor(options)} sortable />
             <Column field="internal_note" header="Note" sortable />
+            {
+              systemRole === SYSTEM_ROLES.admin &&
+              <Column rowEditor headerStyle={{ width: '10%', minWidth: '8rem' }} bodyStyle={{ textAlign: 'center' }}></Column>
+            }
           </DataTable>
           <hr />
           <small className="text-general">
@@ -688,7 +797,6 @@ export default function DonationsDashboard() {
           </Button>
         </div>
       }
-      <Toast ref={toast} position="bottom-center" />
     </div>
   )
 }

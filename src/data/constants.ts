@@ -16,7 +16,7 @@ export const GLOBAL_PRISMA_ACCELERATE_CACHE_STRATEGY = {
 }
 
 export const SPECIFIC_PRISMA_ACCELERATE_CACHE_STRATEGY_LONGER = {
-    ttl: 60 * 60 * 24, // cache for 24 hours minutes
+    ttl: 60 * 60 * 24, // cache for 24 hours
     swr: 60 * 60 * 30 // stale-while-revalidate for 30 hours
 }
 
