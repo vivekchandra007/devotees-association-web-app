@@ -5,7 +5,7 @@ import * as XLSX from 'xlsx'
 import { FileUpload, FileUploadFilesEvent } from 'primereact/fileupload'
 import { DataTable, SortOrder } from 'primereact/datatable'
 import { Calendar } from 'primereact/calendar';
-import { Column } from 'primereact/column'
+import { Column, ColumnEditorOptions } from 'primereact/column'
 import api from '@/lib/axios'
 import { MessageSeverity } from "primereact/api";
 import { Prisma } from '@prisma/client';
@@ -431,6 +431,7 @@ export default function DonationsDashboard() {
       if (res.data.success) {
         const _donations = [...(donations || [])];
         // merging to keep other fields
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         _donations[index] = { ..._donations[index], ...newData, date: formattedDate as any };
         setDonations(_donations);
         toast.success('Donation updated successfully');
@@ -438,6 +439,7 @@ export default function DonationsDashboard() {
         throw new Error(res.data.error || "Update failed");
       }
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       console.error("Update error", error);
       toast.error(error.response?.data?.error || 'Failed to update donation');
@@ -446,24 +448,24 @@ export default function DonationsDashboard() {
     }
   };
 
-  const textEditor = (options: any) => {
-    return <InputText type="text" value={options.value} onChange={(e) => options.editorCallback(e.target.value)} />;
+  const textEditor = (options: ColumnEditorOptions) => {
+    return <InputText type="text" value={options.value} onChange={(e) => options.editorCallback?.(e.target.value)} />;
   };
 
-  const phoneEditor = (options: any) => {
+  const phoneEditor = (options: ColumnEditorOptions) => {
     return <InputText
       keyfilter="int"
       maxLength={10}
       value={options.value}
-      onChange={(e) => options.editorCallback(e.target.value)}
+      onChange={(e) => options.editorCallback?.(e.target.value)}
     />;
   };
 
-  const amountEditor = (options: any) => {
-    return <InputNumber value={options.value} onValueChange={(e) => options.editorCallback(e.value)} mode="currency" currency="INR" locale="en-IN" />;
+  const amountEditor = (options: ColumnEditorOptions) => {
+    return <InputNumber value={options.value} onValueChange={(e) => options.editorCallback?.(e.value)} mode="currency" currency="INR" locale="en-IN" />;
   };
 
-  const paymentModeEditor = (options: any) => {
+  const paymentModeEditor = (options: ColumnEditorOptions) => {
     const paymentModes = [
       { label: 'Cash', value: 'Cash' },
       { label: 'Transfer', value: 'Transfer' },
@@ -471,10 +473,10 @@ export default function DonationsDashboard() {
       { label: 'Online', value: 'Online' },
       { label: 'Card', value: 'Card' }
     ];
-    return <Dropdown value={options.value} options={paymentModes} onChange={(e) => options.editorCallback(e.value)} placeholder="Select Payment Mode" />;
+    return <Dropdown value={options.value} options={paymentModes} onChange={(e) => options.editorCallback?.(e.value)} placeholder="Select Payment Mode" />;
   };
 
-  const dateEditor = (options: any) => {
+  const dateEditor = (options: ColumnEditorOptions) => {
     let dateVal = options.value;
     if (typeof dateVal === 'string') {
       // Check if it's DD/MM/YYYY (contains slashes)
@@ -485,7 +487,7 @@ export default function DonationsDashboard() {
         dateVal = new Date(dateVal);
       }
     }
-    return <Calendar value={dateVal} onChange={(e) => options.editorCallback(e.value)} dateFormat="dd-mm-yy" showIcon />;
+    return <Calendar value={dateVal} onChange={(e) => options.editorCallback?.(e.value)} dateFormat="dd-mm-yy" showIcon />;
   };
 
 

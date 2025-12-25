@@ -14,7 +14,7 @@ const updateDonationSchema = z.object({
     internal_note: z.string().optional(),
 });
 
-export async function PUT(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
     const token = req.headers.get('authorization')?.replace('Bearer ', '');
     if (!token) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -38,7 +38,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
         return NextResponse.json({ error: 'Forbidden: Admin access required' }, { status: 403 });
     }
 
-    const { id } = params;
+    const { id } = await params;
     const donationId = parseInt(id, 10);
 
     if (isNaN(donationId)) {
@@ -54,7 +54,16 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
         }
 
         const data = validation.data;
-        const updateData: any = {
+        const updateData: {
+            updated_by: number;
+            updated_at: Date;
+            name?: string;
+            amount?: number;
+            payment_mode?: string;
+            internal_note?: string;
+            phone?: string;
+            date?: Date | null;
+        } = {
             updated_by: devoteeId,
             updated_at: new Date(),
         };
