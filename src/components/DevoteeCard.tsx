@@ -355,11 +355,14 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({
         }
     }
 
-    adminMenuItems.push({
-        label: 'Add/ View Note',
-        icon: 'pi pi-book',
-        command: () => setShowNotesDialog(true)
-    });
+    // logged in user can't view/ add notes for himself
+    if (devotee.id !== currentDevoteeId) {
+        adminMenuItems.push({
+            label: 'Add/ View Note',
+            icon: 'pi pi-book',
+            command: () => setShowNotesDialog(true)
+        });
+    }
 
     if (loading) {
         return (
