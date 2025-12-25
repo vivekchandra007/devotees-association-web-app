@@ -14,7 +14,8 @@ import api from "@/lib/axios";
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { ProgressSpinner } from 'primereact/progressspinner';
-
+import { InputTextarea } from 'primereact/inputtextarea';
+import { formatDateTimeIntoReadableString } from '@/lib/conversions';
 interface DevoteeCardProps {
     devoteeId: number;
     initialData?: Devotee;
@@ -47,6 +48,8 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({
     const [showAssignLeaderDialog, setShowAssignLeaderDialog] = useState(false);
     const [leaderSuggestions, setLeaderSuggestions] = useState<Devotee[]>([]);
     const [selectedLeader, setSelectedLeader] = useState<Devotee | null>(null);
+    const [showNotesDialog, setShowNotesDialog] = useState(false);
+    const [noteInput, setNoteInput] = useState<string>('');
 
     useEffect(() => {
         const fetchDevoteeData = async () => {
@@ -120,6 +123,43 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({
             const errorMessage = e instanceof Error ? e.message : 'Failed to update role';
             toast.error(errorMessage);
             setDevotee(previousDevotee); // Revert
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSaveNote = async () => {
+        if (!devotee || !noteInput.trim()) return;
+
+        setLoading(true);
+        const previousDevotee = { ...devotee };
+        try {
+            const separator = '\n\n--------------------------------------------------\n\n';
+            const newNoteMetadata = `\n-- by ${loggedInDevotee?.name} (${loggedInDevotee?.phone?.slice(-10)}) on ${formatDateTimeIntoReadableString(new Date())}`;
+            const newNoteContent = `${noteInput.trim()}${newNoteMetadata}`;
+
+            const existingNotes = devotee.internal_note || '';
+            const updatedNotes = existingNotes ? `${existingNotes}${separator}${newNoteContent}` : newNoteContent;
+
+            // Optimistic update
+            const updatedDevotee = { ...devotee, internal_note: updatedNotes };
+            setDevotee(updatedDevotee);
+
+            const res = await api.put(`/devotees/${devotee.id}/notes`, {
+                internal_note: updatedNotes
+            });
+
+            if (res.status === 200 && res.data.success) {
+                toast.success('Note added successfully');
+                setNoteInput('');
+                if (onDataChange) onDataChange(updatedDevotee);
+            } else {
+                throw new Error(res.data.error || "Failed to save note");
+            }
+        } catch (error: any) {
+            console.error("Save note error", error);
+            toast.error(error.response?.data?.error || 'Failed to save note');
+            setDevotee(previousDevotee);
         } finally {
             setLoading(false);
         }
@@ -313,6 +353,12 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({
             });
         }
     }
+
+    adminMenuItems.push({
+        label: 'Add/ View Note',
+        icon: 'pi pi-book',
+        command: () => setShowNotesDialog(true)
+    });
 
     if (loading) {
         return (
@@ -524,6 +570,46 @@ export const DevoteeCard: React.FC<DevoteeCardProps> = ({
                             </div>
                         </div>
                     )}
+                </div>
+            </Dialog>
+
+            {/* Notes Dialog */}
+            <Dialog
+                header={`Notes for ${devotee.name}`}
+                visible={showNotesDialog}
+                onHide={() => setShowNotesDialog(false)}
+                className="w-full max-w-lg"
+            >
+                <div className="flex flex-col gap-4">
+                    <div className="bg-gray-50 p-4 rounded-md text-sm max-h-[300px] overflow-y-auto scrollbar whitespace-pre-wrap">
+                        {devotee.internal_note ?
+                            devotee.internal_note
+                            : <span className="text-gray-400 italic">No notes added yet.</span>
+                        }
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                        <label htmlFor="note-input" className="font-semibold text-sm">Add New Note</label>
+                        <InputTextarea
+                            id="note-input"
+                            value={noteInput}
+                            onChange={(e) => setNoteInput(e.target.value)}
+                            rows={3}
+                            placeholder="Type your note here..."
+                            autoResize
+                            className="w-full"
+                        />
+                        <div className="flex justify-end">
+                            <Button
+                                label="Save Note"
+                                icon="pi pi-check"
+                                size="small"
+                                onClick={handleSaveNote}
+                                disabled={!noteInput.trim()}
+                                loading={loading}
+                            />
+                        </div>
+                    </div>
                 </div>
             </Dialog>
         </>
