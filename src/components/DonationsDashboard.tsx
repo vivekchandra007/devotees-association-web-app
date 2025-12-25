@@ -10,12 +10,13 @@ import api from '@/lib/axios'
 import { MessageSeverity } from "primereact/api";
 import { Prisma } from '@prisma/client';
 import _ from "lodash";
-import { formatDateIntoStringddmmyyyy, parseDateFromStringddmmyyyy } from '@/lib/conversions'
+import { formatDateIntoStringddmmyyyy, parseDateFromStringddmmyyyy, formatDateTimeIntoReadableString } from '@/lib/conversions'
 import { ProgressBar } from 'primereact/progressbar'
 import { useAuth } from '@/hooks/useAuth'
 import { SYSTEM_ROLES } from '@/data/constants'
 import { Button } from 'primereact/button'
 import { InputText } from 'primereact/inputtext'
+import { InputTextarea } from 'primereact/inputtextarea';
 import { Messages } from 'primereact/messages'
 import { Dialog } from 'primereact/dialog'
 import { useSearchParams } from 'next/navigation'
@@ -90,6 +91,9 @@ export default function DonationsDashboard() {
   const [customDateRange, setCustomDateRange] = useState<Nullable<(Date | null)[]>>(null);
   const [selectedAmountRange, setSelectedAmountRange] = useState<"all" | "5L" | "5L-1L" | "1K-10K" | "10K">("all");
   const [customAmountRange, setCustomAmountRange] = useState<[number, number] | number | undefined>(undefined);
+  const [showNotesDialog, setShowNotesDialog] = useState<boolean>(false);
+  const [currentDonationForNotes, setCurrentDonationForNotes] = useState<Donation | null>(null);
+  const [noteInput, setNoteInput] = useState<string>('');
   const msgs = useRef<Messages>(null);
 
   const [lazyParams, setLazyParams] = useState({
@@ -490,6 +494,92 @@ export default function DonationsDashboard() {
     return <Calendar value={dateVal} onChange={(e) => options.editorCallback?.(e.value)} dateFormat="dd-mm-yy" showIcon />;
   };
 
+  const handleSaveNote = async () => {
+    if (!currentDonationForNotes || !noteInput.trim()) return;
+
+    setInProgress(true);
+    try {
+      const separator = '\n\n--------------------------------------------------\n\n';
+      const newNoteMetadata = `\n-- by ${devotee?.name} (${devotee?.phone?.slice(-10)}) on ${formatDateTimeIntoReadableString(new Date())}`;
+      const newNoteContent = `${noteInput.trim()}${newNoteMetadata}`;
+
+      const existingNotes = currentDonationForNotes.internal_note || '';
+      const updatedNotes = existingNotes ? `${existingNotes}${separator}${newNoteContent}` : newNoteContent;
+
+      const res = await api.put(`/donations/${currentDonationForNotes.id}`, {
+        internal_note: updatedNotes
+      });
+
+      if (res.data.success) {
+        // Update local state
+        if (donations) {
+          const index = donations.findIndex(d => d.id === currentDonationForNotes.id);
+          if (index !== -1) {
+            const _donations = [...donations];
+            _donations[index] = { ..._donations[index], internal_note: updatedNotes };
+            setDonations(_donations);
+          }
+        }
+
+        setCurrentDonationForNotes({ ...currentDonationForNotes, internal_note: updatedNotes });
+        setNoteInput('');
+        toast.success('Note added successfully');
+      } else {
+        throw new Error(res.data.error || "Failed to save note");
+      }
+    } catch (error: any) {
+      console.error("Save note error", error);
+      toast.error(error.response?.data?.error || 'Failed to save note');
+    } finally {
+      setInProgress(false);
+      // Don't close dialog so user can see it added? Or close it? User might want to see it.
+      // Let's keep it open.
+    }
+  };
+
+  const notesBody = (rowData: Donation) => {
+    const notes = rowData.internal_note;
+    const notesCount = notes ? notes.split('--------------------------------------------------').length : 0;
+
+    return (
+      <div className="flex items-center gap-2">
+        {
+          notes ?
+            <Button
+              icon="pi pi-comments"
+              rounded
+              text
+              severity="info"
+              tooltip="View/ Add Notes"
+              onClick={() => {
+                setCurrentDonationForNotes(rowData);
+                setNoteInput('');
+                setShowNotesDialog(true);
+              }}
+            >
+              <span className="ml-1 text-xs font-bold">{notesCount}</span>
+            </Button>
+            :
+            <Button
+              icon="pi pi-plus-circle"
+              rounded
+              text
+              severity="warning"
+              tooltip="View/ Add Notes"
+              onClick={() => {
+                setCurrentDonationForNotes(rowData);
+                setNoteInput('');
+                setShowNotesDialog(true);
+              }}
+            >
+              <span className="ml-1 text-xs font-bold">Add Note</span>
+            </Button>
+        }
+      </div>
+    );
+  };
+
+
 
   return (
     <div className="p-2 min-h-screen max-w-screen">
@@ -621,6 +711,46 @@ export default function DonationsDashboard() {
           </div>
         )}
       </Dialog>
+      {/* Notes Dialog */}
+      <Dialog
+        header={`Donation Notes (Receipt: ${currentDonationForNotes?.donation_receipt_number || 'N/A'})`}
+        visible={showNotesDialog}
+        onHide={() => setShowNotesDialog(false)}
+        className="w-full max-w-2xl"
+      >
+        <div className="flex flex-col gap-4">
+          <div className="bg-gray-50 p-4 rounded-md text-sm max-h-[300px] overflow-y-auto scrollbar whitespace-pre-wrap">
+            {currentDonationForNotes?.internal_note ?
+              currentDonationForNotes.internal_note
+              : <span className="text-gray-400 italic">No notes added yet.</span>
+            }
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label htmlFor="note-input" className="font-semibold text-sm">Add New Note</label>
+            <InputTextarea
+              id="note-input"
+              value={noteInput}
+              onChange={(e) => setNoteInput(e.target.value)}
+              rows={3}
+              placeholder="Type your note here..."
+              autoResize
+              className="w-full"
+            />
+            <div className="flex justify-end">
+              <Button
+                label="Save Note"
+                icon="pi pi-check"
+                size="small"
+                onClick={handleSaveNote}
+                disabled={!noteInput.trim()}
+                loading={inProgress}
+              />
+            </div>
+          </div>
+        </div>
+      </Dialog>
+
       <Fieldset className="my-4"
         legend={
           <span className="capitalize">
@@ -753,7 +883,7 @@ export default function DonationsDashboard() {
             <Column field="leader" header="Leader" body={leaderNameWithLink} />
             <Column field="donation_receipt_number" header="Receipt" sortable />
             <Column field="payment_mode" header="Payment Mode" editor={(options) => paymentModeEditor(options)} sortable />
-            <Column field="internal_note" header="Note" sortable />
+            <Column body={notesBody} />
             {
               systemRole === SYSTEM_ROLES.admin &&
               <Column rowEditor headerStyle={{ width: '10%', minWidth: '8rem' }} bodyStyle={{ textAlign: 'center' }}></Column>
